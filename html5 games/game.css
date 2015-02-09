@@ -1,0 +1,14 @@
+body {
+	background:#303030;
+}
+
+#canvasBg  {
+	display:block;
+	background:#ffffff;
+	margin:auto;
+}
+
+#canvasCard  {
+	display:block;
+	margin:-560px auto;
+}
