@@ -271,12 +271,6 @@ function SoundBg(){
 	MainTheme.play();
 }
 
-function clearCtxBg(){
-		ctxBg.clearRect(0,0,gameWidth,gameHeight);
-	}
-	
-}
-
 function setPlayerHand() {
 		// card 4 at bottom of pile, card 0 at top
 		// future: cards[0].position = playerHand[0];
