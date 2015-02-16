@@ -269,10 +269,12 @@ function SoundBg(){
 		}, false);
 	}
 	MainTheme.play();
+}
 
-	function clearCtxBg(){
+function clearCtxBg(){
 		ctxBg.clearRect(0,0,gameWidth,gameHeight);
 	}
+<<<<<<< HEAD
 }
 
 function setPlayerHand() {
@@ -478,6 +480,8 @@ function clearCtxFinger() {
 	ctxFinger.clearRect(0,0,gameWidth,gameHeight);
 }
 
+=======
+>>>>>>> origin/master
 // end of main functions
 
 
