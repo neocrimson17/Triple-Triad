@@ -4,40 +4,42 @@ var ctxBg = canvasBg.getContext('2d');
 // I don't know how to make these variables work in an array.
 // Will change them to an array once I figure it out.
 
-var card0 = document.getElementById('card0');
-var ctxCard0 = card0.getContext('2d');
+var playerCard0 = document.getElementById('playerCard0');
+var ctxPlayerCard0 = playerCard0.getContext('2d');
 
-var card1 = document.getElementById('card1');
-var ctxCard1 = card1.getContext('2d');
+var playerCard1 = document.getElementById('playerCard1');
+var ctxPlayerCard1 = playerCard1.getContext('2d');
 
-var card2 = document.getElementById('card2');
-var ctxCard2 = card2.getContext('2d');
+var playerCard2 = document.getElementById('playerCard2');
+var ctxPlayerCard2 = playerCard2.getContext('2d');
 
-var card3 = document.getElementById('card3');
-var ctxCard3 = card3.getContext('2d');
+var playerCard3 = document.getElementById('playerCard3');
+var ctxPlayerCard3 = playerCard3.getContext('2d');
 
-var card4 = document.getElementById('card4');
-var ctxCard4 = card4.getContext('2d');
+var playerCard4 = document.getElementById('playerCard4');
+var ctxPlayerCard4 = playerCard4.getContext('2d');
 
-var card5 = document.getElementById('card5');
-var ctxCard5 = card5.getContext('2d');
+var enemyCard0 = document.getElementById('enemyCard0');
+var ctxEnemyCard0 = enemyCard0.getContext('2d');
 
-var card6 = document.getElementById('card6');
-var ctxCard6 = card6.getContext('2d');
+var enemyCard1 = document.getElementById('enemyCard1');
+var ctxEnemyCard1 = enemyCard1.getContext('2d');
 
-var card7 = document.getElementById('card7');
-var ctxCard7 = card7.getContext('2d');
+var enemyCard2 = document.getElementById('enemyCard2');
+var ctxEnemyCard2 = enemyCard2.getContext('2d');
 
-var card8 = document.getElementById('card8');
-var ctxCard8 = card8.getContext('2d');
+var enemyCard3 = document.getElementById('enemyCard3');
+var ctxEnemyCard3 = enemyCard3.getContext('2d');
 
-var card9 = document.getElementById('card9');
-var ctxCard9 = card9.getContext('2d');
+var enemyCard4 = document.getElementById('enemyCard4');
+var ctxEnemyCard4 = enemyCard4.getContext('2d');
 
 var canvasFinger = document.getElementById('canvasFinger');
 var ctxFinger = canvasFinger.getContext('2d');
 
-var cards = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
+// Hand arrays
+var playerCards = ["0", "1", "2", "3", "4"];
+var enemyCards = ["0", "1", "2", "3", "4"];
 
 var gameWidth = canvasBg.width;
 var gameHeight = canvasBg.height;
@@ -101,36 +103,24 @@ imgBg.src = 'images/board.png';
 
 var cardSheet = new Image();
 cardSheet.src = 'images/cards.png';
-//imgBg.addEventListener('load',drawBg,false);
 
-var cardImg = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"];
-cardImg[0] = new Image();
-cardImg[1] = new Image();
-cardImg[2] = new Image();
-cardImg[3] = new Image();
-cardImg[4] = new Image();
-cardImg[5] = new Image();
-cardImg[6] = new Image();
-cardImg[7] = new Image();
-cardImg[8] = new Image();
-cardImg[9] = new Image();
+var playerCardImg = ["0", "1", "2", "3", "4"];
+playerCardImg[0] = new Image();
+playerCardImg[1] = new Image();
+playerCardImg[2] = new Image();
+playerCardImg[3] = new Image();
+playerCardImg[4] = new Image();
+
+var enemyCardImg = ["0", "1", "2", "3", "4"];
+enemyCardImg[0] = new Image();
+enemyCardImg[1] = new Image();
+enemyCardImg[2] = new Image();
+enemyCardImg[3] = new Image();
+enemyCardImg[4] = new Image();
 
 fingerImg = new Image();
 
-//var imgCard = new Image();
-//imgCard.src = 'images/card2.png';
-//imgCard.addEventListener('load',drawCard,false);
-
-// filepath of cardBack
-var cardBack = 'images/cardBack.png';
-
-// sprite sheet test
-//19, 2
-//var imgCard = new Image();
-//imgCard.src = 'images/cards.png';
-//imgCard.addEventListener('load',drawCard,false);
-
-
+// Load background
 imgBg.addEventListener('load',init,false);
 
 
@@ -143,76 +133,48 @@ function init(){
 	drawBg();
 	startDrawing();
 	
-	cards[0] = new Card();
-	cardImg[0].src = cards[0].cardFilepath;
-	cards[0].index = 0;
-	cards[0].randomize();
+	playerCards[0] = new Card();
+	playerCards[0].index = 0;
+	playerCards[0].randomize();
 	
-	cards[1] = new Card();
-	cardImg[1].src = cards[1].cardFilepath;
-	cards[1].index = 1;
-	cards[1].randomize();
+	playerCards[1] = new Card();
+	playerCards[1].index = 1;
+	playerCards[1].randomize();
 	
-	cards[2] = new Card();
-	cardImg[2].src = cards[2].cardFilepath;
-	cards[2].index = 2;
-	cards[2].randomize();
+	playerCards[2] = new Card();
+	playerCards[2].index = 2;
+	playerCards[2].randomize();
 	
-	cards[3] = new Card();
-	cardImg[3].src = cards[3].cardFilepath;
-	cards[3].index = 3;
-	cards[3].randomize();
+	playerCards[3] = new Card();
+	playerCards[3].index = 3;
+	playerCards[3].randomize();
 	
-	cards[4] = new Card();
-	cardImg[4].src = cards[4].cardFilepath;
-	cards[4].index = 4;
-	cards[4].randomize();
+	playerCards[4] = new Card();
+	playerCards[4].index = 4;
+	playerCards[4].randomize();
 	
-	cards[5] = new Card();
-	cardImg[5].src = cards[5].cardFilepath;
-	cards[5].index = 5;
-	cards[5].randomize();
+	enemyCards[0] = new Card();
+	enemyCards[0].index = 5;
+	enemyCards[0].randomize();
 	
-	cards[6] = new Card();
-	cardImg[6].src = cards[6].cardFilepath;
-	cards[6].index = 6;
-	cards[6].randomize();
+	enemyCards[1] = new Card();
+	enemyCards[1].index = 6;
+	enemyCards[1].randomize();
 	
-	cards[7] = new Card();
-	cardImg[7].src = cards[7].cardFilepath;
-	cards[7].index = 7;
-	cards[7].randomize();
+	enemyCards[2] = new Card();
+	enemyCards[2].index = 7;
+	enemyCards[2].randomize();
 	
-	cards[8] = new Card();
-	cardImg[8].src = cards[8].cardFilepath;
-	cards[8].index = 8;
-	cards[8].randomize();
+	enemyCards[3] = new Card();
+	enemyCards[3].index = 8;
+	enemyCards[3].randomize();
 	
-	cards[9] = new Card();
-	cardImg[9].src = cards[9].cardFilepath;
-	cards[9].index = 9;
-	cards[9].randomize();
+	enemyCards[4] = new Card();
+	enemyCards[4].index = 9;
+	enemyCards[4].randomize();
 	
 	finger1 = new Finger();
 	fingerImg.src = 'images/finger.png';
-	
-	// temporary placement for testing, replace with 'initialize hands' function or similar
-	
-	/*cards[1].drawX = (74 * 2);
-	cards[2].drawX = (74 * 4);
-	cards[3].drawX = (74 * 6);
-	cards[4].drawX = (74 * 8);
-	
-	cards[5].drawY = 200;
-	cards[6].drawY = 200;
-	cards[7].drawY = 200;
-	cards[8].drawY = 200;
-	cards[9].drawY = 200;
-	
-	cards[6].drawX = (74 * 2);
-	cards[7].drawX = (74 * 4);
-	cards[8].drawX = (74 * 6);
-	cards[9].drawX = (74 * 8);*/
 	
 	setPlayerHand();
 	setEnemyHand();
@@ -222,8 +184,11 @@ function init(){
 }
 
 function draw() {
-	for (i = 0; i < cards.length; i++) {
-		cards[i].draw();
+	for (i = 0; i < playerCards.length; i++) {
+		playerCards[i].draw();
+	}
+	for (i = 0; i < enemyCards.length; i++) {
+		enemyCards[i].draw();
 	}
 	finger1.draw();
 	checkKeys();
@@ -275,63 +240,40 @@ function setPlayerHand() {
 		// card 4 at bottom of pile, card 0 at top
 		// future: cards[0].position = playerHand[0];
 		
-		cards[0].drawX = col4 * widthScale;
-		cards[1].drawX = col4 * widthScale;
-		cards[2].drawX = col4 * widthScale;
-		cards[3].drawX = col4 * widthScale;
-		cards[4].drawX = col4 * widthScale;
+		playerCards[0].drawX = col4 * widthScale;
+		playerCards[1].drawX = col4 * widthScale;
+		playerCards[2].drawX = col4 * widthScale;
+		playerCards[3].drawX = col4 * widthScale;
+		playerCards[4].drawX = col4 * widthScale;
 		
-		cards[0].drawY = row0 * heightScale;
-		cards[1].drawY = row1 * heightScale;
-		cards[2].drawY = row2 * heightScale;
-		cards[3].drawY = row3 * heightScale;
-		cards[4].drawY = row4 * heightScale;
+		playerCards[0].drawY = row0 * heightScale;
+		playerCards[1].drawY = row1 * heightScale;
+		playerCards[2].drawY = row2 * heightScale;
+		playerCards[3].drawY = row3 * heightScale;
+		playerCards[4].drawY = row4 * heightScale;
 }
 
 function setEnemyHand() {
 		// card 9 at bottom of pile, card 5 at top
 		// future: cards[5].position = enemyHand[0];
 		
-		cards[5].drawX = col0 * widthScale;
-		cards[6].drawX = col0 * widthScale;
-		cards[7].drawX = col0 * widthScale;
-		cards[8].drawX = col0 * widthScale;
-		cards[9].drawX = col0 * widthScale;
+		enemyCards[0].drawX = col0 * widthScale;
+		enemyCards[1].drawX = col0 * widthScale;
+		enemyCards[2].drawX = col0 * widthScale;
+		enemyCards[3].drawX = col0 * widthScale;
+		enemyCards[4].drawX = col0 * widthScale;
 		
-		cards[5].drawY = row0 * heightScale;
-		cards[6].drawY = row1 * heightScale;
-		cards[7].drawY = row2 * heightScale;
-		cards[8].drawY = row3 * heightScale;
-		cards[9].drawY = row4 * heightScale;
-}
-
-function setupBoard() {
-	
-		// board placement test	
-		
-		cards[0].drawX = col1 * widthScale;
-		cards[1].drawX = col2 * widthScale;
-		cards[2].drawX = col3 * widthScale;
-		cards[3].drawX = col1 * widthScale;
-		cards[4].drawX = col2 * widthScale;
-		cards[5].drawX = col3 * widthScale;
-		cards[6].drawX = col1 * widthScale;
-		cards[7].drawX = col2 * widthScale;
-		cards[8].drawX = col3 * widthScale;
-		
-		cards[0].drawY = row0 * heightScale;
-		cards[1].drawY = row0 * heightScale;
-		cards[2].drawY = row0 * heightScale;
-		cards[3].drawY = row2 * heightScale;
-		cards[4].drawY = row2 * heightScale;
-		cards[5].drawY = row2 * heightScale;
-		cards[6].drawY = row4 * heightScale;
-		cards[7].drawY = row4 * heightScale;
-		cards[8].drawY = row4 * heightScale;
+		enemyCards[0].drawY = row0 * heightScale;
+		enemyCards[1].drawY = row1 * heightScale;
+		enemyCards[2].drawY = row2 * heightScale;
+		enemyCards[3].drawY = row3 * heightScale;
+		enemyCards[4].drawY = row4 * heightScale;
 }
 
 function placeOnBoard(card) { //(card, location) {
-	var location = card; //just for testing, card 0 on place 0, 1 on 1, etc.
+	// not used yet
+	/*
+	//var location = 
 	
 	// if card not already placed on board & board location isn't taken
 	if (cards[card].onBoard == false) {
@@ -343,7 +285,7 @@ function placeOnBoard(card) { //(card, location) {
 		
 		
 		
-	}
+	}*/
 }
 
 function Finger() {
@@ -354,6 +296,7 @@ function Finger() {
 	this.width = 32;
 	this.height = 32;
 	this.selected = 0; // card selected
+	this.player = true; // boolean for either player or enemy
 }
 
 Finger.prototype.highlight = function(card) {
@@ -362,40 +305,58 @@ Finger.prototype.highlight = function(card) {
 	var enemyCol =  (24 - 32) * widthScale;
 	
 	//only fix previous card's position if not placed on board
-	if (cards[this.selected].onBoard == false) {
+	
+	if (this.player == true) {
+		// player card
+		if (playerCards[this.selected].onBoard == false) {
+			// if card is not already on board, return card to original position in hand
+			playerCards[this.selected].drawX = ((gameWidth/widthScale) - 64 - 24) * widthScale;
+		}
+	} else {
+		// enemy card
+		if (enemyCards[this.selected].onBoard == false) {
+			// if card is not already on board, return card to original position in hand
+			enemyCards[this.selected].drawX = 24 * widthScale;
+		}
+	}
+	
+	/*if (cards[this.selected].onBoard == false) {
 		if (this.selected == 0 || this.selected == 1 || this.selected == 2
 			|| this.selected == 3 || this.selected == 4) {
 			cards[this.selected].drawX = ((gameWidth/widthScale) - 64 - 24) * widthScale;
 		} else {
 			cards[this.selected].drawX = 24 * widthScale;
 		}
-	}
+	}*/
 	
 	//only move selected card out if not already on board
-	if (cards[card].onBoard == false) {
-		if (card == 0 || card == 1 || card == 2 || card == 3 || card == 4) {
-			cards[card].drawX = ((gameWidth/widthScale) - 64 - 24 - 8) * widthScale;
-		} else {
-			cards[card].drawX = (24 * widthScale) -  (8 * widthScale);
+	if (this.player == true) {
+		if (playerCards[card].onBoard == false) {
+			playerCards[card].drawX = ((gameWidth/widthScale) - 64 - 24 - 8) * widthScale;
+		}
+		var mysound = new Audio('sounds/CursorMove.mp3');
+		mysound.play();
+	} else {
+		if (enemyCards[card].onBoard == false) {
+			enemyCards[card].drawX = (24 * widthScale) -  (8 * widthScale);
 		}
 		var mysound = new Audio('sounds/CursorMove.mp3');
 		mysound.play();
 	}
 	
-	
 	this.selected = card;
 	
-	if (card == 0 || card == 1 || card == 2 || card == 3 || card == 4) {
+	if (this.player) {
 		this.drawX = playerCol;
 	} else {
 		this.drawX = enemyCol;
 	}
 	
-	if (card == 0 || card == 5) { this.drawY = (row0 + 16) * heightScale; }
-	if (card == 1 || card == 6) { this.drawY = (row1 + 16) * heightScale; }
-	if (card == 2 || card == 7) { this.drawY = (row2 + 16) * heightScale; }
-	if (card == 3 || card == 8) { this.drawY = (row3 + 16) * heightScale; }
-	if (card == 4 || card == 9) { this.drawY = (row4 + 16) * heightScale; }	
+	if (card == 0) { this.drawY = (row0 + 16) * heightScale; }
+	if (card == 1) { this.drawY = (row1 + 16) * heightScale; }
+	if (card == 2) { this.drawY = (row2 + 16) * heightScale; }
+	if (card == 3) { this.drawY = (row3 + 16) * heightScale; }
+	if (card == 4) { this.drawY = (row4 + 16) * heightScale; }	
 }
 
 Finger.prototype.hoverboard = function() {
@@ -409,50 +370,50 @@ Finger.prototype.hoverboard = function() {
 	
 	// just places corresponding card onto corresponding board place for now
 	
-	if (this.selected == 0) {
-		cards[0].drawX = col1 * widthScale;
-		cards[0].drawY = row0 * heightScale;
-		cards[0].onBoard = true;
+	if (this.selected == 0 && this.player) {
+		playerCards[0].drawX = col1 * widthScale;
+		playerCards[0].drawY = row0 * heightScale;
+		playerCards[0].onBoard = true;
 	}
-	if (this.selected == 1) {
-		cards[1].drawX = col2 * widthScale;
-		cards[1].drawY = row0 * heightScale;
-		cards[1].onBoard = true;
+	if (this.selected == 1 && this.player) {
+		playerCards[1].drawX = col2 * widthScale;
+		playerCards[1].drawY = row0 * heightScale;
+		playerCards[1].onBoard = true;
 	}
-	if (this.selected == 2) {
-		cards[2].drawX = col3 * widthScale;
-		cards[2].drawY = row0 * heightScale;
-		cards[2].onBoard = true;
+	if (this.selected == 2 && this.player) {
+		playerCards[2].drawX = col3 * widthScale;
+		playerCards[2].drawY = row0 * heightScale;
+		playerCards[2].onBoard = true;
 	}
-	if (this.selected == 3) {
-		cards[3].drawX = col1 * widthScale;
-		cards[3].drawY = row2 * heightScale;
-		cards[3].onBoard = true;
+	if (this.selected == 3 && this.player) {
+		playerCards[3].drawX = col1 * widthScale;
+		playerCards[3].drawY = row2 * heightScale;
+		playerCards[3].onBoard = true;
 	}
-	if (this.selected == 4) {
-		cards[4].drawX = col2 * widthScale;
-		cards[4].drawY = row2 * heightScale;
-		cards[4].onBoard = true;
+	if (this.selected == 4 && this.player) {
+		playerCards[4].drawX = col2 * widthScale;
+		playerCards[4].drawY = row2 * heightScale;
+		playerCards[4].onBoard = true;
 	}
-	if (this.selected == 5) {
-		cards[5].drawX = col3 * widthScale;
-		cards[5].drawY = row2 * heightScale;
-		cards[5].onBoard = true;
+	if (this.selected == 0 && this.player == false) {
+		enemyCards[0].drawX = col3 * widthScale;
+		enemyCards[0].drawY = row2 * heightScale;
+		enemyCards[0].onBoard = true;
 	}
-	if (this.selected == 6) {
-		cards[6].drawX = col1 * widthScale;
-		cards[6].drawY = row4 * heightScale;
-		cards[6].onBoard = true;
+	if (this.selected == 1 && this.player == false) {
+		enemyCards[1].drawX = col1 * widthScale;
+		enemyCards[1].drawY = row4 * heightScale;
+		enemyCards[1].onBoard = true;
 	}
-	if (this.selected == 7) {
-		cards[7].drawX = col2 * widthScale;
-		cards[7].drawY = row4 * heightScale;
-		cards[7].onBoard = true;
+	if (this.selected == 2 && this.player == false) {
+		enemyCards[2].drawX = col2 * widthScale;
+		enemyCards[2].drawY = row4 * heightScale;
+		enemyCards[2].onBoard = true;
 	}
-	if (this.selected == 8) {
-		cards[8].drawX = col3 * widthScale;
-		cards[8].drawY = row4 * heightScale;
-		cards[8].onBoard = true;
+	if (this.selected == 3 && this.player == false) {
+		enemyCards[3].drawX = col3 * widthScale;
+		enemyCards[3].drawY = row4 * heightScale;
+		enemyCards[3].onBoard = true;
 	}
 	
 	
@@ -493,6 +454,13 @@ function Card() {
 	this.height = 64;
 	this.widthScale = widthScale;
 	this.heightScale = heightScale;
+	this.origX = 0;
+	this.origY = 0;
+	this.backX = 64 * 26;
+	this.backY = 64 * 3;
+	
+	// blue background = player
+	// pink background = enemy
 	
 	
 	this.index = 0 //0-4 corresponds with player cards, 5-9 with enemy cards
@@ -519,8 +487,17 @@ Card.prototype.randomize = function() {
 	var col = Math.floor((Math.random() * 28)); // 0-27
 	var row = Math.floor((Math.random() * 4));	// 0-3
 	
+	while (row == 4 && (col == 26 || col == 27)) {
+		// if rng chooses back of card or blank space,
+		// regenerate until actual card is found
+		col = Math.floor((Math.random() * 28)); // 0-27
+		row = Math.floor((Math.random() * 4));	// 0-3
+	}
+	
 	this.srcX = 64 * col;
 	this.srcY = 64 * row;
+	this.origX = 64 * col;
+	this.origY = 64 * row;
 	
 }
 
@@ -534,45 +511,45 @@ Card.prototype.draw = function () {
 	
 	// Really need to figure out how to make the ctx variables into an array for this to be compact
 	if (this.index == 0) {
-		ctxCard0.drawImage(cardSheet,this.srcX,this.srcY,this.width,this.height,
+		ctxPlayerCard0.drawImage(cardSheet,this.srcX,this.srcY,this.width,this.height,
 						this.drawX,this.drawY,this.width*this.widthScale,this.height*this.heightScale);
 		//ctxCard0.drawImage(COLOR BACKGROUND,this.srcX,this.srcY,this.width,this.height,
 		//				this.drawX,this.drawY,this.width*this.widthScale,this.height*this.heightScale);
 	}
 	else if (this.index == 1) {
-		ctxCard1.drawImage(cardSheet,this.srcX,this.srcY,this.width,this.height,
+		ctxPlayerCard1.drawImage(cardSheet,this.srcX,this.srcY,this.width,this.height,
 						this.drawX,this.drawY,this.width*this.widthScale,this.height*this.heightScale);
 	}
 	else if (this.index == 2) {
-		ctxCard2.drawImage(cardSheet,this.srcX,this.srcY,this.width,this.height,
+		ctxPlayerCard2.drawImage(cardSheet,this.srcX,this.srcY,this.width,this.height,
 						this.drawX,this.drawY,this.width*this.widthScale,this.height*this.heightScale);
 	}
 	else if (this.index == 3) {
-		ctxCard3.drawImage(cardSheet,this.srcX,this.srcY,this.width,this.height,
+		ctxPlayerCard3.drawImage(cardSheet,this.srcX,this.srcY,this.width,this.height,
 						this.drawX,this.drawY,this.width*this.widthScale,this.height*this.heightScale);
 	}
 	else if (this.index == 4) {
-		ctxCard4.drawImage(cardSheet,this.srcX,this.srcY,this.width,this.height,
+		ctxPlayerCard4.drawImage(cardSheet,this.srcX,this.srcY,this.width,this.height,
 						this.drawX,this.drawY,this.width*this.widthScale,this.height*this.heightScale);
 	}
 	else if (this.index == 5) {
-		ctxCard5.drawImage(cardSheet,this.srcX,this.srcY,this.width,this.height,
+		ctxEnemyCard0.drawImage(cardSheet,this.srcX,this.srcY,this.width,this.height,
 						this.drawX,this.drawY,this.width*this.widthScale,this.height*this.heightScale);
 	}
 	else if (this.index == 6) {
-		ctxCard6.drawImage(cardSheet,this.srcX,this.srcY,this.width,this.height,
+		ctxEnemyCard1.drawImage(cardSheet,this.srcX,this.srcY,this.width,this.height,
 						this.drawX,this.drawY,this.width*this.widthScale,this.height*this.heightScale);
 	}
 	else if (this.index == 7) {
-		ctxCard7.drawImage(cardSheet,this.srcX,this.srcY,this.width,this.height,
+		ctxEnemyCard2.drawImage(cardSheet,this.srcX,this.srcY,this.width,this.height,
 						this.drawX,this.drawY,this.width*this.widthScale,this.height*this.heightScale);
 	}
 	else if (this.index == 8) {
-		ctxCard8.drawImage(cardSheet,this.srcX,this.srcY,this.width,this.height,
+		ctxEnemyCard3.drawImage(cardSheet,this.srcX,this.srcY,this.width,this.height,
 						this.drawX,this.drawY,this.width*this.widthScale,this.height*this.heightScale);
 	}
 	else if (this.index == 9) {
-		ctxCard9.drawImage(cardSheet,this.srcX,this.srcY,this.width,this.height,
+		ctxEnemyCard4.drawImage(cardSheet,this.srcX,this.srcY,this.width,this.height,
 						this.drawX,this.drawY,this.width*this.widthScale,this.height*this.heightScale);
 	}
 	
@@ -591,9 +568,13 @@ Card.prototype.frontFlip = function () {
 			this.front = !this.front;
 			//switch to cardBack
 			if (this.front) {
-				cardImg[this.index].src = this.cardFilepath;
+				// original card coord
+				this.srcX = this.origX;
+				this.srcY = this.origY;
 			} else {
-				cardImg[this.index].src = cardBack;
+				// back card coord
+				this.srcX = this.backX;
+				this.srcY = this.backY;
 			}
 		}
 		
@@ -615,21 +596,28 @@ Card.prototype.frontFlip = function () {
 
 function checkKeys() {
 	//alert('message in pop up window here!');
-	if (is0Key) { finger1.highlight(0); is0Key = false; }
-	if (is1Key) { finger1.highlight(1); is1Key = false; }
-	if (is2Key) { finger1.highlight(2); is2Key = false; }
-	if (is3Key) { finger1.highlight(3); is3Key = false; }
-	if (is4Key) { finger1.highlight(4); is4Key = false; }
-	if (is5Key) { finger1.highlight(5); is5Key = false; }
-	if (is6Key) { finger1.highlight(6); is6Key = false; }
-	if (is7Key) { finger1.highlight(7); is7Key = false; }
-	if (is8Key) { finger1.highlight(8); is8Key = false; }
-	if (is9Key) { finger1.highlight(9); is9Key = false; }
+	if (is0Key) { finger1.player = true; finger1.highlight(0); is0Key = false; }
+	if (is1Key) { finger1.player = true; finger1.highlight(1); is1Key = false; }
+	if (is2Key) { finger1.player = true; finger1.highlight(2); is2Key = false; }
+	if (is3Key) { finger1.player = true; finger1.highlight(3); is3Key = false; }
+	if (is4Key) { finger1.player = true; finger1.highlight(4); is4Key = false; }
+	if (is5Key) { finger1.player = false; finger1.highlight(0); is5Key = false;}
+	if (is6Key) { finger1.player = false; finger1.highlight(1); is6Key = false;}
+	if (is7Key) { finger1.player = false; finger1.highlight(2); is7Key = false;}
+	if (is8Key) { finger1.player = false; finger1.highlight(3); is8Key = false;}
+	if (is9Key) { finger1.player = false; finger1.highlight(4); is9Key = false;}
 	
 	if (isSpacebarKey) {
-		if (cards[finger1.selected].onBoard == false) {
-			//Select this card and choose place on board
-			finger1.hoverboard();
+		if (finger1.player == true) {
+			if (playerCards[finger1.selected].onBoard == false) {
+				//Select this card and choose place on board
+				finger1.hoverboard();
+			}
+		} else {
+			if (enemyCards[finger1.selected].onBoard == false) {
+				//Select this card and choose place on board
+				finger1.hoverboard();
+			}
 		}
 	}
 	if (isUpKey) {
@@ -645,25 +633,30 @@ function checkKeys() {
 		
 	}
 	if (isFKey) {
-		cards[finger1.selected].flip = !cards[finger1.selected].flip;
+		if (finger1.player == true) {
+			playerCards[finger1.selected].flip = !playerCards[finger1.selected].flip;
+		} else {
+			enemyCards[finger1.selected].flip = !enemyCards[finger1.selected].flip;
+		}
+		
 	}
 }
 
 function clearCtxCard(index){
 	// again, much simpler when/if ctx variables are in an array...
 	if (index == 0) {
-		ctxCard0.clearRect(0,0,gameWidth,gameHeight);
+		ctxPlayerCard0.clearRect(0,0,gameWidth,gameHeight);
 	}
 	
-	else if (index == 1) { ctxCard1.clearRect(0,0,gameWidth,gameHeight); }
-	else if (index == 2) { ctxCard2.clearRect(0,0,gameWidth,gameHeight); }
-	else if (index == 3) { ctxCard3.clearRect(0,0,gameWidth,gameHeight); }
-	else if (index == 4) { ctxCard4.clearRect(0,0,gameWidth,gameHeight); }
-	else if (index == 5) { ctxCard5.clearRect(0,0,gameWidth,gameHeight); }
-	else if (index == 6) { ctxCard6.clearRect(0,0,gameWidth,gameHeight); }
-	else if (index == 7) { ctxCard7.clearRect(0,0,gameWidth,gameHeight); }
-	else if (index == 8) { ctxCard8.clearRect(0,0,gameWidth,gameHeight); }
-	else if (index == 9) { ctxCard9.clearRect(0,0,gameWidth,gameHeight); }
+	else if (index == 1) { ctxPlayerCard1.clearRect(0,0,gameWidth,gameHeight); }
+	else if (index == 2) { ctxPlayerCard2.clearRect(0,0,gameWidth,gameHeight); }
+	else if (index == 3) { ctxPlayerCard3.clearRect(0,0,gameWidth,gameHeight); }
+	else if (index == 4) { ctxPlayerCard4.clearRect(0,0,gameWidth,gameHeight); }
+	else if (index == 5) { ctxEnemyCard0.clearRect(0,0,gameWidth,gameHeight); }
+	else if (index == 6) { ctxEnemyCard1.clearRect(0,0,gameWidth,gameHeight); }
+	else if (index == 7) { ctxEnemyCard2.clearRect(0,0,gameWidth,gameHeight); }
+	else if (index == 8) { ctxEnemyCard3.clearRect(0,0,gameWidth,gameHeight); }
+	else if (index == 9) { ctxEnemyCard4.clearRect(0,0,gameWidth,gameHeight); }
 }
 
 // end of Card functions
