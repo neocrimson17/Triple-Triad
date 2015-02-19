@@ -7,7 +7,7 @@ var ctxCard = canvasCard.getContext('2d');
 var card1;
 var gameWidth = canvasBg.width;
 var gameHeight = canvasBg.height;
-var fps = 10;
+var fps = 8;
 var drawInterval;
 var widthScale = 2;
 var heightScale = 2.5;
@@ -16,6 +16,10 @@ var isUpKey = false;
 var isRightKey = false;
 var isDownKey = false;
 var isLeftKey = false;
+
+// sounds variables
+var mainTheme = new Audio('sounds/ShuffleOrBoogie.mp3');
+var CursorMove = new Audio('sounds/CursorMove.mp3');
 
 var imgBg = new Image();
 imgBg.src = 'images/board.png';
@@ -44,6 +48,7 @@ imgBg.addEventListener('load',init,false);
 // main functions
 
 function init(){
+	soundBg();
 	drawBg();
 	startDrawing();
 	card1 = new Card();
@@ -75,13 +80,29 @@ function drawBg(){
 function clearCtxBg(){
 	ctxBg.clearRect(0,0,gameWidth,gameHeight);
 }
+// play main theme song in a loop
+// note this is for looping, but for simple sounds like cursor movement
+// we can simply use this "CursorMove.play();"
+// of course you have to declare var and point it to the correct file to play
+function soundBg(){
+	if (typeof mainTheme.loop == 'boolean')
+	{
+		mainTheme.loop = true;
+	}
+	else
+	{
+		// play main theme song in case loop is not supported
+		mainTheme.addEventListener('ended', function() {
+			this.currentTime = 0;
+			this.play();
+		}, false);
+		
+	}
+	mainTheme.play();
+}
+
 
 // end of main functions
-
-
-
-
-
 
 
 // Card functions
@@ -112,8 +133,10 @@ Card.prototype.draw = function () {
 
 Card.prototype.checkKeys = function () {
 	if (isUpKey) {
+		// play cursor move sound effect
+		// replace with the flipping card sound effect later
+		CursorMove.play();
 		// flip test
-		
 		var origScale = 2.5;
 		
 		if (this.flip) {
@@ -151,6 +174,8 @@ Card.prototype.checkKeys = function () {
 		this.flip = true;
 	}
 	if (isRightKey) {
+		// play cursor move sound effect
+		CursorMove.play();
 		// right side placement test
 		var row1 = 16;
 		var row2 = 48;
@@ -182,6 +207,8 @@ Card.prototype.checkKeys = function () {
 		}
 	}
 	if (isDownKey) {
+		// play cursor move sound effect
+		CursorMove.play();
 		// board placement test
 		var row1 = 16;
 		var row2 = 80;
@@ -226,6 +253,8 @@ Card.prototype.checkKeys = function () {
 		}
 	}
 	if (isLeftKey) {
+		// play cursor move sound effect
+		CursorMove.play();
 		// left side placement test
 		var row1 = 16;
 		var row2 = 48;
