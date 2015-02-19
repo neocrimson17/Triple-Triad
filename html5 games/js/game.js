@@ -133,7 +133,7 @@ var CardEnum = {
 	BLOBRA:"Blobra",
 	GAYLA:"Gayla",
 	GESPER:"Gesper",
-	FASTITOCALON-F:"Fastitocalon-F",
+	FASTITOCALONF:"Fastitocalon-F",
 	BLOODSOUL:"BloodSoul",
 	CATERCHIPILLAR:"Caterchipillar",
 	COCKATRICE:"Cockatrice",
@@ -164,7 +164,7 @@ var CardEnum = {
 	//level 4 monster cards
 	TURTAPOD:"Turtapod",
 	VYSAGE:"Vysage",
-	T-REXAUR:"T-Rexaur",
+	TREXAUR:"T-Rexaur",
 	BOMB:"Bomb",
 	BLITZ:"Blitz",
 	WENDIGO:"Wendigo",
@@ -186,7 +186,7 @@ var CardEnum = {
 
 function init(){
 
-	SoundBg();
+	soundBg();
 	drawBg();
 	startDrawing();
 	
@@ -294,13 +294,6 @@ function soundBg(){
 	}
 	MainTheme.play();
 }
-
-<<<<<<< HEAD
-function clearCtxBg(){
-		ctxBg.clearRect(0,0,gameWidth,gameHeight);
-}
-// end of main functions
-=======
 
 function setPlayerHand() {
 		// card 4 at bottom of pile, card 0 at top
@@ -422,7 +415,6 @@ Finger.prototype.highlight = function(card) {
 	if (card == 3) { this.drawY = (row3 + 16) * heightScale; }
 	if (card == 4) { this.drawY = (row4 + 16) * heightScale; }	
 }
->>>>>>> origin/master
 
 Finger.prototype.hoverboard = function() {
 	// hover finger above board, move with arrow keys, select place for card
@@ -548,7 +540,7 @@ Card.prototype.randomize = function() {
 	var col = Math.floor((Math.random() * 28)); // 0-27
 	var row = Math.floor((Math.random() * 4));	// 0-3
 	
-	while (row == 4 && (col == 26 || col == 27)) {
+	while (row == 3 && (col == 26 || col == 27)) {
 		// if rng chooses back of card or blank space,
 		// regenerate until actual card is found
 		col = Math.floor((Math.random() * 28)); // 0-27
@@ -616,15 +608,6 @@ Card.prototype.draw = function () {
 	
 };
 
-
-Card.prototype.checkKeys = function () {
-	if (isUpKey) {
-		// play cursor move sound effect
-		// replace with the flipping card sound effect later
-		CursorMove.play();
-		// flip test
-		var origScale = 2.5;
-
 Card.prototype.frontFlip = function () {
 
 	if (this.flip) {
@@ -690,45 +673,16 @@ function checkKeys() {
 			}
 		}
 	}
-	if (isRightKey) {
-		// play cursor move sound effect
-		CursorMove.play();
-		// right side placement test
-		var row1 = 16;
-		var row2 = 48;
-		var row3 = 80;
-		var row4 = 112;
-		var row5 = 144;
-
 	if (isUpKey) {
 		
 	} 
-	if (isDownKey) {
-
-		// play cursor move sound effect
-		CursorMove.play();
-		// board placement test
-		var row1 = 16;
-		var row2 = 80;
-		var row3 = 144;
+	if (isRightKey) {
 		
-		var col1 = 96;
-		var col2 = 160;
-		var col3 = 224;
-
+	}
+	if (isDownKey) {
 		
 	}
 	if (isLeftKey) {
-		// play cursor move sound effect
-		CursorMove.play();
-		// left side placement test
-		var row1 = 16;
-		var row2 = 48;
-		var row3 = 80;
-		var row4 = 112;
-		var row5 = 144;
-		
-		var col = 24;
 		
 	}
 	if (isFKey) {
