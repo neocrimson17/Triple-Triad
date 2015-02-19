@@ -43,7 +43,7 @@ var enemyCards = ["0", "1", "2", "3", "4"];
 
 var gameWidth = canvasBg.width;
 var gameHeight = canvasBg.height;
-var fps = 8;
+var fps = 10;
 var drawInterval;
 
 // a Card object has an individual widthScale and heightScale used for animation.
@@ -98,10 +98,6 @@ var isFKey = false;
 var MainTheme = new Audio('sounds/ShuffleBoogie.mp3');
 var CursorMove = new Audio('sounds/CursorMove.mp3');
 
-// sounds variables
-var mainTheme = new Audio('sounds/ShuffleOrBoogie.mp3');
-var CursorMove = new Audio('sounds/CursorMove.mp3');
-
 var imgBg = new Image();
 imgBg.src = 'images/board.png';
 
@@ -127,6 +123,62 @@ fingerImg = new Image();
 // Load background
 imgBg.addEventListener('load',init,false);
 
+// enum for cards
+var CardEnum = {
+	//level 1 monster cards
+	GEEZARD:"Geezard",
+	FUNGUAR:"Funguar",
+	BITEBUG:"BiteBug",
+	REDBAT:"RedBat",
+	BLOBRA:"Blobra",
+	GAYLA:"Gayla",
+	GESPER:"Gesper",
+	FASTITOCALON-F:"Fastitocalon-F",
+	BLOODSOUL:"BloodSoul",
+	CATERCHIPILLAR:"Caterchipillar",
+	COCKATRICE:"Cockatrice",
+	//level 2 monster cards
+	GRAT:"Grat",
+	BUEL:"Buel",
+	MESMERIZE:"Mesmerize",
+	GLACIALEYE:"GlacialEye",
+	BELHELMEL:"Belhelmel",
+	THRUSTAEVIS:"Thrustaevis",
+	ANACONDAUR:"Anacondaur",
+	CREEPS:"Creeps",
+	GRENDEL:"Grendel",
+	JELLEYE:"Jelleye",
+	GRANDMANTIS:"GrandMantis",
+	//level 3 monster cards
+	FORBIDDEN:"Forbidden",
+	ARMADODO:"Armadodo",
+	TriFace:"Tri-Face",
+	FASTITOCALON:"Fastitocalon",
+	SNOWLION:"SnowLion",
+	OCHU:"Ochu",
+	SAM08G:"SAM08G",
+	DEATHCLAW:"DeathClaw",
+	CACTUAR:"Cactuar",
+	TONBERRY:"Tonberry",
+	ABYSSWORM:"AbyssWorm",
+	//level 4 monster cards
+	TURTAPOD:"Turtapod",
+	VYSAGE:"Vysage",
+	T-REXAUR:"T-Rexaur",
+	BOMB:"Bomb",
+	BLITZ:"Blitz",
+	WENDIGO:"Wendigo",
+	TORAMA:"Torama",
+	IMP:"Imp",
+	BLUEDRAGON:"BlueDragon",
+	ADAMANTOISE:"Adamantoise",
+	HEXADRAGON:"Hexadragon",
+	//level 5 monster cards
+	IRONGIANT:"Iron Giant",
+	BEHEMOTH:"Behemoth",
+	CHIMERA:"Chimera",
+	
+};
 
 
 
@@ -187,6 +239,8 @@ function init(){
 	document.addEventListener('keydown',checkKeyDown,false);
 	document.addEventListener('keyup',checkKeyUp,false);
 }
+
+
 
 function draw() {
 	for (i = 0; i < playerCards.length; i++) {
@@ -340,14 +394,12 @@ Finger.prototype.highlight = function(card) {
 		if (playerCards[card].onBoard == false) {
 			playerCards[card].drawX = ((gameWidth/widthScale) - 64 - 24 - 8) * widthScale;
 		}
-		var mysound = new Audio('sounds/CursorMove.mp3');
-		mysound.play();
+		CursorMove.play();
 	} else {
 		if (enemyCards[card].onBoard == false) {
 			enemyCards[card].drawX = (24 * widthScale) -  (8 * widthScale);
 		}
-		var mysound = new Audio('sounds/CursorMove.mp3');
-		mysound.play();
+		CursorMove.play();
 	}
 	
 	this.selected = card;
@@ -443,10 +495,6 @@ function clearCtxFinger() {
 
 // end of main functions
 
-
-
-
-// end of main functions
 
 
 // Card functions
@@ -648,9 +696,6 @@ function checkKeys() {
 	if (isUpKey) {
 		
 	} 
-	if (isRightKey) {
-		
-	}
 	if (isDownKey) {
 
 		// play cursor move sound effect
