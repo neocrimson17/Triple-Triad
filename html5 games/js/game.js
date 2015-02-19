@@ -104,6 +104,7 @@ imgBg.src = 'images/board.png';
 var cardSheet = new Image();
 cardSheet.src = 'images/cards.png';
 
+
 var playerCardImg = ["0", "1", "2", "3", "4"];
 playerCardImg[0] = new Image();
 playerCardImg[1] = new Image();
@@ -133,7 +134,7 @@ var CardEnum = {
 	BLOBRA:"Blobra",
 	GAYLA:"Gayla",
 	GESPER:"Gesper",
-	FASTITOCALON-F:"Fastitocalon-F",
+	FASTITOCALONF:"Fastitocalon-F",
 	BLOODSOUL:"BloodSoul",
 	CATERCHIPILLAR:"Caterchipillar",
 	COCKATRICE:"Cockatrice",
@@ -164,7 +165,7 @@ var CardEnum = {
 	//level 4 monster cards
 	TURTAPOD:"Turtapod",
 	VYSAGE:"Vysage",
-	T-REXAUR:"T-Rexaur",
+	TREXAUR:"T-Rexaur",
 	BOMB:"Bomb",
 	BLITZ:"Blitz",
 	WENDIGO:"Wendigo",
@@ -180,11 +181,11 @@ var CardEnum = {
 	
 };
 
-
 // main functions
 
 function init(){
-	SoundBg();
+
+	soundBg();
 	drawBg();
 	startDrawing();
 	
@@ -238,6 +239,8 @@ function init(){
 	document.addEventListener('keyup',checkKeyUp,false);
 }
 
+
+
 function draw() {
 	for (i = 0; i < playerCards.length; i++) {
 		playerCards[i].draw();
@@ -270,23 +273,23 @@ function clearCtxBg() {
 	ctxBg.clearRect(0,0,gameWidth,gameHeight);
 }
 
-// play main theme
-// loop the song indefinitely
-// however to simply play a sounds one time
-// declare a var and initialize that variable and point to the correct file to play it.
-// for example var mysound = new Audio('sounds/howl.mp3');
-// mysound.play();
-function SoundBg(){
+// play main theme song in a loop
+// note this is for looping, but for simple sounds like cursor movement
+// we can simply use this "CursorMove.play();"
+// of course you have to declare var and point it to the correct file to play
+function soundBg(){
 	if (typeof MainTheme.loop == 'boolean')
 	{
 		MainTheme.loop = true;
 	}
 	else
 	{
+		// play main theme song in case loop is not supported
 		MainTheme.addEventListener('ended', function() {
 			this.currentTime = 0;
 			this.play();
 		}, false);
+		
 	}
 	MainTheme.play();
 }
@@ -389,14 +392,12 @@ Finger.prototype.highlight = function(card) {
 		if (playerCards[card].onBoard == false) {
 			playerCards[card].drawX = ((gameWidth/widthScale) - 64 - 24 - 8) * widthScale;
 		}
-		var mysound = new Audio('sounds/CursorMove.mp3');
-		mysound.play();
+		CursorMove.play();
 	} else {
 		if (enemyCards[card].onBoard == false) {
 			enemyCards[card].drawX = (24 * widthScale) -  (8 * widthScale);
 		}
-		var mysound = new Audio('sounds/CursorMove.mp3');
-		mysound.play();
+		CursorMove.play();
 	}
 	
 	this.selected = card;
@@ -494,10 +495,6 @@ function clearCtxFinger() {
 
 
 
-
-
-
-
 // Card functions
 
 function Card() {
@@ -542,7 +539,7 @@ Card.prototype.randomize = function() {
 	var col = Math.floor((Math.random() * 28)); // 0-27
 	var row = Math.floor((Math.random() * 4));	// 0-3
 	
-	while (row == 4 && (col == 26 || col == 27)) {
+	while (row == 3 && (col == 26 || col == 27)) {
 		// if rng chooses back of card or blank space,
 		// regenerate until actual card is found
 		col = Math.floor((Math.random() * 28)); // 0-27
@@ -715,8 +712,6 @@ function clearCtxCard(index){
 }
 
 // end of Card functions
-
-
 
 
 
