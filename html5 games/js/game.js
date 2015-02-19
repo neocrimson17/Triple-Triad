@@ -100,7 +100,7 @@ function SoundBg(){
 
 function clearCtxBg(){
 		ctxBg.clearRect(0,0,gameWidth,gameHeight);
-	}
+}
 // end of main functions
 
 
