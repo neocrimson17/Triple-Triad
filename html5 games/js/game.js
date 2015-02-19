@@ -279,20 +279,20 @@ function clearCtxBg() {
 // we can simply use this "CursorMove.play();"
 // of course you have to declare var and point it to the correct file to play
 function soundBg(){
-	if (typeof mainTheme.loop == 'boolean')
+	if (typeof MainTheme.loop == 'boolean')
 	{
-		mainTheme.loop = true;
+		MainTheme.loop = true;
 	}
 	else
 	{
 		// play main theme song in case loop is not supported
-		mainTheme.addEventListener('ended', function() {
+		MainTheme.addEventListener('ended', function() {
 			this.currentTime = 0;
 			this.play();
 		}, false);
 		
 	}
-	mainTheme.play();
+	MainTheme.play();
 }
 
 
