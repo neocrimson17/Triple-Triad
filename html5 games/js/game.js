@@ -104,12 +104,6 @@ function clearCtxBg(){
 // end of main functions
 
 
-
-
-
-
-
-
 // Card functions
 
 function Card() {
