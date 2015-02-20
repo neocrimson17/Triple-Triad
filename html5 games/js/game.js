@@ -159,7 +159,7 @@ var CardEnum = {
 	//level 3 monster cards
 	FORBIDDEN: 23,
 	ARMADODO: 24,
-	TriFace: 25,
+	TRIFACE: 25,
 	FASTITOCALON: 26,
 	SNOWLION: 27,
 	OCHU: 28,
@@ -342,38 +342,38 @@ var CardEnum = {
 		78:{name: "Chubby Chocobo", topValue: 4, bottomValue: 8, leftValue: 9, rightValue: 4},
 		79:{name: "Angelo", topValue: 9, bottomValue: 7, leftValue: 3, rightValue: 6},
 		80:{name: "Gilgamesh", topValue: 3, bottomValue: 9, leftValue: 6, rightValue: 7},
-		80:{name: "MiniMog", topValue: 9, bottomValue: 9, leftValue: 2, rightValue: 3},
-		81:{name: "Chocobo", topValue: 9, bottomValue: 8, leftValue: 4, rightValue: 4},
-		82:{name: "Quezacotl", topValue: 2, bottomValue: 9, leftValue: 4, rightValue: 9},
-		83:{name: "Shiva", topValue: 6, bottomValue: 4, leftValue: 9, rightValue: 7},
-		84:{name: "Ifrit", topValue: 9, bottomValue: 2, leftValue: 8, rightValue: 6},
-		85:{name: "Siren", topValue: 8, bottomValue: 6, leftValue: 2, rightValue: 9},
-		86:{name: "Sacred", topValue: 5, bottomValue: 9, leftValue: 9, rightValue: 1},
-		87:{name: "Minotaur", topValue: 9, bottomValue: 2, leftValue: 9, rightValue: 5},
+		81:{name: "MiniMog", topValue: 9, bottomValue: 9, leftValue: 2, rightValue: 3},
+		82:{name: "Chocobo", topValue: 9, bottomValue: 8, leftValue: 4, rightValue: 4},
+		83:{name: "Quezacotl", topValue: 2, bottomValue: 9, leftValue: 4, rightValue: 9},
+		84:{name: "Shiva", topValue: 6, bottomValue: 4, leftValue: 9, rightValue: 7},
+		85:{name: "Ifrit", topValue: 9, bottomValue: 2, leftValue: 8, rightValue: 6},
+		86:{name: "Siren", topValue: 8, bottomValue: 6, leftValue: 2, rightValue: 9},
+		87:{name: "Sacred", topValue: 5, bottomValue: 9, leftValue: 9, rightValue: 1},
+		88:{name: "Minotaur", topValue: 9, bottomValue: 2, leftValue: 9, rightValue: 5},
 		// level 9 guardian forces 
-		88:{name: "Carbuncle", topValue: 8, bottomValue: 10, leftValue: 4, rightValue: 4},
-		89:{name: "Diablos", topValue: 5, bottomValue: 8, leftValue: 3, rightValue: 10},
-		90:{name: "Leviathan", topValue: 7, bottomValue: 1, leftValue: 7, rightValue: 10},
-		91:{name: "Odin", topValue: 8, bottomValue: 3, leftValue: 5, rightValue: 10},
-		92:{name: "Pandemona", topValue: 10, bottomValue: 7, leftValue: 7, rightValue: 1},
-		93:{name: "Cerberus", topValue: 7, bottomValue: 6, leftValue: 10, rightValue: 4},
-		94:{name: "Alexander", topValue: 9, bottomValue: 4, leftValue: 2, rightValue: 10},
-		95:{name: "Phoenix", topValue: 7, bottomValue: 7, leftValue: 10, rightValue: 2},
-		96:{name: "Bahamut", topValue: 10, bottomValue: 2, leftValue: 6, rightValue: 8},
-		97:{name: "Doomtrain", topValue: 3, bottomValue: 10, leftValue: 10, rightValue: 1},
-		98:{name: "Eden", topValue: 4, bottomValue: 9, leftValue: 10, rightValue: 4},
+		89:{name: "Carbuncle", topValue: 8, bottomValue: 10, leftValue: 4, rightValue: 4},
+		90:{name: "Diablos", topValue: 5, bottomValue: 8, leftValue: 3, rightValue: 10},
+		91:{name: "Leviathan", topValue: 7, bottomValue: 1, leftValue: 7, rightValue: 10},
+		92:{name: "Odin", topValue: 8, bottomValue: 3, leftValue: 5, rightValue: 10},
+		93:{name: "Pandemona", topValue: 10, bottomValue: 7, leftValue: 7, rightValue: 1},
+		94:{name: "Cerberus", topValue: 7, bottomValue: 6, leftValue: 10, rightValue: 4},
+		95:{name: "Alexander", topValue: 9, bottomValue: 4, leftValue: 2, rightValue: 10},
+		96:{name: "Phoenix", topValue: 7, bottomValue: 7, leftValue: 10, rightValue: 2},
+		97:{name: "Bahamut", topValue: 10, bottomValue: 2, leftValue: 6, rightValue: 8},
+		98:{name: "Doomtrain", topValue: 3, bottomValue: 10, leftValue: 10, rightValue: 1},
+		99:{name: "Eden", topValue: 4, bottomValue: 9, leftValue: 10, rightValue: 4},
 		// level 10 characters
-		99:{name: "Ward", topValue: 10, bottomValue: 2, leftValue: 8, rightValue: 7},
-		100:{name: "Kiros", topValue: 6, bottomValue: 6, leftValue: 10, rightValue: 7},
-		101:{name: "Laguna", topValue: 5, bottomValue: 3, leftValue: 9, rightValue: 10},
-		102:{name: "Selphie", topValue: 10, bottomValue: 6, leftValue: 4, rightValue: 8},
-		103:{name: "Quistis", topValue: 9, bottomValue: 10, leftValue: 2, rightValue: 6},
-		104:{name: "Irvine", topValue: 2, bottomValue: 9, leftValue: 10, rightValue: 6},
-		105:{name: "Zell", topValue: 8, bottomValue: 10, leftValue: 6, rightValue: 5},
-		106:{name: "Rinoa", topValue: 4, bottomValue: 2, leftValue: 10, rightValue: 10},
-		107:{name: "Edea", topValue: 10, bottomValue: 3, leftValue: 3, rightValue: 10},
-		108:{name: "Seifer", topValue: 6, bottomValue: 10, leftValue: 4, rightValue: 9},
-		109:{name: "Squall", topValue: 10, bottomValue: 6, leftValue: 9, rightValue: 4}
+		100:{name: "Ward", topValue: 10, bottomValue: 2, leftValue: 8, rightValue: 7},
+		101:{name: "Kiros", topValue: 6, bottomValue: 6, leftValue: 10, rightValue: 7},
+		102:{name: "Laguna", topValue: 5, bottomValue: 3, leftValue: 9, rightValue: 10},
+		103:{name: "Selphie", topValue: 10, bottomValue: 6, leftValue: 4, rightValue: 8},
+		104:{name: "Quistis", topValue: 9, bottomValue: 10, leftValue: 2, rightValue: 6},
+		105:{name: "Irvine", topValue: 2, bottomValue: 9, leftValue: 10, rightValue: 6},
+		106:{name: "Zell", topValue: 8, bottomValue: 10, leftValue: 6, rightValue: 5},
+		107:{name: "Rinoa", topValue: 4, bottomValue: 2, leftValue: 10, rightValue: 10},
+		108:{name: "Edea", topValue: 10, bottomValue: 3, leftValue: 3, rightValue: 10},
+		109:{name: "Seifer", topValue: 6, bottomValue: 10, leftValue: 4, rightValue: 9},
+		110:{name: "Squall", topValue: 10, bottomValue: 6, leftValue: 9, rightValue: 4}
 		
 	}
 	
@@ -386,6 +386,7 @@ function init(){
 	soundBg();
 	drawBg();
 	startDrawing();
+	
 	
 	playerCards[0] = new Card();
 	playerCards[0].index = 0;
@@ -432,12 +433,47 @@ function init(){
 	
 	setPlayerHand();
 	setEnemyHand();
-	
+	// testing this function/object TTDeck
+	TTDeck();
 	document.addEventListener('keydown',checkKeyDown,false);
 	document.addEventListener('keyup',checkKeyUp,false);
 }
 
+// card object to represent a monster/character/GF card
+function TTCard(name,top,bottom,left,right){
+	this.name = name;
+	this.top = top;
+	this.bottom = bottom;
+	this.left = left;
+	this.right = right;
+}
 
+// Deck to hold cards
+// will fix this later. 
+// in the process of testing for iteration through the enum, card object, get name, top,bottom,left, right values
+// array to hold all the cards, so far it seems to work notice the name of the cards and value
+function TTDeck(){
+	var card = CardEnum;
+	var name;
+	// length of enum
+	var keys = Object.keys(card);
+	var CardArray = [];
+	alert(keys.length);
+	for (var i = 1;i<keys.length;i++){
+		if (i == 109){
+			name = card[keys[i]];
+		}
+		var c = new TTCard(card.properties[i].name,card.properties[i].topValue,card.properties[i].bottomValue,card.properties[i].leftValue,card.properties[i].rightValue);
+		CardArray.push(c);
+	}
+	//var c = new TTCard(card.properties[1].name,card.properties[1].topValue,card.properties[1].bottomValue,card.properties[1].leftValue,card.properties[1].rightValue);
+	//alert("the name of the first card is: " + c.name +", top value: " + c.top + ", bottom value: " + c.bottom + ", left value: "+c.left + ", right value: " + c.right );
+	alert(name+" "+card.properties[name].name);
+	alert(CardArray[0].name+" top value: " + CardArray[0].top);// Geezard 1st card
+	alert(CardArray[1].name+" top value: " + CardArray[1].top);// Funguar 2nd card 
+	alert(CardArray[109].name+" top value: " + CardArray[109].top);// Squall last card 
+	
+}
 
 function draw() {
 	for (i = 0; i < playerCards.length; i++) {
