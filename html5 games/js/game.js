@@ -1,46 +1,12 @@
+// Canvas Variables
 var canvasBg = document.getElementById('canvasBg');
 var ctxBg = canvasBg.getContext('2d');
-
-// I don't know how to make these variables work in an array.
-// Will change them to an array once I figure it out.
-
-var playerCard0 = document.getElementById('playerCard0');
-var ctxPlayerCard0 = playerCard0.getContext('2d');
-
-var playerCard1 = document.getElementById('playerCard1');
-var ctxPlayerCard1 = playerCard1.getContext('2d');
-
-var playerCard2 = document.getElementById('playerCard2');
-var ctxPlayerCard2 = playerCard2.getContext('2d');
-
-var playerCard3 = document.getElementById('playerCard3');
-var ctxPlayerCard3 = playerCard3.getContext('2d');
-
-var playerCard4 = document.getElementById('playerCard4');
-var ctxPlayerCard4 = playerCard4.getContext('2d');
-
-var enemyCard0 = document.getElementById('enemyCard0');
-var ctxEnemyCard0 = enemyCard0.getContext('2d');
-
-var enemyCard1 = document.getElementById('enemyCard1');
-var ctxEnemyCard1 = enemyCard1.getContext('2d');
-
-var enemyCard2 = document.getElementById('enemyCard2');
-var ctxEnemyCard2 = enemyCard2.getContext('2d');
-
-var enemyCard3 = document.getElementById('enemyCard3');
-var ctxEnemyCard3 = enemyCard3.getContext('2d');
-
-var enemyCard4 = document.getElementById('enemyCard4');
-var ctxEnemyCard4 = enemyCard4.getContext('2d');
-
-var canvasFinger = document.getElementById('canvasFinger');
-var ctxFinger = canvasFinger.getContext('2d');
 
 // Hand arrays
 var playerCards = ["0", "1", "2", "3", "4"];
 var enemyCards = ["0", "1", "2", "3", "4"];
 
+// Game Settings variables
 var gameWidth = canvasBg.width;
 var gameHeight = canvasBg.height;
 var fps = 10;
@@ -104,6 +70,17 @@ imgBg.src = 'images/board.png';
 var cardSheet = new Image();
 cardSheet.src = 'images/cards.png';
 
+var imgFinger = new Image();
+imgFinger.src = 'images/finger.png';
+
+var imgFont = new Image();
+imgFont.src = 'images/fonts.png';
+
+var imgEnemyBack = new Image();
+imgEnemyBack.src = 'images/enemyBack.png';
+
+var imgPlayerBack = new Image();
+imgPlayerBack.src = 'images/playerBack.png';
 
 var playerCardImg = ["0", "1", "2", "3", "4"];
 playerCardImg[0] = new Image();
@@ -118,8 +95,6 @@ enemyCardImg[1] = new Image();
 enemyCardImg[2] = new Image();
 enemyCardImg[3] = new Image();
 enemyCardImg[4] = new Image();
-
-fingerImg = new Image();
 
 // Load background
 imgBg.addEventListener('load',init,false);
@@ -387,10 +362,19 @@ function init(){
 	drawBg();
 	startDrawing();
 	
-	
 	playerCards[0] = new Card();
 	playerCards[0].index = 0;
-	playerCards[0].randomize();
+	//playerCards[0].randomize();
+	//temporarily make chubby chocobo
+	playerCards[0].card = CardEnum.CHOCOBO;
+	playerCards[0].top 	= CardEnum.properties[CardEnum.CHOCOBO].topValue;
+	playerCards[0].left 	= CardEnum.properties[CardEnum.CHOCOBO].leftValue;
+	playerCards[0].right 	= CardEnum.properties[CardEnum.CHOCOBO].rightValue;
+	playerCards[0].bottom = CardEnum.properties[CardEnum.CHOCOBO].bottomValue;
+	playerCards[0].srcX = 64 * 19;
+	playerCards[0].srcY = 64 * 2;
+	playerCards[0].origX = playerCards[0].srcX;
+	playerCards[0].origY = playerCards[0].srcY;
 	
 	playerCards[1] = new Card();
 	playerCards[1].index = 1;
@@ -411,30 +395,36 @@ function init(){
 	enemyCards[0] = new Card();
 	enemyCards[0].index = 5;
 	enemyCards[0].randomize();
+	enemyCards[0].player = false;
 	
 	enemyCards[1] = new Card();
 	enemyCards[1].index = 6;
 	enemyCards[1].randomize();
+	enemyCards[1].player = false;
 	
 	enemyCards[2] = new Card();
 	enemyCards[2].index = 7;
 	enemyCards[2].randomize();
+	enemyCards[2].player = false;
 	
 	enemyCards[3] = new Card();
 	enemyCards[3].index = 8;
 	enemyCards[3].randomize();
+	enemyCards[3].player = false;
 	
 	enemyCards[4] = new Card();
 	enemyCards[4].index = 9;
 	enemyCards[4].randomize();
+	enemyCards[4].player = false;
 	
 	finger1 = new Finger();
-	fingerImg.src = 'images/finger.png';
 	
 	setPlayerHand();
 	setEnemyHand();
+	
 	// testing this function/object TTDeck
 	TTDeck();
+	
 	document.addEventListener('keydown',checkKeyDown,false);
 	document.addEventListener('keyup',checkKeyUp,false);
 }
@@ -496,6 +486,8 @@ function TTDraw(index, deck){
 }
 
 function draw() {
+	ctxBg.clearRect(0, 0, canvasBg.width, canvasBg.height);
+	drawBg();
 	for (i = 0; i < playerCards.length; i++) {
 		playerCards[i].draw();
 	}
@@ -521,10 +513,6 @@ function drawBg() {
 	var drawX = 0;
 	var drawY = 0;
 	ctxBg.drawImage(imgBg,srcX,srcY,gameWidth,gameHeight,drawX,drawY,gameWidth*widthScale,gameHeight*heightScale);
-}
-
-function clearCtxBg() {
-	ctxBg.clearRect(0,0,gameWidth,gameHeight);
 }
 
 // play main theme song in a loop
@@ -735,14 +723,8 @@ Finger.prototype.place = function() {
 }
 
 Finger.prototype.draw = function() {
-	clearCtxFinger();
-	
-	ctxFinger.drawImage(fingerImg,this.srcX,this.srcY,gameWidth,gameHeight,
+	ctxBg.drawImage(imgFinger,this.srcX,this.srcY,gameWidth,gameHeight,
 				this.drawX,this.drawY,gameWidth*widthScale,gameHeight*heightScale);
-}
-
-function clearCtxFinger() {
-	ctxFinger.clearRect(0,0,gameWidth,gameHeight);
 }
 
 // end of main functions
@@ -764,6 +746,7 @@ function Card() {
 	this.origY = 0;
 	this.backX = 64 * 26;
 	this.backY = 64 * 3;
+	this.player = true; //either player or enemy
 	
 	// blue background = player
 	// pink background = enemy
@@ -776,11 +759,22 @@ function Card() {
 	this.flip = false;
 	
 	// Card values, future implementation
+	this.card;
 	this.top;
 	this.left;
 	this.right;
 	this.bottom;
 	this.element;
+	
+	//CardEnum = { 82:{name: "Chocobo", topValue: 9, bottomValue: 8, leftValue: 4, rightValue: 4},
+	
+	/*
+	var mySize = SizeEnum.MEDIUM;
+	var myCode = SizeEnum.properties[mySize].code; // myCode == "M"
+	*/
+	// chubby values
+	//this.top 	= 4;
+	//this.card = CardEnum.CHOCOBO;
 }
 
 Card.prototype.randomize = function() {
@@ -802,8 +796,17 @@ Card.prototype.randomize = function() {
 	
 	this.srcX = 64 * col;
 	this.srcY = 64 * row;
-	this.origX = 64 * col;
-	this.origY = 64 * row;
+	this.origX = this.srcX;
+	this.origY = this.srcY;
+	
+	// later, match the following with the picture array
+	
+	this.card = Math.floor((Math.random() * 110)+1);	// 1-110
+	
+	this.top 	= CardEnum.properties[this.card].topValue;
+	this.left 	= CardEnum.properties[this.card].leftValue;
+	this.right 	= CardEnum.properties[this.card].rightValue;
+	this.bottom = CardEnum.properties[this.card].bottomValue;
 	
 }
 
@@ -812,54 +815,68 @@ Card.prototype.draw = function () {
 	// flip functions, test whether front or side flip. just front for now.
 	if (this.flip) { this.frontFlip(); }
 	
-	// clears previous drawing of card in order to redraw card in new spot
-	clearCtxCard(this.index);
+	// Draw card background (blue = player, pink = enemy)
+	if (this.player) {
+		ctxBg.drawImage(imgPlayerBack,0,0,this.width,this.height,
+				this.drawX,this.drawY,this.width*this.widthScale,this.height*this.heightScale);
+	} else {
+		ctxBg.drawImage(imgEnemyBack,0,0,this.width,this.height,
+				this.drawX,this.drawY,this.width*this.widthScale,this.height*this.heightScale);
+	}
 	
-	// Really need to figure out how to make the ctx variables into an array for this to be compact
-	if (this.index == 0) {
-		ctxPlayerCard0.drawImage(cardSheet,this.srcX,this.srcY,this.width,this.height,
-						this.drawX,this.drawY,this.width*this.widthScale,this.height*this.heightScale);
-		//ctxCard0.drawImage(COLOR BACKGROUND,this.srcX,this.srcY,this.width,this.height,
-		//				this.drawX,this.drawY,this.width*this.widthScale,this.height*this.heightScale);
-	}
-	else if (this.index == 1) {
-		ctxPlayerCard1.drawImage(cardSheet,this.srcX,this.srcY,this.width,this.height,
-						this.drawX,this.drawY,this.width*this.widthScale,this.height*this.heightScale);
-	}
-	else if (this.index == 2) {
-		ctxPlayerCard2.drawImage(cardSheet,this.srcX,this.srcY,this.width,this.height,
-						this.drawX,this.drawY,this.width*this.widthScale,this.height*this.heightScale);
-	}
-	else if (this.index == 3) {
-		ctxPlayerCard3.drawImage(cardSheet,this.srcX,this.srcY,this.width,this.height,
-						this.drawX,this.drawY,this.width*this.widthScale,this.height*this.heightScale);
-	}
-	else if (this.index == 4) {
-		ctxPlayerCard4.drawImage(cardSheet,this.srcX,this.srcY,this.width,this.height,
-						this.drawX,this.drawY,this.width*this.widthScale,this.height*this.heightScale);
-	}
-	else if (this.index == 5) {
-		ctxEnemyCard0.drawImage(cardSheet,this.srcX,this.srcY,this.width,this.height,
-						this.drawX,this.drawY,this.width*this.widthScale,this.height*this.heightScale);
-	}
-	else if (this.index == 6) {
-		ctxEnemyCard1.drawImage(cardSheet,this.srcX,this.srcY,this.width,this.height,
-						this.drawX,this.drawY,this.width*this.widthScale,this.height*this.heightScale);
-	}
-	else if (this.index == 7) {
-		ctxEnemyCard2.drawImage(cardSheet,this.srcX,this.srcY,this.width,this.height,
-						this.drawX,this.drawY,this.width*this.widthScale,this.height*this.heightScale);
-	}
-	else if (this.index == 8) {
-		ctxEnemyCard3.drawImage(cardSheet,this.srcX,this.srcY,this.width,this.height,
-						this.drawX,this.drawY,this.width*this.widthScale,this.height*this.heightScale);
-	}
-	else if (this.index == 9) {
-		ctxEnemyCard4.drawImage(cardSheet,this.srcX,this.srcY,this.width,this.height,
-						this.drawX,this.drawY,this.width*this.widthScale,this.height*this.heightScale);
-	}
+	// Draw card image from sprite sheet
+	ctxBg.drawImage(cardSheet,this.srcX,this.srcY,this.width,this.height,
+				this.drawX,this.drawY,this.width*this.widthScale,this.height*this.heightScale);
+	
+	// Draw card's point values (and element later)
+	this.drawNumbers();
 	
 };
+
+Card.prototype.drawNumbers = function () {
+	//imgFont
+	
+	//0 : 148, 66
+	// subsequent numbers are 148 * #
+	// A is outlier: 175, 83
+	var scale = 1.65;
+	var x = 0;
+	var y = 0;
+	
+	// Columns and Rows for Number placement
+	var col1 = this.drawX + (this.widthScale*1);
+	var col2 = this.drawX + (this.widthScale*5);
+	var col3 = this.drawX + (this.widthScale*9);
+	
+	var row1 = this.drawY + (this.heightScale*2);
+	var row2 = this.drawY + (this.heightScale*10);
+	var row3 = this.drawY + (this.heightScale*18);
+	
+	
+	
+	/*
+		number images stretched to 165%
+		on final 2x2.5 stretched card
+	*/
+	
+	
+	// if not 'A', or rather, if an integer between 0-9 (A is 10)
+	
+	// Top
+	if (-1 < this.top && this.top < 10) { x = 148 + (this.top * 16); y = 66; } else { x = 175; y = 83; }
+	ctxBg.drawImage(imgFont, x, y, 16, 16, col2, row1, 16*scale, 16*scale);
+	
+	// Left
+	if (-1 < this.left && this.left < 10) { x = 148 + (this.left * 16); y = 66; } else { x = 175; y = 83; }
+	ctxBg.drawImage(imgFont, x, y, 16, 16, col1, row2, 16*scale, 16*scale);
+	// Right
+	if (-1 < this.right && this.right < 10) { x = 148 + (this.right * 16); y = 66; } else { x = 175; y = 83; }
+	ctxBg.drawImage(imgFont, x, y, 16, 16, col3, row2, 16*scale, 16*scale);
+	// Bottom
+	if (-1 < this.bottom && this.bottom < 10) { x = 148 + (this.bottom * 16); y = 66; } else { x = 175; y = 83; }
+	ctxBg.drawImage(imgFont, x, y, 16, 16, col2, row3, 16*scale, 16*scale);
+	
+}
 
 Card.prototype.frontFlip = function () {
 
@@ -948,22 +965,6 @@ function checkKeys() {
 	}
 }
 
-function clearCtxCard(index){
-	// again, much simpler when/if ctx variables are in an array...
-	if (index == 0) {
-		ctxPlayerCard0.clearRect(0,0,gameWidth,gameHeight);
-	}
-	
-	else if (index == 1) { ctxPlayerCard1.clearRect(0,0,gameWidth,gameHeight); }
-	else if (index == 2) { ctxPlayerCard2.clearRect(0,0,gameWidth,gameHeight); }
-	else if (index == 3) { ctxPlayerCard3.clearRect(0,0,gameWidth,gameHeight); }
-	else if (index == 4) { ctxPlayerCard4.clearRect(0,0,gameWidth,gameHeight); }
-	else if (index == 5) { ctxEnemyCard0.clearRect(0,0,gameWidth,gameHeight); }
-	else if (index == 6) { ctxEnemyCard1.clearRect(0,0,gameWidth,gameHeight); }
-	else if (index == 7) { ctxEnemyCard2.clearRect(0,0,gameWidth,gameHeight); }
-	else if (index == 8) { ctxEnemyCard3.clearRect(0,0,gameWidth,gameHeight); }
-	else if (index == 9) { ctxEnemyCard4.clearRect(0,0,gameWidth,gameHeight); }
-}
 
 // end of Card functions
 
