@@ -457,22 +457,42 @@ function TTDeck(){
 	var name;
 	// length of enum
 	var keys = Object.keys(card);
+	// CardArray is a global array
 	var CardArray = [];
-	alert(keys.length);
+	//alert(keys.length);
 	for (var i = 1;i<keys.length;i++){
-		if (i == 109){
-			name = card[keys[i]];
-		}
+		
 		var c = new TTCard(card.properties[i].name,card.properties[i].topValue,card.properties[i].bottomValue,card.properties[i].leftValue,card.properties[i].rightValue);
 		CardArray.push(c);
+		if (i == 1){
+			name = c;
+		}
 	}
 	//var c = new TTCard(card.properties[1].name,card.properties[1].topValue,card.properties[1].bottomValue,card.properties[1].leftValue,card.properties[1].rightValue);
-	//alert("the name of the first card is: " + c.name +", top value: " + c.top + ", bottom value: " + c.bottom + ", left value: "+c.left + ", right value: " + c.right );
-	alert(name+" "+card.properties[name].name);
+	alert("the name of the first card is: " + name.name +", top value: " + name.top + ", bottom value: " + name.bottom + ", left value: "+name.left + ", right value: " + name.right );
+	alert("name: " +name.name);
 	alert(CardArray[0].name+" top value: " + CardArray[0].top);// Geezard 1st card
 	alert(CardArray[1].name+" top value: " + CardArray[1].top);// Funguar 2nd card 
 	alert(CardArray[109].name+" top value: " + CardArray[109].top);// Squall last card 
 	
+	return CardArray;
+	
+}
+
+// function to add card to a deck/stack/hand and etc.
+// the global array of cards called CardArray holds all the cards.
+
+function TTDraw(index, deck){
+	var card;
+
+	if (index >= 0 && index < this.deck.length) {
+		card = this.deck[index];
+		this.deck.splice(index, 1);
+	}
+	else
+		card = null;
+
+	return card;
 }
 
 function draw() {
