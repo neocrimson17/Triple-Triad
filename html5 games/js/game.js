@@ -230,125 +230,125 @@ var CardEnum = {
 	
 	properties: {
 		// level 1 monsters 
-		1:{name: "Geezard", topValue: 1, bottomValue: 1, leftValue: 5, rightValue: 4},
-		2:{name: "Funguar", topValue: 5, bottomValue: 1, leftValue: 3, rightValue: 1},
-		3:{name: "Bite Bug", topValue: 1, bottomValue: 3, leftValue: 5, rightValue: 3},
-		4:{name: "Red Bat", topValue: 6, bottomValue: 1, leftValue: 2, rightValue: 1},
-		5:{name: "Blobra", topValue: 2, bottomValue: 1, leftValue: 5, rightValue: 3},
-		6:{name: "Gayla", topValue: 2, bottomValue: 4, leftValue: 4, rightValue: 1},
-		7:{name: "Gesper", topValue: 1, bottomValue: 4, leftValue: 1, rightValue: 5},
-		8:{name: "Fastitocalon-F", topValue: 3, bottomValue: 2, leftValue: 1, rightValue: 5},
-		9:{name: "Blood Soul", topValue: 2, bottomValue: 6, leftValue: 1, rightValue: 1},
-		10:{name: "Caterchipillar", topValue: 4, bottomValue: 4, leftValue: 3, rightValue: 2},
-		11:{name: "Cockatrice", topValue: 2, bottomValue: 2, leftValue: 6, rightValue: 1},
+		1:{name: "Geezard", topValue: 1, bottomValue: 1, leftValue: 5, rightValue: 4, numCopy: 1},
+		2:{name: "Funguar", topValue: 5, bottomValue: 1, leftValue: 3, rightValue: 1, numCopy: 1},
+		3:{name: "Bite Bug", topValue: 1, bottomValue: 3, leftValue: 5, rightValue: 3, numCopy: 1},
+		4:{name: "Red Bat", topValue: 6, bottomValue: 1, leftValue: 2, rightValue: 1, numCopy: 1},
+		5:{name: "Blobra", topValue: 2, bottomValue: 1, leftValue: 5, rightValue: 3, numCopy: 1},
+		6:{name: "Gayla", topValue: 2, bottomValue: 4, leftValue: 4, rightValue: 1, numCopy: 1},
+		7:{name: "Gesper", topValue: 1, bottomValue: 4, leftValue: 1, rightValue: 5, numCopy: 1},
+		8:{name: "Fastitocalon-F", topValue: 3, bottomValue: 2, leftValue: 1, rightValue: 5, numCopy: 1},
+		9:{name: "Blood Soul", topValue: 2, bottomValue: 6, leftValue: 1, rightValue: 1, numCopy: 1},
+		10:{name: "Caterchipillar", topValue: 4, bottomValue: 4, leftValue: 3, rightValue: 2, numCopy: 1},
+		11:{name: "Cockatrice", topValue: 2, bottomValue: 2, leftValue: 6, rightValue: 1, numCopy: 1},
 		// level 2 monsters 
-		12:{name: "Grat", topValue: 7, bottomValue: 3, leftValue: 1, rightValue: 1},
-		13:{name: "Buel", topValue: 6, bottomValue: 2, leftValue: 3, rightValue: 2},
-		14:{name: "Mesmerize", topValue: 5, bottomValue: 3, leftValue: 4, rightValue: 3},
-		15:{name: "Glacial Eye", topValue: 6, bottomValue: 4, leftValue: 3, rightValue: 1},
-		16:{name: "Belhelmel", topValue: 3, bottomValue: 5, leftValue: 3, rightValue: 4},
-		17:{name: "Thrustaevis", topValue: 5, bottomValue: 2, leftValue: 5, rightValue: 3},
-		18:{name: "Anacondaur", topValue: 5, bottomValue: 3, leftValue: 5, rightValue: 1},
-		19:{name: "Creeps", topValue: 5, bottomValue: 5, leftValue: 2, rightValue: 2},
-		20:{name: "Grendel", topValue: 4, bottomValue: 5, leftValue: 2, rightValue: 4},
-		21:{name: "Jelleye", topValue: 3, bottomValue: 1, leftValue: 7, rightValue: 2},
-		22:{name: "Grand Mantis", topValue: 5, bottomValue: 5, leftValue: 3, rightValue: 2},
+		12:{name: "Grat", topValue: 7, bottomValue: 3, leftValue: 1, rightValue: 1, numCopy: 1},
+		13:{name: "Buel", topValue: 6, bottomValue: 2, leftValue: 3, rightValue: 2, numCopy: 1},
+		14:{name: "Mesmerize", topValue: 5, bottomValue: 3, leftValue: 4, rightValue: 3, numCopy: 1},
+		15:{name: "Glacial Eye", topValue: 6, bottomValue: 4, leftValue: 3, rightValue: 1, numCopy: 1},
+		16:{name: "Belhelmel", topValue: 3, bottomValue: 5, leftValue: 3, rightValue: 4, numCopy: 1},
+		17:{name: "Thrustaevis", topValue: 5, bottomValue: 2, leftValue: 5, rightValue: 3, numCopy: 1},
+		18:{name: "Anacondaur", topValue: 5, bottomValue: 3, leftValue: 5, rightValue: 1, numCopy: 1},
+		19:{name: "Creeps", topValue: 5, bottomValue: 5, leftValue: 2, rightValue: 2, numCopy: 1},
+		20:{name: "Grendel", topValue: 4, bottomValue: 5, leftValue: 2, rightValue: 4, numCopy: 1},
+		21:{name: "Jelleye", topValue: 3, bottomValue: 1, leftValue: 7, rightValue: 2, numCopy: 1},
+		22:{name: "Grand Mantis", topValue: 5, bottomValue: 5, leftValue: 3, rightValue: 2, numCopy: 1},
 		// level 3 monsters 
-		23:{name: "Forbidden", topValue: 6, bottomValue: 3, leftValue: 2, rightValue: 6},
-		24:{name: "Armadodo", topValue: 6, bottomValue: 1, leftValue: 6, rightValue: 3},
-		25:{name: "Tri-Face", topValue: 3, bottomValue: 5, leftValue: 5, rightValue: 5},
-		26:{name: "Fastitocalon", topValue: 7, bottomValue: 1, leftValue: 3, rightValue: 5},
-		27:{name: "Snow Lion", topValue: 7, bottomValue: 5, leftValue: 3, rightValue: 1},
-		28:{name: "Ochu", topValue: 5, bottomValue: 3, leftValue: 3, rightValue: 6},
-		29:{name: "SAM08G", topValue: 5, bottomValue: 2, leftValue: 4, rightValue: 6},
-		30:{name: "Death Claw", topValue: 4, bottomValue: 7, leftValue: 2, rightValue: 4},
-		31:{name: "Cactuar", topValue: 6, bottomValue: 6, leftValue: 3, rightValue: 2},
-		32:{name: "Tonberry", topValue: 3, bottomValue: 4, leftValue: 4, rightValue: 6},
-		33:{name: "Abyss Worm", topValue: 7, bottomValue: 3, leftValue: 5, rightValue: 2},
+		23:{name: "Forbidden", topValue: 6, bottomValue: 3, leftValue: 2, rightValue: 6, numCopy: 1},
+		24:{name: "Armadodo", topValue: 6, bottomValue: 1, leftValue: 6, rightValue: 3, numCopy: 1},
+		25:{name: "Tri-Face", topValue: 3, bottomValue: 5, leftValue: 5, rightValue: 5, numCopy: 1},
+		26:{name: "Fastitocalon", topValue: 7, bottomValue: 1, leftValue: 3, rightValue: 5, numCopy: 1},
+		27:{name: "Snow Lion", topValue: 7, bottomValue: 5, leftValue: 3, rightValue: 1, numCopy: 1},
+		28:{name: "Ochu", topValue: 5, bottomValue: 3, leftValue: 3, rightValue: 6, numCopy: 1},
+		29:{name: "SAM08G", topValue: 5, bottomValue: 2, leftValue: 4, rightValue: 6, numCopy: 1},
+		30:{name: "Death Claw", topValue: 4, bottomValue: 7, leftValue: 2, rightValue: 4, numCopy: 1},
+		31:{name: "Cactuar", topValue: 6, bottomValue: 6, leftValue: 3, rightValue: 2, numCopy: 1},
+		32:{name: "Tonberry", topValue: 3, bottomValue: 4, leftValue: 4, rightValue: 6, numCopy: 1},
+		33:{name: "Abyss Worm", topValue: 7, bottomValue: 3, leftValue: 5, rightValue: 2, numCopy: 1},
 		// level 4 monsters 
-		34:{name: "Turtapod", topValue: 2, bottomValue: 6, leftValue: 7, rightValue: 3},
-		35:{name: "Vysage", topValue: 6, bottomValue: 4, leftValue: 5, rightValue: 5},
-		36:{name: "T-Rexaur", topValue: 4, bottomValue: 2, leftValue: 7, rightValue: 6},
-		37:{name: "Bomb", topValue: 2, bottomValue: 6, leftValue: 3, rightValue: 7},
-		38:{name: "Blitz", topValue: 1, bottomValue: 4, leftValue: 7, rightValue: 6},
-		39:{name: "Wendigo", topValue: 7, bottomValue: 1, leftValue: 6, rightValue: 3},
-		40:{name: "Torama", topValue: 7, bottomValue: 4, leftValue: 4, rightValue: 4},
-		41:{name: "Imp", topValue: 3, bottomValue: 3, leftValue: 6, rightValue: 7},
-		42:{name: "Blue Dragon", topValue: 6, bottomValue: 7, leftValue: 3, rightValue: 2},
-		43:{name: "Adamantoise", topValue: 4, bottomValue: 5, leftValue: 6, rightValue: 5},
-		44:{name: "Hexadragon", topValue: 7, bottomValue: 4, leftValue: 3, rightValue: 5},
+		34:{name: "Turtapod", topValue: 2, bottomValue: 6, leftValue: 7, rightValue: 3, numCopy: 1},
+		35:{name: "Vysage", topValue: 6, bottomValue: 4, leftValue: 5, rightValue: 5, numCopy: 1},
+		36:{name: "T-Rexaur", topValue: 4, bottomValue: 2, leftValue: 7, rightValue: 6, numCopy: 1},
+		37:{name: "Bomb", topValue: 2, bottomValue: 6, leftValue: 3, rightValue: 7, numCopy: 1},
+		38:{name: "Blitz", topValue: 1, bottomValue: 4, leftValue: 7, rightValue: 6, numCopy: 1},
+		39:{name: "Wendigo", topValue: 7, bottomValue: 1, leftValue: 6, rightValue: 3, numCopy: 1},
+		40:{name: "Torama", topValue: 7, bottomValue: 4, leftValue: 4, rightValue: 4, numCopy: 1},
+		41:{name: "Imp", topValue: 3, bottomValue: 3, leftValue: 6, rightValue: 7, numCopy: 1},
+		42:{name: "Blue Dragon", topValue: 6, bottomValue: 7, leftValue: 3, rightValue: 2, numCopy: 1},
+		43:{name: "Adamantoise", topValue: 4, bottomValue: 5, leftValue: 6, rightValue: 5, numCopy: 1},
+		44:{name: "Hexadragon", topValue: 7, bottomValue: 4, leftValue: 3, rightValue: 5, numCopy: 1},
 		// level 5 monsters 
-		45:{name: "Iron Giant", topValue: 6, bottomValue: 6, leftValue: 5, rightValue: 5},
-		46:{name: "Behemoth", topValue: 3, bottomValue: 5, leftValue: 7, rightValue: 6},
-		47:{name: "Chimera", topValue: 7, bottomValue: 5, leftValue: 3, rightValue: 6},
-		48:{name: "PuPu", topValue: 3, bottomValue: 2, leftValue: 1, rightValue: 10},
-		49:{name: "Elastoid", topValue: 6, bottomValue: 6, leftValue: 7, rightValue: 2},
-		50:{name: "GIM47N", topValue: 5, bottomValue: 7, leftValue: 4, rightValue: 5},
-		51:{name: "Malboro", topValue: 7, bottomValue: 4, leftValue: 2, rightValue: 7},
-		52:{name: "Ruby Dragon", topValue: 7, bottomValue: 7, leftValue: 4, rightValue: 2},
-		53:{name: "Elnoyle", topValue: 5, bottomValue: 7, leftValue: 6, rightValue: 3},
-		54:{name: "Tonberry King", topValue: 4, bottomValue: 7, leftValue: 4, rightValue: 6},
-		55:{name: "Biggs, Wedge", topValue: 6, bottomValue: 2, leftValue: 7, rightValue: 6},
+		45:{name: "Iron Giant", topValue: 6, bottomValue: 6, leftValue: 5, rightValue: 5, numCopy: 1},
+		46:{name: "Behemoth", topValue: 3, bottomValue: 5, leftValue: 7, rightValue: 6, numCopy: 1},
+		47:{name: "Chimera", topValue: 7, bottomValue: 5, leftValue: 3, rightValue: 6, numCopy: 1},
+		48:{name: "PuPu", topValue: 3, bottomValue: 2, leftValue: 1, rightValue: 10, numCopy: 1},
+		49:{name: "Elastoid", topValue: 6, bottomValue: 6, leftValue: 7, rightValue: 2, numCopy: 1},
+		50:{name: "GIM47N", topValue: 5, bottomValue: 7, leftValue: 4, rightValue: 5, numCopy: 1},
+		51:{name: "Malboro", topValue: 7, bottomValue: 4, leftValue: 2, rightValue: 7, numCopy: 1},
+		52:{name: "Ruby Dragon", topValue: 7, bottomValue: 7, leftValue: 4, rightValue: 2, numCopy: 1},
+		53:{name: "Elnoyle", topValue: 5, bottomValue: 7, leftValue: 6, rightValue: 3, numCopy: 1},
+		54:{name: "Tonberry King", topValue: 4, bottomValue: 7, leftValue: 4, rightValue: 6, numCopy: 1},
+		55:{name: "Biggs, Wedge", topValue: 6, bottomValue: 2, leftValue: 7, rightValue: 6, numCopy: 1},
 		// level 6 bosses 
-		56:{name: "Fujin, Raijin", topValue: 2, bottomValue: 8, leftValue: 4, rightValue: 8},
-		57:{name: "Elvoret", topValue: 7, bottomValue: 3, leftValue: 4, rightValue: 8},
-		58:{name: "X-ATM092", topValue: 4, bottomValue: 7, leftValue: 3, rightValue: 8},
-		59:{name: "Granaldo", topValue: 7, bottomValue: 8, leftValue: 5, rightValue: 2},
-		60:{name: "Gerogero", topValue: 1, bottomValue: 8, leftValue: 3, rightValue: 8},
-		61:{name: "Iguion", topValue: 8, bottomValue: 8, leftValue: 2, rightValue: 2},
-		62:{name: "Abadon", topValue: 6, bottomValue: 4, leftValue: 5, rightValue: 8},
-		63:{name: "Trauma", topValue: 4, bottomValue: 5, leftValue: 6, rightValue: 8},
-		64:{name: "Oilboyle", topValue: 1, bottomValue: 4, leftValue: 8, rightValue: 8},
-		65:{name: "Shumi Tribe", topValue: 6, bottomValue: 8, leftValue: 4, rightValue: 5},
-		66:{name: "Krysta", topValue: 7, bottomValue: 8, leftValue: 1, rightValue: 5},
+		56:{name: "Fujin, Raijin", topValue: 2, bottomValue: 8, leftValue: 4, rightValue: 8, numCopy: 1},
+		57:{name: "Elvoret", topValue: 7, bottomValue: 3, leftValue: 4, rightValue: 8, numCopy: 1},
+		58:{name: "X-ATM092", topValue: 4, bottomValue: 7, leftValue: 3, rightValue: 8, numCopy: 1},
+		59:{name: "Granaldo", topValue: 7, bottomValue: 8, leftValue: 5, rightValue: 2, numCopy: 1},
+		60:{name: "Gerogero", topValue: 1, bottomValue: 8, leftValue: 3, rightValue: 8, numCopy: 1},
+		61:{name: "Iguion", topValue: 8, bottomValue: 8, leftValue: 2, rightValue: 2, numCopy: 1},
+		62:{name: "Abadon", topValue: 6, bottomValue: 4, leftValue: 5, rightValue: 8, numCopy: 1},
+		63:{name: "Trauma", topValue: 4, bottomValue: 5, leftValue: 6, rightValue: 8, numCopy: 1},
+		64:{name: "Oilboyle", topValue: 1, bottomValue: 4, leftValue: 8, rightValue: 8, numCopy: 1},
+		65:{name: "Shumi Tribe", topValue: 6, bottomValue: 8, leftValue: 4, rightValue: 5, numCopy: 1},
+		66:{name: "Krysta", topValue: 7, bottomValue: 8, leftValue: 1, rightValue: 5, numCopy: 1},
 		// level 7 bosses 
-		67:{name: "Propagator", topValue: 8, bottomValue: 4, leftValue: 8, rightValue: 4},
-		68:{name: "Jumbo Cactuar", topValue: 8, bottomValue: 4, leftValue: 4, rightValue: 8},
-		69:{name: "Tri-Point", topValue: 8, bottomValue: 2, leftValue: 8, rightValue: 5},
-		70:{name: "Gargantua", topValue: 5, bottomValue: 6, leftValue: 8, rightValue: 6},
-		71:{name: "Mobile Type 8", topValue: 8, bottomValue: 7, leftValue: 3, rightValue: 6},
-		72:{name: "Sphinxara", topValue: 8, bottomValue: 5, leftValue: 8, rightValue: 3},
-		73:{name: "Tiamat", topValue: 8, bottomValue: 5, leftValue: 4, rightValue: 8},
-		74:{name: "BGH251F2", topValue: 5, bottomValue: 8, leftValue: 5, rightValue: 7},
-		75:{name: "Red Giant", topValue: 6, bottomValue: 4, leftValue: 7, rightValue: 8},
-		76:{name: "Catoblepas", topValue: 1, bottomValue: 7, leftValue: 7, rightValue: 8},
-		77:{name: "Ultima Weapon", topValue: 7, bottomValue: 2, leftValue: 8, rightValue: 7},
+		67:{name: "Propagator", topValue: 8, bottomValue: 4, leftValue: 8, rightValue: 4, numCopy: 1},
+		68:{name: "Jumbo Cactuar", topValue: 8, bottomValue: 4, leftValue: 4, rightValue: 8, numCopy: 1},
+		69:{name: "Tri-Point", topValue: 8, bottomValue: 2, leftValue: 8, rightValue: 5, numCopy: 1},
+		70:{name: "Gargantua", topValue: 5, bottomValue: 6, leftValue: 8, rightValue: 6, numCopy: 1},
+		71:{name: "Mobile Type 8", topValue: 8, bottomValue: 7, leftValue: 3, rightValue: 6, numCopy: 1},
+		72:{name: "Sphinxara", topValue: 8, bottomValue: 5, leftValue: 8, rightValue: 3, numCopy: 1},
+		73:{name: "Tiamat", topValue: 8, bottomValue: 5, leftValue: 4, rightValue: 8, numCopy: 1},
+		74:{name: "BGH251F2", topValue: 5, bottomValue: 8, leftValue: 5, rightValue: 7, numCopy: 1},
+		75:{name: "Red Giant", topValue: 6, bottomValue: 4, leftValue: 7, rightValue: 8, numCopy: 1},
+		76:{name: "Catoblepas", topValue: 1, bottomValue: 7, leftValue: 7, rightValue: 8, numCopy: 1},
+		77:{name: "Ultima Weapon", topValue: 7, bottomValue: 2, leftValue: 8, rightValue: 7, numCopy: 1},
 		// level 8 guardian forces
-		78:{name: "Chubby Chocobo", topValue: 4, bottomValue: 8, leftValue: 9, rightValue: 4},
-		79:{name: "Angelo", topValue: 9, bottomValue: 7, leftValue: 3, rightValue: 6},
-		80:{name: "Gilgamesh", topValue: 3, bottomValue: 9, leftValue: 6, rightValue: 7},
-		81:{name: "MiniMog", topValue: 9, bottomValue: 9, leftValue: 2, rightValue: 3},
-		82:{name: "Chocobo", topValue: 9, bottomValue: 8, leftValue: 4, rightValue: 4},
-		83:{name: "Quezacotl", topValue: 2, bottomValue: 9, leftValue: 4, rightValue: 9},
-		84:{name: "Shiva", topValue: 6, bottomValue: 4, leftValue: 9, rightValue: 7},
-		85:{name: "Ifrit", topValue: 9, bottomValue: 2, leftValue: 8, rightValue: 6},
-		86:{name: "Siren", topValue: 8, bottomValue: 6, leftValue: 2, rightValue: 9},
-		87:{name: "Sacred", topValue: 5, bottomValue: 9, leftValue: 9, rightValue: 1},
-		88:{name: "Minotaur", topValue: 9, bottomValue: 2, leftValue: 9, rightValue: 5},
+		78:{name: "Chubby Chocobo", topValue: 4, bottomValue: 8, leftValue: 9, rightValue: 4, numCopy: 1},
+		79:{name: "Angelo", topValue: 9, bottomValue: 7, leftValue: 3, rightValue: 6, numCopy: 1},
+		80:{name: "Gilgamesh", topValue: 3, bottomValue: 9, leftValue: 6, rightValue: 7, numCopy: 1},
+		81:{name: "MiniMog", topValue: 9, bottomValue: 9, leftValue: 2, rightValue: 3, numCopy: 1},
+		82:{name: "Chocobo", topValue: 9, bottomValue: 8, leftValue: 4, rightValue: 4, numCopy: 1},
+		83:{name: "Quezacotl", topValue: 2, bottomValue: 9, leftValue: 4, rightValue: 9, numCopy: 1},
+		84:{name: "Shiva", topValue: 6, bottomValue: 4, leftValue: 9, rightValue: 7, numCopy: 1},
+		85:{name: "Ifrit", topValue: 9, bottomValue: 2, leftValue: 8, rightValue: 6, numCopy: 1},
+		86:{name: "Siren", topValue: 8, bottomValue: 6, leftValue: 2, rightValue: 9, numCopy: 1},
+		87:{name: "Sacred", topValue: 5, bottomValue: 9, leftValue: 9, rightValue: 1, numCopy: 1},
+		88:{name: "Minotaur", topValue: 9, bottomValue: 2, leftValue: 9, rightValue: 5, numCopy: 1},
 		// level 9 guardian forces 
-		89:{name: "Carbuncle", topValue: 8, bottomValue: 10, leftValue: 4, rightValue: 4},
-		90:{name: "Diablos", topValue: 5, bottomValue: 8, leftValue: 3, rightValue: 10},
-		91:{name: "Leviathan", topValue: 7, bottomValue: 1, leftValue: 7, rightValue: 10},
-		92:{name: "Odin", topValue: 8, bottomValue: 3, leftValue: 5, rightValue: 10},
-		93:{name: "Pandemona", topValue: 10, bottomValue: 7, leftValue: 7, rightValue: 1},
-		94:{name: "Cerberus", topValue: 7, bottomValue: 6, leftValue: 10, rightValue: 4},
-		95:{name: "Alexander", topValue: 9, bottomValue: 4, leftValue: 2, rightValue: 10},
-		96:{name: "Phoenix", topValue: 7, bottomValue: 7, leftValue: 10, rightValue: 2},
-		97:{name: "Bahamut", topValue: 10, bottomValue: 2, leftValue: 6, rightValue: 8},
-		98:{name: "Doomtrain", topValue: 3, bottomValue: 10, leftValue: 10, rightValue: 1},
-		99:{name: "Eden", topValue: 4, bottomValue: 9, leftValue: 10, rightValue: 4},
+		89:{name: "Carbuncle", topValue: 8, bottomValue: 10, leftValue: 4, rightValue: 4, numCopy: 1},
+		90:{name: "Diablos", topValue: 5, bottomValue: 8, leftValue: 3, rightValue: 10, numCopy: 1},
+		91:{name: "Leviathan", topValue: 7, bottomValue: 1, leftValue: 7, rightValue: 10, numCopy: 1},
+		92:{name: "Odin", topValue: 8, bottomValue: 3, leftValue: 5, rightValue: 10, numCopy: 1},
+		93:{name: "Pandemona", topValue: 10, bottomValue: 7, leftValue: 7, rightValue: 1, numCopy: 1},
+		94:{name: "Cerberus", topValue: 7, bottomValue: 6, leftValue: 10, rightValue: 4, numCopy: 1},
+		95:{name: "Alexander", topValue: 9, bottomValue: 4, leftValue: 2, rightValue: 10, numCopy: 1},
+		96:{name: "Phoenix", topValue: 7, bottomValue: 7, leftValue: 10, rightValue: 2, numCopy: 1},
+		97:{name: "Bahamut", topValue: 10, bottomValue: 2, leftValue: 6, rightValue: 8, numCopy: 1},
+		98:{name: "Doomtrain", topValue: 3, bottomValue: 10, leftValue: 10, rightValue: 1, numCopy: 1},
+		99:{name: "Eden", topValue: 4, bottomValue: 9, leftValue: 10, rightValue: 4, numCopy: 1},
 		// level 10 characters
-		100:{name: "Ward", topValue: 10, bottomValue: 2, leftValue: 8, rightValue: 7},
-		101:{name: "Kiros", topValue: 6, bottomValue: 6, leftValue: 10, rightValue: 7},
-		102:{name: "Laguna", topValue: 5, bottomValue: 3, leftValue: 9, rightValue: 10},
-		103:{name: "Selphie", topValue: 10, bottomValue: 6, leftValue: 4, rightValue: 8},
-		104:{name: "Quistis", topValue: 9, bottomValue: 10, leftValue: 2, rightValue: 6},
-		105:{name: "Irvine", topValue: 2, bottomValue: 9, leftValue: 10, rightValue: 6},
-		106:{name: "Zell", topValue: 8, bottomValue: 10, leftValue: 6, rightValue: 5},
-		107:{name: "Rinoa", topValue: 4, bottomValue: 2, leftValue: 10, rightValue: 10},
-		108:{name: "Edea", topValue: 10, bottomValue: 3, leftValue: 3, rightValue: 10},
-		109:{name: "Seifer", topValue: 6, bottomValue: 10, leftValue: 4, rightValue: 9},
-		110:{name: "Squall", topValue: 10, bottomValue: 6, leftValue: 9, rightValue: 4}
+		100:{name: "Ward", topValue: 10, bottomValue: 2, leftValue: 8, rightValue: 7, numCopy: 1},
+		101:{name: "Kiros", topValue: 6, bottomValue: 6, leftValue: 10, rightValue: 7, numCopy: 1},
+		102:{name: "Laguna", topValue: 5, bottomValue: 3, leftValue: 9, rightValue: 10, numCopy: 1},
+		103:{name: "Selphie", topValue: 10, bottomValue: 6, leftValue: 4, rightValue: 8, numCopy: 1},
+		104:{name: "Quistis", topValue: 9, bottomValue: 10, leftValue: 2, rightValue: 6, numCopy: 1},
+		105:{name: "Irvine", topValue: 2, bottomValue: 9, leftValue: 10, rightValue: 6, numCopy: 1},
+		106:{name: "Zell", topValue: 8, bottomValue: 10, leftValue: 6, rightValue: 5, numCopy: 1},
+		107:{name: "Rinoa", topValue: 4, bottomValue: 2, leftValue: 10, rightValue: 10, numCopy: 1},
+		108:{name: "Edea", topValue: 10, bottomValue: 3, leftValue: 3, rightValue: 10, numCopy: 1},
+		109:{name: "Seifer", topValue: 6, bottomValue: 10, leftValue: 4, rightValue: 9, numCopy: 1},
+		110:{name: "Squall", topValue: 10, bottomValue: 6, leftValue: 9, rightValue: 4, numCopy: 1}
 		
 	}
 	
@@ -430,12 +430,15 @@ function init(){
 }
 
 // card object to represent a monster/character/GF card
-function TTCard(name,top,bottom,left,right){
+// name = name of card, top,bottom,left,right are the card's strength corresponding to 
+// the 4 values on the card, and numCopy = the number of copies of the same card you have in the deck
+function TTCard(name,top,bottom,left,right,numCopy){
 	this.name = name;
 	this.top = top;
 	this.bottom = bottom;
 	this.left = left;
 	this.right = right;
+	this.numCopy = numCopy;
 }
 
 // Deck to hold cards
@@ -452,18 +455,18 @@ function TTDeck(){
 	//alert(keys.length);
 	for (var i = 1;i<keys.length;i++){
 		
-		var c = new TTCard(card.properties[i].name,card.properties[i].topValue,card.properties[i].bottomValue,card.properties[i].leftValue,card.properties[i].rightValue);
+		var c = new TTCard(card.properties[i].name,card.properties[i].topValue,card.properties[i].bottomValue,card.properties[i].leftValue,card.properties[i].rightValue, card.properties[i].numCopy);
 		CardArray.push(c);
 		if (i == 1){
 			name = c;
 		}
 	}
 	//var c = new TTCard(card.properties[1].name,card.properties[1].topValue,card.properties[1].bottomValue,card.properties[1].leftValue,card.properties[1].rightValue);
-	alert("the name of the first card is: " + name.name +", top value: " + name.top + ", bottom value: " + name.bottom + ", left value: "+name.left + ", right value: " + name.right );
-	alert("name: " +name.name);
-	alert(CardArray[0].name+" top value: " + CardArray[0].top);// Geezard 1st card
-	alert(CardArray[1].name+" top value: " + CardArray[1].top);// Funguar 2nd card 
-	alert(CardArray[109].name+" top value: " + CardArray[109].top);// Squall last card 
+	//alert("the name of the first card is: " + name.name +", top value: " + name.top + ", bottom value: " + name.bottom + ", left value: "+name.left + ", right value: " + name.right );
+	//alert("name: " +name.name);
+	//alert(CardArray[0].name+" top value: " + CardArray[0].top);// Geezard 1st card
+	//alert(CardArray[1].name+" top value: " + CardArray[1].top);// Funguar 2nd card 
+	//alert(CardArray[109].name+" top value: " + CardArray[109].top);// Squall last card 
 	
 	return CardArray;
 	
