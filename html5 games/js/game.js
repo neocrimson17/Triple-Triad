@@ -462,7 +462,7 @@ function TTDeck(){
 		}
 	}
 	//var c = new TTCard(card.properties[1].name,card.properties[1].topValue,card.properties[1].bottomValue,card.properties[1].leftValue,card.properties[1].rightValue);
-	//alert("the name of the first card is: " + name.name +", top value: " + name.top + ", bottom value: " + name.bottom + ", left value: "+name.left + ", right value: " + name.right );
+	alert("the name of the first card is: " + name.name +", top value: " + name.top + ", bottom value: " + name.bottom + ", left value: "+name.left + ", right value: " + name.right + " the number of copy current: " + name.numCopy );
 	//alert("name: " +name.name);
 	//alert(CardArray[0].name+" top value: " + CardArray[0].top);// Geezard 1st card
 	//alert(CardArray[1].name+" top value: " + CardArray[1].top);// Funguar 2nd card 
@@ -486,6 +486,26 @@ function TTDraw(index, deck){
 		card = null;
 
 	return card;
+}
+// function to shuffle the cards in the deck
+// n is the number of time you want to shuffle
+// deck = the stack of cards you want to shuffle
+function TTDeckShuffle(n, deck){
+	var i, j, k;
+	var temp;
+
+	// Shuffle the stack 'n' times.
+
+	for (i = 0; i < n; i++){
+		for (j = 0; j < this.deck.length; j++) {
+		  k = Math.floor(Math.random() * this.deck.length);
+		  temp = this.deck[j];
+		  this.deck[j] = this.deck[k];
+		  this.deck[k] = temp;
+		}
+	}
+	
+	return deck;
 }
 
 function draw() {
