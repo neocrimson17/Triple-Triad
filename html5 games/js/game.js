@@ -15,7 +15,7 @@ var playerTurn = true;
 
 // a Card object has an individual widthScale and heightScale used for animation.
 // These two variables are global scaling variables, used as the
-// original scales for all iamges at initialization
+// original scales for all images at initialization
 var widthScale = 2;
 var heightScale = 2.5;
 
@@ -477,8 +477,6 @@ function TTDeck(){
 	}
 	//var c = new TTCard(card.properties[1].name,card.properties[1].topValue,card.properties[1].bottomValue,card.properties[1].leftValue,card.properties[1].rightValue);
 	alert("the name of the first card is: " + name.name +", top value: " + name.top + ", bottom value: " + name.bottom + ", left value: "+name.left + ", right value: " + name.right + " the number of copy current: " + name.numCopy );
-	CardArray[0].numCopy++;
-	alert(CardArray[0].numCopy);
 	//alert("name: " +name.name);
 	//alert(CardArray[0].name+" top value: " + CardArray[0].top);// Geezard 1st card
 	//alert(CardArray[1].name+" top value: " + CardArray[1].top);// Funguar 2nd card 
@@ -578,12 +576,12 @@ function drawScore() {
 	var locX = col0 + (12 * widthScale);
 	var locY = row4 + (40 * heightScale);
 	
-	x = 148 + (playerScore * 16); y = 66;
+	x = 148 + (enemyScore * 16); y = 66;
 	ctxBg.drawImage(imgFont, x, y, 16, 16, locX, locY, scaleX * widthScale, scaleY * heightScale);
 	
 	var locX = col4 + (12 * widthScale);
 	
-	x = 148 + (enemyScore * 16); y = 66;
+	x = 148 + (playerScore * 16); y = 66;
 	ctxBg.drawImage(imgFont, x, y, 16, 16, locX, locY, scaleX * widthScale, scaleY * heightScale);
 }
 
@@ -960,7 +958,7 @@ Card.prototype.drawNumbers = function () {
 	
 }
 
-Card.prototype.checkProximity = function (row, col) {
+Card.prototype.checkProximity = function (col, row) {
 	/*
 		if in row 0, check against row 1
 		if in row 1, check against 0 and 2
@@ -968,18 +966,41 @@ Card.prototype.checkProximity = function (row, col) {
 		etc
 	*/
 	
+	var card = boardCards[col][row];
+	var check;
+	
 	if (row == 0) {
-		if (boardCards[1][col].card > 0) {
-			alert(boardCards[row][col].bottom);
-			alert(boardCards[1][col].top);
-			if (boardCards[row][col].bottom > boardCards[1][col].top) {
-			alert(boardCards[row][col].bottom + ' > ' + boardCards[1][col].top);
-				boardCards[1][col].player = true;
-				//boardCards[1][col].frontFlip(true);
+		if (boardCards[col][1].card > 0 && card.player != boardCards[col][1].player) {
+			check = boardCards[col][1];
+			//if there is a card under the recently placed card
+			alert(card.bottom);
+			alert(check.top);
+			if (card.bottom > check.top) {
+				alert(card.bottom + ' > ' + check.top);
+				if (card.player) {
+					playerScore++;
+					enemyScore--;
+					check.player = true;
+				} else {
+					playerScore--;
+					enemyScore++;
+					check.player = false;
+				}
 			}
 		}
+	} else if (row == 1) {
+		
+	} else if (row == 2) {
+	
 	}
 	
+	if (col == 0) {
+	
+	} else if (col == 1) {
+	
+	} else if (col == 2) {
+	
+	}
 }
 
 Card.prototype.frontFlip = function (changeTeam) {
@@ -1156,47 +1177,6 @@ function checkKeyDown(e) {
 		lastKey = e;
 		e.preventDefault();
 	}
-	/*
-	if (keyID === 48) { // 0
-		is0Key = true;
-		e.preventDefault();
-	}
-	if (keyID === 49) { // 1
-		is1Key = true;
-		e.preventDefault();
-	}
-	if (keyID === 50) { // 2
-		is2Key = true;
-		e.preventDefault();
-	}
-	if (keyID === 51) { // 3
-		is3Key = true;
-		e.preventDefault();
-	}
-	if (keyID === 52) { // 4
-		is4Key = true;
-		e.preventDefault();
-	}
-	if (keyID === 53) { // 5
-		is5Key = true;
-		e.preventDefault();
-	}
-	if (keyID === 54) { // 6
-		is6Key = true;
-		e.preventDefault();
-	}
-	if (keyID === 55) { // 7
-		is7Key = true;
-		e.preventDefault();
-	}
-	if (keyID === 56) { // 8
-		is8Key = true;
-		e.preventDefault();
-	}
-	if (keyID === 57) { // 9
-		is9Key = true;
-		e.preventDefault();
-	}*/
 	if (keyID === 32) { // spacebar
 		isSpacebarKey = true;
 		lastKey = e;
@@ -1231,47 +1211,6 @@ function checkKeyUp(e) {
 		lastKey = null;
 		e.preventDefault();
 	}
-	/*
-	if (keyID === 48) { // 0
-		is0Key = false;
-		e.preventDefault();
-	}
-	if (keyID === 49) { // 1
-		is1Key = false;
-		e.preventDefault();
-	}
-	if (keyID === 50) { // 2
-		is2Key = false;
-		e.preventDefault();
-	}
-	if (keyID === 51) { // 3
-		is3Key = false;
-		e.preventDefault();
-	}
-	if (keyID === 52) { // 4
-		is4Key = false;
-		e.preventDefault();
-	}
-	if (keyID === 53) { // 5
-		is5Key = false;
-		e.preventDefault();
-	}
-	if (keyID === 54) { // 6
-		is6Key = false;
-		e.preventDefault();
-	}
-	if (keyID === 55) { // 7
-		is7Key = false;
-		e.preventDefault();
-	}
-	if (keyID === 56) { // 8
-		is8Key = false;
-		e.preventDefault();
-	}
-	if (keyID === 57) { // 9
-		is9Key = false;
-		e.preventDefault();
-	}*/
 	if (keyID === 32) { // spacebar
 		isSpacebarKey = false;
 		lastKey = null;
