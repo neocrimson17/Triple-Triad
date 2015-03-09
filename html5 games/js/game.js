@@ -477,6 +477,8 @@ function TTDeck(){
 	}
 	//var c = new TTCard(card.properties[1].name,card.properties[1].topValue,card.properties[1].bottomValue,card.properties[1].leftValue,card.properties[1].rightValue);
 	alert("the name of the first card is: " + name.name +", top value: " + name.top + ", bottom value: " + name.bottom + ", left value: "+name.left + ", right value: " + name.right + " the number of copy current: " + name.numCopy );
+	CardArray[0].numCopy++;
+	alert(CardArray[0].numCopy);
 	//alert("name: " +name.name);
 	//alert(CardArray[0].name+" top value: " + CardArray[0].top);// Geezard 1st card
 	//alert(CardArray[1].name+" top value: " + CardArray[1].top);// Funguar 2nd card 
