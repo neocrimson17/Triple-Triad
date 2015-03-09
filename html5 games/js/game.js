@@ -11,6 +11,7 @@ var gameWidth = canvasBg.width;
 var gameHeight = canvasBg.height;
 var fps = 10;
 var drawInterval;
+var playerTurn = true;
 
 // a Card object has an individual widthScale and heightScale used for animation.
 // These two variables are global scaling variables, used as the
@@ -20,29 +21,25 @@ var heightScale = 2.5;
 
 // future: double array for board cards, stores either card or enemyCard index
 // future: array to store pixel locations of placements (player/enemy hand, board)
-var row0 = 16; // row 1 in hand, row 1 on board
-var row1 = 48; // row 2 in hand
-var row2 = 80; // row 3 in hand, row 2 on board
-var row3 = 112;// row 4 in hand
-var row4 = 144;// row 5 in hand, row 3 on board
+var row0 = heightScale * 16; // row 1 in hand, row 1 on board
+var row1 = heightScale * 48; // row 2 in hand
+var row2 = heightScale * 80; // row 3 in hand, row 2 on board
+var row3 = heightScale * 112;// row 4 in hand
+var row4 = heightScale * 144;// row 5 in hand, row 3 on board
 
-var col0 = 24;	
-var col1 = 96;
-var col2 = 160;
-var col3 = 224;
-var col4 = (gameWidth/widthScale) - 64 - 24;
+var col0 = widthScale * 24;	
+var col1 = widthScale * 96;
+var col2 = widthScale * 160;
+var col3 = widthScale * 224;
+var col4 = widthScale * 296;
 
-// change to double array when figure out how
-var board0 = -1;
-var board1 = -1;
-var board2 = -1;
-var board3 = -1;
-var board4 = -1;
-var board5 = -1;
-var board6 = -1;
-var board7 = -1;
-var board8 = -1;
+var boardCards = [
+[0,0],[0,1],[0,2],
+[1,0],[1,1],[1,2],
+[2,0],[2,1],[2,2],
+];
 
+var lastKey = null;
 var isUpKey = false;
 var isRightKey = false;
 var isDownKey = false;
@@ -59,6 +56,9 @@ var is8Key = false;
 var is9Key = false;
 var isSpacebarKey = false;
 var isFKey = false;
+
+var playerScore = 5;
+var enemyScore = 5;
 
 // sounds
 var MainTheme = new Audio('sounds/ShuffleBoogie.mp3');
@@ -361,9 +361,31 @@ function init(){
 	soundBg();
 	drawBg();
 	startDrawing();
+
+	// Initialize board drawing coordinates
+	for (var i = 0; i < 3; i++) {
+		for (var j = 0; j < 3; j++) {
+			boardCards[i][j] = new Card();
+			
+			if (i == 0) {
+				boardCards[i][j].drawX = col1;
+			} else if (i == 1) {
+				boardCards[i][j].drawX = col2;
+			} else if (i == 2) {
+				boardCards[i][j].drawX = col3;
+			}
+			
+			if (j == 0) {
+				boardCards[i][j].drawY = row0;
+			} else if (j == 1) {
+				boardCards[i][j].drawY = row2;
+			} else if (j == 2) {
+				boardCards[i][j].drawY = row4;
+			}
+		}
+	}
 	
 	playerCards[0] = new Card();
-	playerCards[0].index = 0;
 	//playerCards[0].randomize();
 	//temporarily make chubby chocobo
 	playerCards[0].card = CardEnum.CHOCOBO;
@@ -377,47 +399,39 @@ function init(){
 	playerCards[0].origY = playerCards[0].srcY;
 	
 	playerCards[1] = new Card();
-	playerCards[1].index = 1;
 	playerCards[1].randomize();
 	
 	playerCards[2] = new Card();
-	playerCards[2].index = 2;
 	playerCards[2].randomize();
 	
 	playerCards[3] = new Card();
-	playerCards[3].index = 3;
 	playerCards[3].randomize();
 	
 	playerCards[4] = new Card();
-	playerCards[4].index = 4;
 	playerCards[4].randomize();
 	
 	enemyCards[0] = new Card();
-	enemyCards[0].index = 5;
 	enemyCards[0].randomize();
 	enemyCards[0].player = false;
 	
 	enemyCards[1] = new Card();
-	enemyCards[1].index = 6;
 	enemyCards[1].randomize();
 	enemyCards[1].player = false;
 	
 	enemyCards[2] = new Card();
-	enemyCards[2].index = 7;
 	enemyCards[2].randomize();
 	enemyCards[2].player = false;
 	
 	enemyCards[3] = new Card();
-	enemyCards[3].index = 8;
 	enemyCards[3].randomize();
 	enemyCards[3].player = false;
 	
 	enemyCards[4] = new Card();
-	enemyCards[4].index = 9;
 	enemyCards[4].randomize();
 	enemyCards[4].player = false;
 	
 	finger1 = new Finger();
+	finger1.selected = playerCards[0];
 	
 	setPlayerHand();
 	setEnemyHand();
@@ -512,12 +526,28 @@ function draw() {
 	ctxBg.clearRect(0, 0, canvasBg.width, canvasBg.height);
 	drawBg();
 	for (i = 0; i < playerCards.length; i++) {
-		playerCards[i].draw();
+		if (playerCards[i] != null) {
+			playerCards[i].draw();
+		}
 	}
 	for (i = 0; i < enemyCards.length; i++) {
-		enemyCards[i].draw();
+		if (enemyCards[i] != null) {
+			enemyCards[i].draw();
+		}
 	}
+	
+	for (i = 0; i < 3; i++) {
+		for (j = 0; j < 3; j++) {
+			if (boardCards[i][j].card > 0) {
+				boardCards[i][j].draw();
+			}
+		}
+	}
+	
 	finger1.draw();
+	
+	drawScore();
+	
 	checkKeys();
 }
 
@@ -536,6 +566,23 @@ function drawBg() {
 	var drawX = 0;
 	var drawY = 0;
 	ctxBg.drawImage(imgBg,srcX,srcY,gameWidth,gameHeight,drawX,drawY,gameWidth*widthScale,gameHeight*heightScale);
+}
+
+function drawScore() {
+	var scaleX = 40;
+	var scaleY = 40;
+	var x = 0;
+	var y = 0;
+	var locX = col0 + (12 * widthScale);
+	var locY = row4 + (40 * heightScale);
+	
+	x = 148 + (playerScore * 16); y = 66;
+	ctxBg.drawImage(imgFont, x, y, 16, 16, locX, locY, scaleX * widthScale, scaleY * heightScale);
+	
+	var locX = col4 + (12 * widthScale);
+	
+	x = 148 + (enemyScore * 16); y = 66;
+	ctxBg.drawImage(imgFont, x, y, 16, 16, locX, locY, scaleX * widthScale, scaleY * heightScale);
 }
 
 // play main theme song in a loop
@@ -560,55 +607,35 @@ function soundBg(){
 }
 
 function setPlayerHand() {
-		// card 4 at bottom of pile, card 0 at top
 		// future: cards[0].position = playerHand[0];
 		
-		playerCards[0].drawX = col4 * widthScale;
-		playerCards[1].drawX = col4 * widthScale;
-		playerCards[2].drawX = col4 * widthScale;
-		playerCards[3].drawX = col4 * widthScale;
-		playerCards[4].drawX = col4 * widthScale;
+		playerCards[0].drawX = col4;
+		playerCards[1].drawX = col4;
+		playerCards[2].drawX = col4;
+		playerCards[3].drawX = col4;
+		playerCards[4].drawX = col4;
 		
-		playerCards[0].drawY = row0 * heightScale;
-		playerCards[1].drawY = row1 * heightScale;
-		playerCards[2].drawY = row2 * heightScale;
-		playerCards[3].drawY = row3 * heightScale;
-		playerCards[4].drawY = row4 * heightScale;
+		playerCards[0].drawY = row0;
+		playerCards[1].drawY = row1;
+		playerCards[2].drawY = row2;
+		playerCards[3].drawY = row3;
+		playerCards[4].drawY = row4;
 }
 
 function setEnemyHand() {
-		// card 9 at bottom of pile, card 5 at top
 		// future: cards[5].position = enemyHand[0];
 		
-		enemyCards[0].drawX = col0 * widthScale;
-		enemyCards[1].drawX = col0 * widthScale;
-		enemyCards[2].drawX = col0 * widthScale;
-		enemyCards[3].drawX = col0 * widthScale;
-		enemyCards[4].drawX = col0 * widthScale;
+		enemyCards[0].drawX = col0;
+		enemyCards[1].drawX = col0;
+		enemyCards[2].drawX = col0;
+		enemyCards[3].drawX = col0;
+		enemyCards[4].drawX = col0;
 		
-		enemyCards[0].drawY = row0 * heightScale;
-		enemyCards[1].drawY = row1 * heightScale;
-		enemyCards[2].drawY = row2 * heightScale;
-		enemyCards[3].drawY = row3 * heightScale;
-		enemyCards[4].drawY = row4 * heightScale;
-}
-
-function placeOnBoard(card) { //(card, location) {
-	// not used yet
-	/*
-	//var location = 
-	
-	// if card not already placed on board & board location isn't taken
-	if (cards[card].onBoard == false) {
-		//columns 1, 2, 3
-		//rows 0, 2, 4
-		//0, 1, 2
-		//3, 4, 5
-		//6, 7, 8
-		
-		
-		
-	}*/
+		enemyCards[0].drawY = row0;
+		enemyCards[1].drawY = row1;
+		enemyCards[2].drawY = row2;
+		enemyCards[3].drawY = row3;
+		enemyCards[4].drawY = row4;
 }
 
 function Finger() {
@@ -616,30 +643,37 @@ function Finger() {
 	this.srcY = 0;
 	this.drawX = 0;
 	this.drawY = 0;
-	this.width = 32;
-	this.height = 32;
-	this.selected = 0; // card selected
-	this.player = true; // boolean for either player or enemy
+	this.width = gameWidth * 16;
+	this.height = gameHeight * 12;
+	this.selectedNumber = 0;
+	
+	this.playerHand = true;
+	this.board = false;
+	this.locX = 0;	// used in relation to board or hand
+	this.locY = 0;	
 }
 
 Finger.prototype.highlight = function(card) {
+	// unused right now, reimplement later once animations are figured out
 	
-	var playerCol = gameWidth - (32 * widthScale) - (64 * widthScale) - (24 * widthScale);
-	var enemyCol =  (24 - 32) * widthScale;
+	//var playerCol = gameWidth - (32 * widthScale) - (64 * widthScale) - (24 * widthScale);
+	//var enemyCol =  (24 - 32) * widthScale;
+	var playerCol = col4;
+	var enemyCol  = col0;
 	
 	//only fix previous card's position if not placed on board
 	
 	if (this.player == true) {
 		// player card
-		if (playerCards[this.selected].onBoard == false) {
+		if (playerCards[this.selectedCard].onBoard == false) {
 			// if card is not already on board, return card to original position in hand
-			playerCards[this.selected].drawX = ((gameWidth/widthScale) - 64 - 24) * widthScale;
+			playerCards[this.selectedCard].drawX = playerCol;
 		}
 	} else {
 		// enemy card
-		if (enemyCards[this.selected].onBoard == false) {
+		if (enemyCards[this.selectedCard].onBoard == false) {
 			// if card is not already on board, return card to original position in hand
-			enemyCards[this.selected].drawX = 24 * widthScale;
+			enemyCards[this.selectedCard].drawX = enemyCol;
 		}
 	}
 	
@@ -655,12 +689,12 @@ Finger.prototype.highlight = function(card) {
 	//only move selected card out if not already on board
 	if (this.player == true) {
 		if (playerCards[card].onBoard == false) {
-			playerCards[card].drawX = ((gameWidth/widthScale) - 64 - 24 - 8) * widthScale;
+			playerCards[card].drawX = playerCol - (widthScale * 8);
 		}
 		CursorMove.play();
 	} else {
 		if (enemyCards[card].onBoard == false) {
-			enemyCards[card].drawX = (24 * widthScale) -  (8 * widthScale);
+			enemyCards[card].drawX = enemyCol - (widthScale * 8);
 		}
 		CursorMove.play();
 	}
@@ -668,84 +702,110 @@ Finger.prototype.highlight = function(card) {
 	this.selected = card;
 	
 	if (this.player) {
-		this.drawX = playerCol;
+		this.drawX = playerCol - (26 * heightScale);
 	} else {
-		this.drawX = enemyCol;
+		this.drawX = enemyCol - (26 * heightScale);
 	}
 	
-	if (card == 0) { this.drawY = (row0 + 16) * heightScale; }
-	if (card == 1) { this.drawY = (row1 + 16) * heightScale; }
-	if (card == 2) { this.drawY = (row2 + 16) * heightScale; }
-	if (card == 3) { this.drawY = (row3 + 16) * heightScale; }
-	if (card == 4) { this.drawY = (row4 + 16) * heightScale; }	
+	if (card == 0) { this.drawY = row0 + (16 * heightScale); }
+	if (card == 1) { this.drawY = row1 + (16 * heightScale); }
+	if (card == 2) { this.drawY = row2 + (16 * heightScale); }
+	if (card == 3) { this.drawY = row3 + (16 * heightScale); }
+	if (card == 4) { this.drawY = row4 + (16 * heightScale); }	
+}
+
+Finger.prototype.select = function() {
+	if (this.playerHand == true && this.board == false) {
+		//if selecting a card in the player's hand
+		this.selectedNumber = this.locY;
+		this.locY = 0; // will point at first slot on board
+		this.playerHand = false;
+		this.board		= true;
+	} else if (this.board == true && this.playerHand == false) {
+		//if selecting a place on the board to put card
+		this.placeOnBoard(this.selectedNumber, this.locX, this.locY);
+		enemyChoice();
+	}
 }
 
 Finger.prototype.hoverboard = function() {
 	// hover finger above board, move with arrow keys, select place for card
 	
-	//columns 1, 2, 3
-	//rows 0, 2, 4
-	//0, 1, 2
-	//3, 4, 5
-	//6, 7, 8
-	
-	// just places corresponding card onto corresponding board place for now
-	
-	if (this.selected == 0 && this.player) {
-		playerCards[0].drawX = col1 * widthScale;
-		playerCards[0].drawY = row0 * heightScale;
-		playerCards[0].onBoard = true;
+	if (this.playerHand) {
+		// just up and down keys
+		//locX = 0
+		//locY = 0 to 5
+		
+		this.drawX = col4 - (26 * heightScale);
+		
+		if (this.locY == 0) {
+			this.drawY = row0 + (16 * heightScale);
+		} else if (this.locY == 1) {
+			this.drawY = row1 + (16 * heightScale);
+		} else if (this.locY == 2) {
+			this.drawY = row2 + (16 * heightScale);
+		} else if (this.locY == 3) {
+			this.drawY = row3 + (16 * heightScale);
+		} else if (this.locY == 4) {
+			this.drawY = row4 + (16 * heightScale);
+		} else {}
+	} else if (this.board) {
+		
+		// X location
+		if (this.locX == 0) {
+			this.drawX = col1 - (26 * heightScale);
+		} else if (this.locX == 1) {
+			this.drawX = col2 - (26 * heightScale);
+		} else if (this.locX == 2) {
+			this.drawX = col3 - (26 * heightScale);
+		} else {}
+		
+		// Y location
+		if (this.locY == 0) {
+			this.drawY = row0 + (16 * heightScale);
+		} else if (this.locY == 1) {
+			this.drawY = row2 + (16 * heightScale);
+		} else if (this.locY == 2) {
+			this.drawY = row4 + (16 * heightScale);
+		} else {}
+	} else {
+		
 	}
-	if (this.selected == 1 && this.player) {
-		playerCards[1].drawX = col2 * widthScale;
-		playerCards[1].drawY = row0 * heightScale;
-		playerCards[1].onBoard = true;
-	}
-	if (this.selected == 2 && this.player) {
-		playerCards[2].drawX = col3 * widthScale;
-		playerCards[2].drawY = row0 * heightScale;
-		playerCards[2].onBoard = true;
-	}
-	if (this.selected == 3 && this.player) {
-		playerCards[3].drawX = col1 * widthScale;
-		playerCards[3].drawY = row2 * heightScale;
-		playerCards[3].onBoard = true;
-	}
-	if (this.selected == 4 && this.player) {
-		playerCards[4].drawX = col2 * widthScale;
-		playerCards[4].drawY = row2 * heightScale;
-		playerCards[4].onBoard = true;
-	}
-	if (this.selected == 0 && this.player == false) {
-		enemyCards[0].drawX = col3 * widthScale;
-		enemyCards[0].drawY = row2 * heightScale;
-		enemyCards[0].onBoard = true;
-	}
-	if (this.selected == 1 && this.player == false) {
-		enemyCards[1].drawX = col1 * widthScale;
-		enemyCards[1].drawY = row4 * heightScale;
-		enemyCards[1].onBoard = true;
-	}
-	if (this.selected == 2 && this.player == false) {
-		enemyCards[2].drawX = col2 * widthScale;
-		enemyCards[2].drawY = row4 * heightScale;
-		enemyCards[2].onBoard = true;
-	}
-	if (this.selected == 3 && this.player == false) {
-		enemyCards[3].drawX = col3 * widthScale;
-		enemyCards[3].drawY = row4 * heightScale;
-		enemyCards[3].onBoard = true;
-	}
-	
 	
 }
 
-Finger.prototype.place = function() {
-	// places card
+Finger.prototype.placeOnBoard = function(selectedNumber, locX, locY) {
+	var card = new Card();
 	
+	if (playerTurn) {
+		card = playerCards[selectedNumber];
+		playerCards[selectedNumber] = null;
+		this.board = false;
+		playerTurn = false;
+	} else {
+		card = enemyCards[selectedNumber];
+		enemyCards[selectedNumber] = null;
+		this.playerHand = true;
+		playerTurn = true;
+		card.player = false;
+	}
+		
+	boardCards[locX][locY].card		= card.card;
+	boardCards[locX][locY].top		= card.top;
+	boardCards[locX][locY].left		= card.left;
+	boardCards[locX][locY].right	= card.right;
+	boardCards[locX][locY].bottom	= card.bottom;
+	boardCards[locX][locY].srcX		= card.srcX;
+	boardCards[locX][locY].srcY		= card.srcY;
+	boardCards[locX][locY].origX	= card.origX;
+	boardCards[locX][locY].origY	= card.origY;
+	boardCards[locX][locY].player	= card.player;
+	
+	boardCards[locX][locY].checkProximity(locX, locY);
 }
 
 Finger.prototype.draw = function() {
+	this.hoverboard();
 	ctxBg.drawImage(imgFinger,this.srcX,this.srcY,gameWidth,gameHeight,
 				this.drawX,this.drawY,gameWidth*widthScale,gameHeight*heightScale);
 }
@@ -774,8 +834,6 @@ function Card() {
 	// blue background = player
 	// pink background = enemy
 	
-	
-	this.index = 0 //0-4 corresponds with player cards, 5-9 with enemy cards
 	this.onBoard = false;
 	this.shrink = true;
 	this.front = true;
@@ -857,12 +915,11 @@ Card.prototype.draw = function () {
 };
 
 Card.prototype.drawNumbers = function () {
-	//imgFont
-	
-	//0 : 148, 66
-	// subsequent numbers are 148 * #
+	// 0 : 148, 66
+	// subsequent numbers up to 9 are 148 * #
 	// A is outlier: 175, 83
-	var scale = 1.65;
+	var scaleX = 13 * widthScale;
+	var scaleY = 10.5 * heightScale;
 	var x = 0;
 	var y = 0;
 	
@@ -887,21 +944,43 @@ Card.prototype.drawNumbers = function () {
 	
 	// Top
 	if (-1 < this.top && this.top < 10) { x = 148 + (this.top * 16); y = 66; } else { x = 175; y = 83; }
-	ctxBg.drawImage(imgFont, x, y, 16, 16, col2, row1, 16*scale, 16*scale);
+	ctxBg.drawImage(imgFont, x, y, 16, 16, col2, row1, scaleX, scaleY);
 	
 	// Left
 	if (-1 < this.left && this.left < 10) { x = 148 + (this.left * 16); y = 66; } else { x = 175; y = 83; }
-	ctxBg.drawImage(imgFont, x, y, 16, 16, col1, row2, 16*scale, 16*scale);
+	ctxBg.drawImage(imgFont, x, y, 16, 16, col1, row2, scaleX, scaleY);
 	// Right
 	if (-1 < this.right && this.right < 10) { x = 148 + (this.right * 16); y = 66; } else { x = 175; y = 83; }
-	ctxBg.drawImage(imgFont, x, y, 16, 16, col3, row2, 16*scale, 16*scale);
+	ctxBg.drawImage(imgFont, x, y, 16, 16, col3, row2, scaleX, scaleY);
 	// Bottom
 	if (-1 < this.bottom && this.bottom < 10) { x = 148 + (this.bottom * 16); y = 66; } else { x = 175; y = 83; }
-	ctxBg.drawImage(imgFont, x, y, 16, 16, col2, row3, 16*scale, 16*scale);
+	ctxBg.drawImage(imgFont, x, y, 16, 16, col2, row3, scaleX, scaleY);
 	
 }
 
-Card.prototype.frontFlip = function () {
+Card.prototype.checkProximity = function (row, col) {
+	/*
+		if in row 0, check against row 1
+		if in row 1, check against 0 and 2
+		if in 2, check against 1
+		etc
+	*/
+	
+	if (row == 0) {
+		if (boardCards[1][col].card > 0) {
+			alert(boardCards[row][col].bottom);
+			alert(boardCards[1][col].top);
+			if (boardCards[row][col].bottom > boardCards[1][col].top) {
+			alert(boardCards[row][col].bottom + ' > ' + boardCards[1][col].top);
+				boardCards[1][col].player = true;
+				//boardCards[1][col].frontFlip(true);
+			}
+		}
+	}
+	
+}
+
+Card.prototype.frontFlip = function (changeTeam) {
 
 	if (this.flip) {
 		if (this.heightScale > 0 && this.shrink == true) {
@@ -921,6 +1000,10 @@ Card.prototype.frontFlip = function () {
 				// back card coord
 				this.srcX = this.backX;
 				this.srcY = this.backY;
+				if (changeTeam)
+				{
+					this.player = !this.player;
+				}
 			}
 		}
 		
@@ -941,44 +1024,55 @@ Card.prototype.frontFlip = function () {
 }
 
 function checkKeys() {
-	//alert('message in pop up window here!');
-	if (is0Key) { finger1.player = true; finger1.highlight(0); is0Key = false; }
-	if (is1Key) { finger1.player = true; finger1.highlight(1); is1Key = false; }
-	if (is2Key) { finger1.player = true; finger1.highlight(2); is2Key = false; }
-	if (is3Key) { finger1.player = true; finger1.highlight(3); is3Key = false; }
-	if (is4Key) { finger1.player = true; finger1.highlight(4); is4Key = false; }
-	if (is5Key) { finger1.player = false; finger1.highlight(0); is5Key = false;}
-	if (is6Key) { finger1.player = false; finger1.highlight(1); is6Key = false;}
-	if (is7Key) { finger1.player = false; finger1.highlight(2); is7Key = false;}
-	if (is8Key) { finger1.player = false; finger1.highlight(3); is8Key = false;}
-	if (is9Key) { finger1.player = false; finger1.highlight(4); is9Key = false;}
-	
 	if (isSpacebarKey) {
-		if (finger1.player == true) {
-			if (playerCards[finger1.selected].onBoard == false) {
-				//Select this card and choose place on board
-				finger1.hoverboard();
+		finger1.select();
+		isSpacebarKey = false;
+	}
+	if (isUpKey) {
+		if (finger1.playerHand) {
+			if (finger1.locY > 0 ) {
+				finger1.locY --;
+				isUpKey = false;
 			}
-		} else {
-			if (enemyCards[finger1.selected].onBoard == false) {
-				//Select this card and choose place on board
-				finger1.hoverboard();
+		} else if (finger1.board) {
+			if (finger1.locY > 0 ) {
+				finger1.locY --;
+				isUpKey = false;
+			}
+		}
+	} 
+	if (isRightKey) {
+		if (finger1.board) {
+			if (finger1.locX < 2 ) {
+				finger1.locX ++;
+				isRightKey = false;
 			}
 		}
 	}
-	if (isUpKey) {
-		
-	} 
-	if (isRightKey) {
-		
-	}
 	if (isDownKey) {
-		
+		if (finger1.playerHand) {
+			if (finger1.locY < 4 ) {
+				finger1.locY ++;
+				isDownKey = false;
+			}
+		} else if (finger1.board) {
+			if (finger1.locY < 2 ) {
+				finger1.locY ++;
+				isDownKey = false;
+			}
+		}
 	}
 	if (isLeftKey) {
-		
+		if (finger1.board) {
+			if (finger1.locX > 0 ) {
+				finger1.locX --;
+				isLeftKey = false;
+			}
+		}
 	}
 	if (isFKey) {
+		finger1.board = !finger1.board;
+		finger1.playerHand = !finger1.playerHand;
 		if (finger1.player == true) {
 			playerCards[finger1.selected].flip = !playerCards[finger1.selected].flip;
 		} else {
@@ -996,7 +1090,34 @@ function checkKeys() {
 
 
 // enemy functions
-
+function enemyChoice() {
+	alert('hey');
+	alert('enemy');
+	
+	//randomize enemy choice
+	
+	//choose a card from enemy hand
+	var selection = Math.floor((Math.random() * 5)); // 0-4
+	
+	while (enemyCards[selection] == null) {
+		// if rng chooses back of card or blank space,
+		// regenerate until actual card is found
+		selection = Math.floor((Math.random() * 5)); // 0-4
+	}
+	
+	//choose a card from enemy hand
+	var locX = Math.floor((Math.random() * 3)); // 0-2
+	var locY = Math.floor((Math.random() * 3)); // 0-2
+	
+	while (boardCards[locX][locY].card >= 0) {
+		// if rng chooses back of card or blank space,
+		// regenerate until actual card is found
+		locX = Math.floor((Math.random() * 3)); // 0-2
+		locY = Math.floor((Math.random() * 3)); // 0-2
+	}
+	
+	finger1.placeOnBoard(selection,locX,locY);
+}
 // end of enemy functions
 
 
@@ -1009,23 +1130,31 @@ function checkKeys() {
 
 function checkKeyDown(e) {
 	var keyID = e.keyCode || e.which;
-	if (keyID === 38 || keyID === 87) { // up arrow or W
+	if (lastKey && lastKey.keyCode == e.keyCode) {
+        return;
+    }
+	if (keyID === 38) { // up arrow
 		//alert('up arrow was pressed');
 		isUpKey = true;
+		lastKey = e;
 		e.preventDefault();
 	}
-	if (keyID === 39 || keyID === 68) { // right arrow or D
+	if (keyID === 39) { // right arrow
 		isRightKey = true;
+		lastKey = e;
 		e.preventDefault();
 	}
-	if (keyID === 40 || keyID === 83) { // down arrow or S
+	if (keyID === 40) { // down arrow 
 		isDownKey = true;
+		lastKey = e;
 		e.preventDefault();
 	}
-	if (keyID === 37 || keyID === 65) { // left arrow or A
+	if (keyID === 37) { // left arrow
 		isLeftKey = true;
+		lastKey = e;
 		e.preventDefault();
 	}
+	/*
 	if (keyID === 48) { // 0
 		is0Key = true;
 		e.preventDefault();
@@ -1065,35 +1194,42 @@ function checkKeyDown(e) {
 	if (keyID === 57) { // 9
 		is9Key = true;
 		e.preventDefault();
-	}
+	}*/
 	if (keyID === 32) { // spacebar
 		isSpacebarKey = true;
+		lastKey = e;
 		e.preventDefault();
 	}
 	if (keyID === 70) { // F
 		isFKey = true;
+		lastKey = e;
 		e.preventDefault();
 	}
 }
 
 function checkKeyUp(e) {
 	var keyID = e.keyCode || e.which;
-	if (keyID === 38 || keyID === 87) { // up arrow or W
+	if (keyID === 38) { // up arrow
 		isUpKey = false;
+		lastKey = null;
 		e.preventDefault();
 	}
-	if (keyID === 39 || keyID === 68) { // right arrow or D
+	if (keyID === 39) { // right arrow
 		isRightKey = false;
+		lastKey = null;
 		e.preventDefault();
 	}
-	if (keyID === 40 || keyID === 83) { // down arrow or S
+	if (keyID === 40) { // down arrow
 		isDownKey = false;
+		lastKey = null;
 		e.preventDefault();
 	}
-	if (keyID === 37 || keyID === 65) { // left arrow or A
+	if (keyID === 37) { // left arrow
 		isLeftKey = false;
+		lastKey = null;
 		e.preventDefault();
 	}
+	/*
 	if (keyID === 48) { // 0
 		is0Key = false;
 		e.preventDefault();
@@ -1133,13 +1269,15 @@ function checkKeyUp(e) {
 	if (keyID === 57) { // 9
 		is9Key = false;
 		e.preventDefault();
-	}
+	}*/
 	if (keyID === 32) { // spacebar
 		isSpacebarKey = false;
+		lastKey = null;
 		e.preventDefault();
 	}
 	if (keyID === 70) { // F
 		isFKey = false;
+		lastKey = null;
 		e.preventDefault();
 	}
 }
