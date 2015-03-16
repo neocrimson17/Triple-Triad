@@ -482,7 +482,7 @@ function TTDeck(){
 	//alert("name: " +name.name);
 	//alert(CardArray[0].name+" top value: " + CardArray[0].top);// Geezard 1st card
 	//alert(CardArray[1].name+" top value: " + CardArray[1].top);// Funguar 2nd card 
-	//alert(CardArray[109].name+" top value: " + CardArray[109].top);// Squall last card 
+	alert(CardArray[109].name+" top value: " + CardArray[109].top);// Squall last card 
 	
 	return CardArray;
 	
