@@ -2,9 +2,14 @@
 var canvasBg = document.getElementById('canvasBg');
 var ctxBg = canvasBg.getContext('2d');
 
+// Decks
+//var playerDeck = [];
+//var enemyDeck = [];
+var CardArray = [];
+
 // Hand arrays
-var playerCards = ["0", "1", "2", "3", "4"];
-var enemyCards = ["0", "1", "2", "3", "4"];
+var playerCards = [];
+var enemyCards = [];
 
 // Game Settings variables
 var gameWidth = canvasBg.width;
@@ -12,6 +17,7 @@ var gameHeight = canvasBg.height;
 var fps = 10;
 var drawInterval;
 var playerTurn = true;
+var turn = 1;
 
 // a Card object has an individual widthScale and heightScale used for animation.
 // These two variables are global scaling variables, used as the
@@ -70,8 +76,8 @@ imgBg.src = 'images/board.png';
 var cardSheet = new Image();
 cardSheet.src = 'images/cards.png';
 
-var imgFinger = new Image();
-imgFinger.src = 'images/finger.png';
+var imgSelector = new Image();
+imgSelector.src = 'images/finger.png';
 
 var imgFont = new Image();
 imgFont.src = 'images/fonts.png';
@@ -82,19 +88,8 @@ imgEnemyBack.src = 'images/enemyBack.png';
 var imgPlayerBack = new Image();
 imgPlayerBack.src = 'images/playerBack.png';
 
-var playerCardImg = ["0", "1", "2", "3", "4"];
-playerCardImg[0] = new Image();
-playerCardImg[1] = new Image();
-playerCardImg[2] = new Image();
-playerCardImg[3] = new Image();
-playerCardImg[4] = new Image();
-
-var enemyCardImg = ["0", "1", "2", "3", "4"];
-enemyCardImg[0] = new Image();
-enemyCardImg[1] = new Image();
-enemyCardImg[2] = new Image();
-enemyCardImg[3] = new Image();
-enemyCardImg[4] = new Image();
+var imgSelection = new Image();
+imgSelection.src = 'images/selection.png';
 
 // Load background
 imgBg.addEventListener('load',init,false);
@@ -354,18 +349,110 @@ var CardEnum = {
 	
 };
 
-// main functions
 
-function init(){
 
+
+
+// initialization functions
+
+function init() {
+	// Initialize deck object (CardArray global variable)
+	TTDeck();
+	
+	// Take cards from deck CardArray and put into hands
+	setPlayerHand();
+	setEnemyHand();
+	
+	// Draw things on canvas
 	soundBg();
 	drawBg();
 	startDrawing();
 
 	// Initialize board drawing coordinates
+	drawingCoordinates();
+	
+	// Initialize Selector (finger)
+	selector1 = new Selector();
+	selector1.selected = playerCards[0];
+	
+	document.addEventListener('keydown',checkKeyDown,false);
+	document.addEventListener('keyup',checkKeyUp,false);
+	
+	//gameLogic();
+}
+
+function setPlayerHand() {
+	// Randomly takes five cards from the main deck
+	// and assigns cards to player's hand
+	
+	var max = CardArray.length; max--;
+	var rand = Math.floor((Math.random() * max));
+	
+	for (var i = 0; i < 5; i++) {
+		playerCards[i] = TTDraw(rand);
+		max--;
+		rand = Math.floor((Math.random() * max));
+	}
+}
+
+function setEnemyHand() {
+	// Randomly takes five cards from the main deck
+	// and assigns cards to enemy's hand
+
+	var max = CardArray.length; max--;
+	var rand = Math.floor((Math.random() * max));
+	
+	for (var i = 0; i < 5; i++) {
+		enemyCards[i] = TTDraw(rand);
+		enemyCards[i].player = false;
+		max--;
+		rand = Math.floor((Math.random() * max));
+	}
+}
+
+function drawingCoordinates() {
+	// Initializes the coordinates for drawing each card
+
+	// player cards
+	playerCards[0].drawX = col4;
+	playerCards[1].drawX = col4;
+	playerCards[2].drawX = col4;
+	playerCards[3].drawX = col4;
+	playerCards[4].drawX = col4;
+	
+	playerCards[0].drawY = row0;
+	playerCards[1].drawY = row1;
+	playerCards[2].drawY = row2;
+	playerCards[3].drawY = row3;
+	playerCards[4].drawY = row4;
+	
+	for (var i = 0; i < 5; i++) {
+		playerCards[i].origDrawX = playerCards[i].drawX;
+		playerCards[i].origDrawY = playerCards[i].drawY;
+	}
+	
+	// enemy cards
+	enemyCards[0].drawX = col0;
+	enemyCards[1].drawX = col0;
+	enemyCards[2].drawX = col0;
+	enemyCards[3].drawX = col0;
+	enemyCards[4].drawX = col0;
+	
+	enemyCards[0].drawY = row0;
+	enemyCards[1].drawY = row1;
+	enemyCards[2].drawY = row2;
+	enemyCards[3].drawY = row3;
+	enemyCards[4].drawY = row4
+	
+	for (var i = 0; i < 5; i++) {
+		enemyCards[i].origDrawX = enemyCards[i].drawX;
+		enemyCards[i].origDrawY = enemyCards[i].drawY;
+	}
+	
+	// board cards
 	for (var i = 0; i < 3; i++) {
 		for (var j = 0; j < 3; j++) {
-			boardCards[i][j] = new Card();
+			boardCards[i][j] = new TTCard();
 			
 			if (i == 0) {
 				boardCards[i][j].drawX = col1;
@@ -385,74 +472,61 @@ function init(){
 		}
 	}
 	
-	playerCards[0] = new Card();
-	//playerCards[0].randomize();
-	//temporarily make chubby chocobo
-	playerCards[0].card = CardEnum.CHOCOBO;
-	playerCards[0].top 	= CardEnum.properties[CardEnum.CHOCOBO].topValue;
-	playerCards[0].left 	= CardEnum.properties[CardEnum.CHOCOBO].leftValue;
-	playerCards[0].right 	= CardEnum.properties[CardEnum.CHOCOBO].rightValue;
-	playerCards[0].bottom = CardEnum.properties[CardEnum.CHOCOBO].bottomValue;
-	playerCards[0].srcX = 64 * 19;
-	playerCards[0].srcY = 64 * 2;
-	playerCards[0].origX = playerCards[0].srcX;
-	playerCards[0].origY = playerCards[0].srcY;
 	
-	playerCards[1] = new Card();
-	playerCards[1].randomize();
-	
-	playerCards[2] = new Card();
-	playerCards[2].randomize();
-	
-	playerCards[3] = new Card();
-	playerCards[3].randomize();
-	
-	playerCards[4] = new Card();
-	playerCards[4].randomize();
-	
-	enemyCards[0] = new Card();
-	enemyCards[0].randomize();
-	enemyCards[0].player = false;
-	
-	enemyCards[1] = new Card();
-	enemyCards[1].randomize();
-	enemyCards[1].player = false;
-	
-	enemyCards[2] = new Card();
-	enemyCards[2].randomize();
-	enemyCards[2].player = false;
-	
-	enemyCards[3] = new Card();
-	enemyCards[3].randomize();
-	enemyCards[3].player = false;
-	
-	enemyCards[4] = new Card();
-	enemyCards[4].randomize();
-	enemyCards[4].player = false;
-	
-	finger1 = new Finger();
-	finger1.selected = playerCards[0];
-	
-	setPlayerHand();
-	setEnemyHand();
-	
-	// testing this function/object TTDeck
-	TTDeck();
-	
-	document.addEventListener('keydown',checkKeyDown,false);
-	document.addEventListener('keyup',checkKeyUp,false);
+	for (var i = 0; i < 3; i++) {
+		for (var j = 0; j < 3; j++) {
+			boardCards[i][j].origDrawX = boardCards[i][j].drawX;
+			boardCards[i][j].origDrawY = boardCards[i][j].drawY;
+		}
+	}
 }
+
+// end initialization functions
+
+
+
+
+
+
+// game logic functions
+
+function gameLogic() {
+	// Transfer the actual game logic to this function.
+	// It will make it easier when we want to create different rules.
+}
+
+// end game logic functions
+
+
+
+
+
+
+// TTCard functions
 
 // card object to represent a monster/character/GF card
 // name = name of card, top,bottom,left,right are the card's strength corresponding to 
 // the 4 values on the card, and numCopy = the number of copies of the same card you have in the deck
-function TTCard(name,top,bottom,left,right,numCopy){
+function TTCard(name,top,bottom,left,right,numCopy,index){
 	this.name = name;
 	this.top = top;
 	this.bottom = bottom;
 	this.left = left;
 	this.right = right;
 	this.numCopy = numCopy;
+	this.index = index; //used for finding correct image on spritesheet
+	
+	this.srcX = 0;	// column
+	this.srcY = 0;	// row
+	this.drawX = 0;
+	this.drawY = 0;
+	this.origDrawX = 0;
+	this.origDrawY = 0;
+	this.width = 64;
+	this.height = 64;
+	this.widthScale = widthScale;
+	this.heightScale = heightScale;
+	this.player = true; //either player or enemy
 }
 
 // Deck to hold cards
@@ -465,11 +539,12 @@ function TTDeck(){
 	// length of enum
 	var keys = Object.keys(card);
 	// CardArray is a global array
-	var CardArray = [];
+	//var CardArray = [];
 	//alert(keys.length);
 	for (var i = 1;i<keys.length;i++){
 		
-		var c = new TTCard(card.properties[i].name,card.properties[i].topValue,card.properties[i].bottomValue,card.properties[i].leftValue,card.properties[i].rightValue, card.properties[i].numCopy);
+		var c = new TTCard(card.properties[i].name,card.properties[i].topValue,card.properties[i].bottomValue,card.properties[i].leftValue,card.properties[i].rightValue, card.properties[i].numCopy, i);
+		c.srcCoordinates(i);
 		CardArray.push(c);
 		if (i == 1){
 			name = c;
@@ -489,12 +564,12 @@ function TTDeck(){
 // function to add card to a deck/stack/hand and etc.
 // the global array of cards called CardArray holds all the cards.
 
-function TTDraw(index, deck){
+function TTDraw(index){
 	var card;
 
-	if (index >= 0 && index < this.deck.length) {
-		card = this.deck[index];
-		this.deck.splice(index, 1);
+	if (index >= 0 && index < CardArray.length) {
+		card = CardArray[index];
+		CardArray.splice(index, 1);
 	}
 	else
 		card = null;
@@ -522,7 +597,214 @@ function TTDeckShuffle(n, deck){
 	return deck;
 }
 
+TTCard.prototype.draw = function () {
+	// Draw card background (blue = player, pink = enemy)
+	if (this.player) {
+		ctxBg.drawImage(imgPlayerBack,0,0,this.width,this.height,
+				this.drawX,this.drawY,this.width*this.widthScale,this.height*this.heightScale);
+	} else {
+		ctxBg.drawImage(imgEnemyBack,0,0,this.width,this.height,
+				this.drawX,this.drawY,this.width*this.widthScale,this.height*this.heightScale);
+	}
+	
+	// Draw card image from sprite sheet
+	ctxBg.drawImage(cardSheet,this.srcX,this.srcY,this.width,this.height,
+				this.drawX,this.drawY,this.width*this.widthScale,this.height*this.heightScale);
+	
+	// Draw card's point values (and element later)
+	this.drawNumbers();
+	
+};
+
+TTCard.prototype.drawNumbers = function () {
+
+	var scaleX = 13 * widthScale;
+	var scaleY = 10.5 * heightScale;
+	var x = 0;
+	var y = 0;
+	
+	// Columns and Rows for Number placement
+	var col1 = this.drawX + (this.widthScale*1);
+	var col2 = this.drawX + (this.widthScale*5);
+	var col3 = this.drawX + (this.widthScale*9);
+	
+	var row1 = this.drawY + (this.heightScale*2);
+	var row2 = this.drawY + (this.heightScale*10);
+	var row3 = this.drawY + (this.heightScale*18);
+	
+	// Top
+	if (-1 < this.top && this.top < 10) { x = 148 + (this.top * 16); y = 66; } else { x = 175; y = 83; }
+	ctxBg.drawImage(imgFont, x, y, 16, 16, col2, row1, scaleX, scaleY);
+	
+	// Left
+	if (-1 < this.left && this.left < 10) { x = 148 + (this.left * 16); y = 66; } else { x = 175; y = 83; }
+	ctxBg.drawImage(imgFont, x, y, 16, 16, col1, row2, scaleX, scaleY);
+	// Right
+	if (-1 < this.right && this.right < 10) { x = 148 + (this.right * 16); y = 66; } else { x = 175; y = 83; }
+	ctxBg.drawImage(imgFont, x, y, 16, 16, col3, row2, scaleX, scaleY);
+	// Bottom
+	if (-1 < this.bottom && this.bottom < 10) { x = 148 + (this.bottom * 16); y = 66; } else { x = 175; y = 83; }
+	ctxBg.drawImage(imgFont, x, y, 16, 16, col2, row3, scaleX, scaleY);
+	
+}
+
+TTCard.prototype.srcCoordinates = function(index) {
+
+	// Calculates the correct 'monster' image from spritesheet
+	// based on index number given
+	var count = 1;
+	var row = 0;
+	var col = 0;
+	var i = 0;
+	var j = 0;
+	var k = 0;
+	var stop = false;
+	
+	while (!stop) {
+	
+		for (j = 0; j < 4; j++) {
+			for (i = 0; i < 2; i++) {
+				if (index == count) {
+					break;
+				} else if (i < 1) {
+					count++;
+				} 
+			}
+			if (i > 1) { i = 1; }
+			
+			
+			if (index == count) {
+				break;
+			} else if (j < 3) {
+				count++;
+			} 
+		}
+		if (j > 3) { j = 3;}
+		
+		if (index == count) {
+			stop = true;
+		} else {
+			k += 2; count++;
+		}
+		
+	}
+	
+	col = i;
+	row = j;
+	this.srcX = (64 * col) + (64 * k);
+	this.srcY = 64 * row;
+}
+
+TTCard.prototype.checkProximity = function (col, row) {
+	var card = boardCards[col][row];
+	var check;
+	var checkTop = false;
+	var checkLeft = false;
+	var checkRight = false;
+	var checkBottom = false;
+	
+	if (row == 0) {
+		checkBottom = true;
+	} else if (row == 1) {
+		checkTop = true;
+		checkBottom = true;
+	} else if (row == 2) {
+		checkTop = true;
+	}
+	
+	if (col == 0) {
+		checkRight = true;
+	} else if (col == 1) {
+		checkLeft = true;
+		checkRight = true;
+	} else if (col == 2) {
+		checkLeft = true;
+	}
+	
+	if (checkBottom) {
+		if (boardCards[col][row+1].index > 0 && card.player != boardCards[col][row+1].player) {
+			check = boardCards[col][row+1];
+			if (card.bottom > check.top) {
+				if (card.player) {
+					playerScore++;
+					enemyScore--;
+					check.player = true;
+				} else {
+					playerScore--;
+					enemyScore++;
+					check.player = false;
+				}
+			}
+		}
+	}
+	
+	if (checkTop) {
+		if (boardCards[col][row-1].index > 0 && card.player != boardCards[col][row-1].player) {
+			check = boardCards[col][row-1];
+			if (card.top > check.bottom) {
+				if (card.player) {
+					playerScore++;
+					enemyScore--;
+					check.player = true;
+				} else {
+					playerScore--;
+					enemyScore++;
+					check.player = false;
+				}
+			}
+		}
+	}
+	
+	if (checkRight) {
+		if (boardCards[col+1][row].index > 0 && card.player != boardCards[col+1][row].player) {
+			check = boardCards[col+1][row];
+			if (card.right > check.left) {
+				if (card.player) {
+					playerScore++;
+					enemyScore--;
+					check.player = true;
+				} else {
+					playerScore--;
+					enemyScore++;
+					check.player = false;
+				}
+			}
+		}
+	}
+	
+	if (checkLeft) {
+		if (boardCards[col-1][row].index > 0 && card.player != boardCards[col-1][row].player) {
+			check = boardCards[col-1][row];
+			if (card.left > check.right) {
+				if (card.player) {
+					playerScore++;
+					enemyScore--;
+					check.player = true;
+				} else {
+					playerScore--;
+					enemyScore++;
+					check.player = false;
+				}
+			}
+		}
+	}
+	
+}
+
+// end TTCard functions
+
+
+
+
+
+
+// Drawing (on canvas) functions
+
 function draw() {
+
+	// Draw the various images on the canvas
+	// and checks for key input
+	
 	ctxBg.clearRect(0, 0, canvasBg.width, canvasBg.height);
 	drawBg();
 	for (i = 0; i < playerCards.length; i++) {
@@ -538,13 +820,13 @@ function draw() {
 	
 	for (i = 0; i < 3; i++) {
 		for (j = 0; j < 3; j++) {
-			if (boardCards[i][j].card > 0) {
+			if (boardCards[i][j].index > 0) {
 				boardCards[i][j].draw();
 			}
 		}
 	}
 	
-	finger1.draw();
+	selector1.draw();
 	
 	drawScore();
 	
@@ -585,6 +867,15 @@ function drawScore() {
 	ctxBg.drawImage(imgFont, x, y, 16, 16, locX, locY, scaleX * widthScale, scaleY * heightScale);
 }
 
+// end Drawing functions
+
+
+
+
+
+
+// Sound functions
+
 // play main theme song in a loop
 // note this is for looping, but for simple sounds like cursor movement
 // we can simply use this "CursorMove.play();"
@@ -606,39 +897,14 @@ function soundBg(){
 	MainTheme.play();
 }
 
-function setPlayerHand() {
-		// future: cards[0].position = playerHand[0];
-		
-		playerCards[0].drawX = col4;
-		playerCards[1].drawX = col4;
-		playerCards[2].drawX = col4;
-		playerCards[3].drawX = col4;
-		playerCards[4].drawX = col4;
-		
-		playerCards[0].drawY = row0;
-		playerCards[1].drawY = row1;
-		playerCards[2].drawY = row2;
-		playerCards[3].drawY = row3;
-		playerCards[4].drawY = row4;
-}
+// end Sound functions
 
-function setEnemyHand() {
-		// future: cards[5].position = enemyHand[0];
-		
-		enemyCards[0].drawX = col0;
-		enemyCards[1].drawX = col0;
-		enemyCards[2].drawX = col0;
-		enemyCards[3].drawX = col0;
-		enemyCards[4].drawX = col0;
-		
-		enemyCards[0].drawY = row0;
-		enemyCards[1].drawY = row1;
-		enemyCards[2].drawY = row2;
-		enemyCards[3].drawY = row3;
-		enemyCards[4].drawY = row4;
-}
 
-function Finger() {
+
+
+// Selector functions
+
+function Selector() {
 	this.srcX = 0;
 	this.srcY = 0;
 	this.drawX = 0;
@@ -653,83 +919,23 @@ function Finger() {
 	this.locY = 0;	
 }
 
-Finger.prototype.highlight = function(card) {
-	// unused right now, reimplement later once animations are figured out
-	
-	//var playerCol = gameWidth - (32 * widthScale) - (64 * widthScale) - (24 * widthScale);
-	//var enemyCol =  (24 - 32) * widthScale;
-	var playerCol = col4;
-	var enemyCol  = col0;
-	
-	//only fix previous card's position if not placed on board
-	
-	if (this.player == true) {
-		// player card
-		if (playerCards[this.selectedCard].onBoard == false) {
-			// if card is not already on board, return card to original position in hand
-			playerCards[this.selectedCard].drawX = playerCol;
-		}
-	} else {
-		// enemy card
-		if (enemyCards[this.selectedCard].onBoard == false) {
-			// if card is not already on board, return card to original position in hand
-			enemyCards[this.selectedCard].drawX = enemyCol;
-		}
-	}
-	
-	/*if (cards[this.selected].onBoard == false) {
-		if (this.selected == 0 || this.selected == 1 || this.selected == 2
-			|| this.selected == 3 || this.selected == 4) {
-			cards[this.selected].drawX = ((gameWidth/widthScale) - 64 - 24) * widthScale;
-		} else {
-			cards[this.selected].drawX = 24 * widthScale;
-		}
-	}*/
-	
-	//only move selected card out if not already on board
-	if (this.player == true) {
-		if (playerCards[card].onBoard == false) {
-			playerCards[card].drawX = playerCol - (widthScale * 8);
-		}
-		CursorMove.play();
-	} else {
-		if (enemyCards[card].onBoard == false) {
-			enemyCards[card].drawX = enemyCol - (widthScale * 8);
-		}
-		CursorMove.play();
-	}
-	
-	this.selected = card;
-	
-	if (this.player) {
-		this.drawX = playerCol - (26 * heightScale);
-	} else {
-		this.drawX = enemyCol - (26 * heightScale);
-	}
-	
-	if (card == 0) { this.drawY = row0 + (16 * heightScale); }
-	if (card == 1) { this.drawY = row1 + (16 * heightScale); }
-	if (card == 2) { this.drawY = row2 + (16 * heightScale); }
-	if (card == 3) { this.drawY = row3 + (16 * heightScale); }
-	if (card == 4) { this.drawY = row4 + (16 * heightScale); }	
-}
-
-Finger.prototype.select = function() {
-	if (this.playerHand == true && this.board == false) {
-		//if selecting a card in the player's hand
+Selector.prototype.select = function() {
+	// Should actually be in gameLogic
+	if (this.playerHand == true && this.board == false && playerCards[this.locY] != null) {
+		//if selecting a card in the player's hand, and not selecting an empty space
 		this.selectedNumber = this.locY;
 		this.locY = 0; // will point at first slot on board
 		this.playerHand = false;
 		this.board		= true;
-	} else if (this.board == true && this.playerHand == false) {
+	} else if (this.board == true && this.playerHand == false && boardCards[this.locX][this.locY].index == null) {
 		//if selecting a place on the board to put card
 		this.placeOnBoard(this.selectedNumber, this.locX, this.locY);
 		enemyChoice();
 	}
 }
 
-Finger.prototype.hoverboard = function() {
-	// hover finger above board, move with arrow keys, select place for card
+Selector.prototype.hoverboard = function() {
+	// hover selector above board, move with arrow keys, select place for card
 	
 	if (this.playerHand) {
 		// just up and down keys
@@ -749,6 +955,18 @@ Finger.prototype.hoverboard = function() {
 		} else if (this.locY == 4) {
 			this.drawY = row4 + (16 * heightScale);
 		} else {}
+		
+		
+		for (var i = 0; i < playerCards.length; i++) {
+			if (playerCards[i] != null) {
+				playerCards[i].drawX = playerCards[i].origDrawX;
+			}
+		}
+		
+		if (playerCards[this.locY] != null) {
+			playerCards[this.locY].drawX -= 16;
+		}
+		
 	} else if (this.board) {
 		
 		// X location
@@ -772,10 +990,11 @@ Finger.prototype.hoverboard = function() {
 		
 	}
 	
+	
 }
 
-Finger.prototype.placeOnBoard = function(selectedNumber, locX, locY) {
-	var card = new Card();
+Selector.prototype.placeOnBoard = function(selectedNumber, locX, locY) {
+	var card;
 	
 	if (playerTurn) {
 		card = playerCards[selectedNumber];
@@ -789,330 +1008,44 @@ Finger.prototype.placeOnBoard = function(selectedNumber, locX, locY) {
 		playerTurn = true;
 		card.player = false;
 	}
-		
-	boardCards[locX][locY].card		= card.card;
-	boardCards[locX][locY].top		= card.top;
-	boardCards[locX][locY].left		= card.left;
-	boardCards[locX][locY].right	= card.right;
+	
+	boardCards[locX][locY].name 	= card.name;
+	boardCards[locX][locY].top 		= card.top;
 	boardCards[locX][locY].bottom	= card.bottom;
+	boardCards[locX][locY].left 	= card.left;
+	boardCards[locX][locY].right 	= card.right;
+	boardCards[locX][locY].numCopy	= card.numCopy;
+	boardCards[locX][locY].index	= card.index;
 	boardCards[locX][locY].srcX		= card.srcX;
 	boardCards[locX][locY].srcY		= card.srcY;
-	boardCards[locX][locY].origX	= card.origX;
-	boardCards[locX][locY].origY	= card.origY;
 	boardCards[locX][locY].player	= card.player;
 	
 	boardCards[locX][locY].checkProximity(locX, locY);
+	
+	turn++;
 }
 
-Finger.prototype.draw = function() {
+Selector.prototype.draw = function() {
 	this.hoverboard();
-	ctxBg.drawImage(imgFinger,this.srcX,this.srcY,gameWidth,gameHeight,
+	ctxBg.drawImage(imgSelector,this.srcX,this.srcY,gameWidth,gameHeight,
 				this.drawX,this.drawY,gameWidth*widthScale,gameHeight*heightScale);
-}
-
-// end of main functions
-
-
-
-// Card functions
-
-function Card() {
-	this.srcX = 0;	// column
-	this.srcY = 0;	// row
-	this.drawX = 0;
-	this.drawY = 0;
-	this.width = 64;
-	this.height = 64;
-	this.widthScale = widthScale;
-	this.heightScale = heightScale;
-	this.origX = 0;
-	this.origY = 0;
-	this.backX = 64 * 26;
-	this.backY = 64 * 3;
-	this.player = true; //either player or enemy
 	
-	// blue background = player
-	// pink background = enemy
-	
-	this.onBoard = false;
-	this.shrink = true;
-	this.front = true;
-	this.flip = false;
-	
-	// Card values, future implementation
-	this.card;
-	this.top;
-	this.left;
-	this.right;
-	this.bottom;
-	this.element;
-	
-	//CardEnum = { 82:{name: "Chocobo", topValue: 9, bottomValue: 8, leftValue: 4, rightValue: 4},
-	
-	/*
-	var mySize = SizeEnum.MEDIUM;
-	var myCode = SizeEnum.properties[mySize].code; // myCode == "M"
-	*/
-	// chubby values
-	//this.top 	= 4;
-	//this.card = CardEnum.CHOCOBO;
-}
-
-Card.prototype.randomize = function() {
-	// This function gets a random card image
-	// from the card sheet
-	// 28 columns, 4 rows
-	// column 27, row 4 is back of card,
-	// column 28, row 4 is blank
-	
-	var col = Math.floor((Math.random() * 28)); // 0-27
-	var row = Math.floor((Math.random() * 4));	// 0-3
-	
-	while (row == 3 && (col == 26 || col == 27)) {
-		// if rng chooses back of card or blank space,
-		// regenerate until actual card is found
-		col = Math.floor((Math.random() * 28)); // 0-27
-		row = Math.floor((Math.random() * 4));	// 0-3
-	}
-	
-	this.srcX = 64 * col;
-	this.srcY = 64 * row;
-	this.origX = this.srcX;
-	this.origY = this.srcY;
-	
-	// later, match the following with the picture array
-	
-	this.card = Math.floor((Math.random() * 110)+1);	// 1-110
-	
-	this.top 	= CardEnum.properties[this.card].topValue;
-	this.left 	= CardEnum.properties[this.card].leftValue;
-	this.right 	= CardEnum.properties[this.card].rightValue;
-	this.bottom = CardEnum.properties[this.card].bottomValue;
-	
-}
-
-Card.prototype.draw = function () {
-	
-	// flip functions, test whether front or side flip. just front for now.
-	if (this.flip) { this.frontFlip(); }
-	
-	// Draw card background (blue = player, pink = enemy)
-	if (this.player) {
-		ctxBg.drawImage(imgPlayerBack,0,0,this.width,this.height,
-				this.drawX,this.drawY,this.width*this.widthScale,this.height*this.heightScale);
-	} else {
-		ctxBg.drawImage(imgEnemyBack,0,0,this.width,this.height,
-				this.drawX,this.drawY,this.width*this.widthScale,this.height*this.heightScale);
-	}
-	
-	// Draw card image from sprite sheet
-	ctxBg.drawImage(cardSheet,this.srcX,this.srcY,this.width,this.height,
-				this.drawX,this.drawY,this.width*this.widthScale,this.height*this.heightScale);
-	
-	// Draw card's point values (and element later)
-	this.drawNumbers();
-	
-};
-
-Card.prototype.drawNumbers = function () {
-	// 0 : 148, 66
-	// subsequent numbers up to 9 are 148 * #
-	// A is outlier: 175, 83
-	var scaleX = 13 * widthScale;
-	var scaleY = 10.5 * heightScale;
-	var x = 0;
-	var y = 0;
-	
-	// Columns and Rows for Number placement
-	var col1 = this.drawX + (this.widthScale*1);
-	var col2 = this.drawX + (this.widthScale*5);
-	var col3 = this.drawX + (this.widthScale*9);
-	
-	var row1 = this.drawY + (this.heightScale*2);
-	var row2 = this.drawY + (this.heightScale*10);
-	var row3 = this.drawY + (this.heightScale*18);
-	
-	
-	
-	/*
-		number images stretched to 165%
-		on final 2x2.5 stretched card
-	*/
-	
-	
-	// if not 'A', or rather, if an integer between 0-9 (A is 10)
-	
-	// Top
-	if (-1 < this.top && this.top < 10) { x = 148 + (this.top * 16); y = 66; } else { x = 175; y = 83; }
-	ctxBg.drawImage(imgFont, x, y, 16, 16, col2, row1, scaleX, scaleY);
-	
-	// Left
-	if (-1 < this.left && this.left < 10) { x = 148 + (this.left * 16); y = 66; } else { x = 175; y = 83; }
-	ctxBg.drawImage(imgFont, x, y, 16, 16, col1, row2, scaleX, scaleY);
-	// Right
-	if (-1 < this.right && this.right < 10) { x = 148 + (this.right * 16); y = 66; } else { x = 175; y = 83; }
-	ctxBg.drawImage(imgFont, x, y, 16, 16, col3, row2, scaleX, scaleY);
-	// Bottom
-	if (-1 < this.bottom && this.bottom < 10) { x = 148 + (this.bottom * 16); y = 66; } else { x = 175; y = 83; }
-	ctxBg.drawImage(imgFont, x, y, 16, 16, col2, row3, scaleX, scaleY);
-	
-}
-
-Card.prototype.checkProximity = function (col, row) {
-	/*
-		if in row 0, check against row 1
-		if in row 1, check against 0 and 2
-		if in 2, check against 1
-		etc
-	*/
-	
-	var card = boardCards[col][row];
-	var check;
-	
-	if (row == 0) {
-		if (boardCards[col][1].card > 0 && card.player != boardCards[col][1].player) {
-			check = boardCards[col][1];
-			//if there is a card under the recently placed card
-			alert(card.bottom);
-			alert(check.top);
-			if (card.bottom > check.top) {
-				alert(card.bottom + ' > ' + check.top);
-				if (card.player) {
-					playerScore++;
-					enemyScore--;
-					check.player = true;
-				} else {
-					playerScore--;
-					enemyScore++;
-					check.player = false;
-				}
-			}
-		}
-	} else if (row == 1) {
-		
-	} else if (row == 2) {
-	
-	}
-	
-	if (col == 0) {
-	
-	} else if (col == 1) {
-	
-	} else if (col == 2) {
-	
+	if (this.board) {
+		// draw selection square beside selector
+		selX = boardCards[this.locX][this.locY].drawX; selX -= (4 * widthScale);
+		selY = boardCards[this.locX][this.locY].drawY; selY -= (4 * heightScale);
+		ctxBg.drawImage(imgSelection,this.srcX,this.srcY,gameWidth,gameHeight,
+					selX,selY,gameWidth*widthScale,gameHeight*heightScale);
 	}
 }
 
-Card.prototype.frontFlip = function (changeTeam) {
-
-	if (this.flip) {
-		if (this.heightScale > 0 && this.shrink == true) {
-			this.drawY += 4;
-			this.heightScale -= 0.125;
-		}
-		
-		if (this.heightScale == 0) {
-			this.shrink = !this.shrink;
-			this.front = !this.front;
-			//switch to cardBack
-			if (this.front) {
-				// original card coord
-				this.srcX = this.origX;
-				this.srcY = this.origY;
-			} else {
-				// back card coord
-				this.srcX = this.backX;
-				this.srcY = this.backY;
-				if (changeTeam)
-				{
-					this.player = !this.player;
-				}
-			}
-		}
-		
-		if (this.shrink == false && this.heightScale < heightScale) {
-			this.drawY -= 4;
-			this.heightScale += 0.125;
-		}
-		
-		if (this.heightScale == heightScale) {
-			// flipping done
-			// switch to cardFront
-			this.shrink = !this.shrink;
-			if (this.front) {
-				this.flip = false;
-			}
-		}
-	}
-}
-
-function checkKeys() {
-	if (isSpacebarKey) {
-		finger1.select();
-		isSpacebarKey = false;
-	}
-	if (isUpKey) {
-		if (finger1.playerHand) {
-			if (finger1.locY > 0 ) {
-				finger1.locY --;
-				isUpKey = false;
-			}
-		} else if (finger1.board) {
-			if (finger1.locY > 0 ) {
-				finger1.locY --;
-				isUpKey = false;
-			}
-		}
-	} 
-	if (isRightKey) {
-		if (finger1.board) {
-			if (finger1.locX < 2 ) {
-				finger1.locX ++;
-				isRightKey = false;
-			}
-		}
-	}
-	if (isDownKey) {
-		if (finger1.playerHand) {
-			if (finger1.locY < 4 ) {
-				finger1.locY ++;
-				isDownKey = false;
-			}
-		} else if (finger1.board) {
-			if (finger1.locY < 2 ) {
-				finger1.locY ++;
-				isDownKey = false;
-			}
-		}
-	}
-	if (isLeftKey) {
-		if (finger1.board) {
-			if (finger1.locX > 0 ) {
-				finger1.locX --;
-				isLeftKey = false;
-			}
-		}
-	}
-	if (isFKey) {
-		finger1.board = !finger1.board;
-		finger1.playerHand = !finger1.playerHand;
-		if (finger1.player == true) {
-			playerCards[finger1.selected].flip = !playerCards[finger1.selected].flip;
-		} else {
-			enemyCards[finger1.selected].flip = !enemyCards[finger1.selected].flip;
-		}
-		
-	}
-}
-
-
-// end of Card functions
-
+// end selector functions
 
 
 
 
 // enemy functions
+
 function enemyChoice() {
 	alert('hey');
 	alert('enemy');
@@ -1131,25 +1064,83 @@ function enemyChoice() {
 	//choose a card from enemy hand
 	var locX = Math.floor((Math.random() * 3)); // 0-2
 	var locY = Math.floor((Math.random() * 3)); // 0-2
+	if (turn < 10) {
+		while (boardCards[locX][locY].index >= 0) {
+			// if rng chooses back of card or blank space,
+			// regenerate until actual card is found
+			locX = Math.floor((Math.random() * 3)); // 0-2
+			locY = Math.floor((Math.random() * 3)); // 0-2
+		}
 	
-	while (boardCards[locX][locY].card >= 0) {
-		// if rng chooses back of card or blank space,
-		// regenerate until actual card is found
-		locX = Math.floor((Math.random() * 3)); // 0-2
-		locY = Math.floor((Math.random() * 3)); // 0-2
+	selector1.placeOnBoard(selection,locX,locY);
 	}
-	
-	finger1.placeOnBoard(selection,locX,locY);
 }
-// end of enemy functions
+
+// end enemy functions
 
 
 
 
+// Keyboard functions
 
-
-
-// event functions
+function checkKeys() {
+	if (isSpacebarKey) {
+		selector1.select();
+		isSpacebarKey = false;
+	}
+	if (isUpKey) {
+		if (selector1.playerHand) {
+			if (selector1.locY > 0 ) {
+				selector1.locY --;
+				isUpKey = false;
+			}
+		} else if (selector1.board) {
+			if (selector1.locY > 0 ) {
+				selector1.locY --;
+				isUpKey = false;
+			}
+		}
+	} 
+	if (isRightKey) {
+		if (selector1.board) {
+			if (selector1.locX < 2 ) {
+				selector1.locX ++;
+				isRightKey = false;
+			}
+		}
+	}
+	if (isDownKey) {
+		if (selector1.playerHand) {
+			if (selector1.locY < 4 ) {
+				selector1.locY ++;
+				isDownKey = false;
+			}
+		} else if (selector1.board) {
+			if (selector1.locY < 2 ) {
+				selector1.locY ++;
+				isDownKey = false;
+			}
+		}
+	}
+	if (isLeftKey) {
+		if (selector1.board) {
+			if (selector1.locX > 0 ) {
+				selector1.locX --;
+				isLeftKey = false;
+			}
+		}
+	}
+	if (isFKey) {
+		selector1.board = !selector1.board;
+		selector1.playerHand = !selector1.playerHand;
+		if (selector1.player == true) {
+			playerCards[selector1.selected].flip = !playerCards[selector1.selected].flip;
+		} else {
+			enemyCards[selector1.selected].flip = !enemyCards[selector1.selected].flip;
+		}
+		
+	}
+}
 
 function checkKeyDown(e) {
 	var keyID = e.keyCode || e.which;
@@ -1223,4 +1214,4 @@ function checkKeyUp(e) {
 	}
 }
 
-// end of event functions
+// end keyboard functions
