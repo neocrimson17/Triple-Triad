@@ -405,6 +405,7 @@ function setEnemyHand() {
 	for (var i = 0; i < 5; i++) {
 		enemyCards[i] = TTDraw(rand);
 		enemyCards[i].player = false;
+		enemyCards[i].front = false;
 		max--;
 		rand = Math.floor((Math.random() * max));
 	}
@@ -514,7 +515,7 @@ function TTCard(name,top,bottom,left,right,numCopy,index){
 	this.left = left;
 	this.right = right;
 	this.numCopy = numCopy;
-	this.index = index; //used for finding correct image on spritesheet
+	this.index = index; // used for finding correct image on spritesheet
 	
 	this.srcX = 0;	// column
 	this.srcY = 0;	// row
@@ -522,11 +523,19 @@ function TTCard(name,top,bottom,left,right,numCopy,index){
 	this.drawY = 0;
 	this.origDrawX = 0;
 	this.origDrawY = 0;
+	this.backX = 64 * 26;
+	this.backY = 64 * 3;
 	this.width = 64;
 	this.height = 64;
 	this.widthScale = widthScale;
 	this.heightScale = heightScale;
-	this.player = true; //either player or enemy
+	
+	this.player = true; 		// either player or enemy
+	this.front = true;			// display front or back of card
+	this.handSelect = false;	// when selector points to card in hand
+	this.flipHori = false;		// horizontal flip
+	this.flipVert = false;		// vertical flip
+	this.shrink = false;		// used for flipping
 }
 
 // Deck to hold cards
@@ -608,11 +617,17 @@ TTCard.prototype.draw = function () {
 	}
 	
 	// Draw card image from sprite sheet
-	ctxBg.drawImage(cardSheet,this.srcX,this.srcY,this.width,this.height,
-				this.drawX,this.drawY,this.width*this.widthScale,this.height*this.heightScale);
-	
-	// Draw card's point values (and element later)
-	this.drawNumbers();
+	if (this.front) {
+		ctxBg.drawImage(cardSheet,this.srcX,this.srcY,this.width,this.height,
+					this.drawX,this.drawY,this.width*this.widthScale,this.height*this.heightScale);
+		
+		// Draw card's point values (and element later)
+		this.drawNumbers();
+	} else {
+		// Draw card's back
+		ctxBg.drawImage(cardSheet,64*26,64*3,this.width,this.height,
+					this.drawX,this.drawY,this.width*this.widthScale,this.height*this.heightScale);
+	}
 	
 };
 
@@ -693,6 +708,52 @@ TTCard.prototype.srcCoordinates = function(index) {
 	row = j;
 	this.srcX = (64 * col) + (64 * k);
 	this.srcY = 64 * row;
+}
+
+TTCard.prototype.update = function() {
+	if (this.handSelect) {
+		// move card out slightly to the left
+		alert('handSelect');
+	} else if (this.flipHori) {
+		// flip card horizontally
+		alert('flipHori');
+		if (this.heightScale > 0 && this.shrink == true) {
+			this.drawY += 4;
+			this.heightScale -= 0.125;
+		}
+		
+		if (this.heightScale == 0) {
+			this.shrink = !this.shrink;
+			this.front = !this.front;
+			//switch to cardBack
+			if (this.front) {
+				// original card coord
+				this.srcX = this.origX;
+				this.srcY = this.origY;
+			} else {
+				// back card coord
+				this.srcX = this.backX;
+				this.srcY = this.backY;
+			}
+		}
+		
+		if (this.shrink == false && this.heightScale < heightScale) {
+			this.drawY -= 4;
+			this.heightScale += 0.125;
+		}
+		
+		if (this.heightScale == heightScale) {
+			// flipping done
+			// switch to cardFront
+			this.shrink = !this.shrink;
+			if (this.front) {
+				this.flip = false;
+			}
+		}
+	} else if (this.flipVert) {
+		// flip card vertically
+		
+	}
 }
 
 TTCard.prototype.checkProximity = function (col, row) {
@@ -810,6 +871,7 @@ function draw() {
 	for (i = 0; i < playerCards.length; i++) {
 		if (playerCards[i] != null) {
 			playerCards[i].draw();
+			playerCards[i].update();
 		}
 	}
 	for (i = 0; i < enemyCards.length; i++) {
@@ -831,6 +893,18 @@ function draw() {
 	drawScore();
 	
 	checkKeys();
+	
+	if (turn >= 10) {
+		// draw gameOver
+		alert('game over');
+		if (playerScore > enemyScore) {
+			alert('Player won!');
+		} else if (playerScore < enemyScore){
+			alert('Enemy won!');
+		} else {
+			alert('Tie game!');
+		}
+	}
 }
 
 function startDrawing() {
@@ -1019,6 +1093,7 @@ Selector.prototype.placeOnBoard = function(selectedNumber, locX, locY) {
 	boardCards[locX][locY].srcX		= card.srcX;
 	boardCards[locX][locY].srcY		= card.srcY;
 	boardCards[locX][locY].player	= card.player;
+	boardCards[locX][locY].flipHori = true;
 	
 	boardCards[locX][locY].checkProximity(locX, locY);
 	
@@ -1072,7 +1147,7 @@ function enemyChoice() {
 			locY = Math.floor((Math.random() * 3)); // 0-2
 		}
 	
-	selector1.placeOnBoard(selection,locX,locY);
+		selector1.placeOnBoard(selection,locX,locY);
 	}
 }
 
