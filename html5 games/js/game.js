@@ -21,7 +21,7 @@ var turn = 1;
 
 // a Card object has an individual widthScale and heightScale used for animation.
 // These two variables are global scaling variables, used as the
-// original scales for all iamges at initialization
+// original scales for all images at initialization
 var widthScale = 2;
 var heightScale = 2.5;
 
@@ -69,7 +69,7 @@ var enemyScore = 5;
 // sounds
 var MainTheme = new Audio('sounds/ShuffleBoogie.mp3');
 var CursorMove = new Audio('sounds/CursorMove.mp3');
-// image sources
+
 var imgBg = new Image();
 imgBg.src = 'images/board.png';
 
@@ -351,9 +351,6 @@ var CardEnum = {
 
 
 
-<<<<<<< HEAD
-	//soundBg();
-=======
 
 
 // initialization functions
@@ -368,7 +365,6 @@ function init() {
 	
 	// Draw things on canvas
 	soundBg();
->>>>>>> 6d695cbfcce9e95e80688414c11db078e70f47b0
 	drawBg();
 	startDrawing();
 
@@ -555,13 +551,11 @@ function TTDeck(){
 		}
 	}
 	//var c = new TTCard(card.properties[1].name,card.properties[1].topValue,card.properties[1].bottomValue,card.properties[1].leftValue,card.properties[1].rightValue);
-	//alert("the name of the first card is: " + name.name +", top value: " + name.top + ", bottom value: " + name.bottom + ", left value: "+name.left + ", right value: " + name.right + " the number of copy current: " + name.numCopy );
-	//CardArray[0].numCopy++;
-	//alert(CardArray[0].numCopy);
+	alert("the name of the first card is: " + name.name +", top value: " + name.top + ", bottom value: " + name.bottom + ", left value: "+name.left + ", right value: " + name.right + " the number of copy current: " + name.numCopy );
 	//alert("name: " +name.name);
 	//alert(CardArray[0].name+" top value: " + CardArray[0].top);// Geezard 1st card
 	//alert(CardArray[1].name+" top value: " + CardArray[1].top);// Funguar 2nd card 
-	alert(CardArray[109].name+" top value: " + CardArray[109].top);// Squall last card 
+	//alert(CardArray[109].name+" top value: " + CardArray[109].top);// Squall last card 
 	
 	return CardArray;
 	
@@ -864,12 +858,12 @@ function drawScore() {
 	var locX = col0 + (12 * widthScale);
 	var locY = row4 + (40 * heightScale);
 	
-	x = 148 + (playerScore * 16); y = 66;
+	x = 148 + (enemyScore * 16); y = 66;
 	ctxBg.drawImage(imgFont, x, y, 16, 16, locX, locY, scaleX * widthScale, scaleY * heightScale);
 	
 	var locX = col4 + (12 * widthScale);
 	
-	x = 148 + (enemyScore * 16); y = 66;
+	x = 148 + (playerScore * 16); y = 66;
 	ctxBg.drawImage(imgFont, x, y, 16, 16, locX, locY, scaleX * widthScale, scaleY * heightScale);
 }
 
@@ -1085,30 +1079,6 @@ function enemyChoice() {
 // end enemy functions
 
 
-<<<<<<< HEAD
-Card.prototype.checkProximity = function (row, col) {
-	/*
-		if in row 0, check against row 1
-		if in row 1, check against 0 and 2
-		if in 2, check against 1
-		etc
-	*/
-	
-	if (row == 0) {
-		if (boardCards[1][col].card > 0) {
-			alert(boardCards[row][col].bottom);
-			alert(boardCards[1][col].top);
-			if (boardCards[row][col].bottom > boardCards[1][col].top) {
-			alert(boardCards[row][col].bottom + ' > ' + boardCards[1][col].top);
-				boardCards[1][col].player = true;
-				//boardCards[1][col].frontFlip(true);
-			}
-		}
-	}
-	
-}
-=======
->>>>>>> 6d695cbfcce9e95e80688414c11db078e70f47b0
 
 
 // Keyboard functions
@@ -1198,47 +1168,6 @@ function checkKeyDown(e) {
 		lastKey = e;
 		e.preventDefault();
 	}
-	/*
-	if (keyID === 48) { // 0
-		is0Key = true;
-		e.preventDefault();
-	}
-	if (keyID === 49) { // 1
-		is1Key = true;
-		e.preventDefault();
-	}
-	if (keyID === 50) { // 2
-		is2Key = true;
-		e.preventDefault();
-	}
-	if (keyID === 51) { // 3
-		is3Key = true;
-		e.preventDefault();
-	}
-	if (keyID === 52) { // 4
-		is4Key = true;
-		e.preventDefault();
-	}
-	if (keyID === 53) { // 5
-		is5Key = true;
-		e.preventDefault();
-	}
-	if (keyID === 54) { // 6
-		is6Key = true;
-		e.preventDefault();
-	}
-	if (keyID === 55) { // 7
-		is7Key = true;
-		e.preventDefault();
-	}
-	if (keyID === 56) { // 8
-		is8Key = true;
-		e.preventDefault();
-	}
-	if (keyID === 57) { // 9
-		is9Key = true;
-		e.preventDefault();
-	}*/
 	if (keyID === 32) { // spacebar
 		isSpacebarKey = true;
 		lastKey = e;
@@ -1273,47 +1202,6 @@ function checkKeyUp(e) {
 		lastKey = null;
 		e.preventDefault();
 	}
-	/*
-	if (keyID === 48) { // 0
-		is0Key = false;
-		e.preventDefault();
-	}
-	if (keyID === 49) { // 1
-		is1Key = false;
-		e.preventDefault();
-	}
-	if (keyID === 50) { // 2
-		is2Key = false;
-		e.preventDefault();
-	}
-	if (keyID === 51) { // 3
-		is3Key = false;
-		e.preventDefault();
-	}
-	if (keyID === 52) { // 4
-		is4Key = false;
-		e.preventDefault();
-	}
-	if (keyID === 53) { // 5
-		is5Key = false;
-		e.preventDefault();
-	}
-	if (keyID === 54) { // 6
-		is6Key = false;
-		e.preventDefault();
-	}
-	if (keyID === 55) { // 7
-		is7Key = false;
-		e.preventDefault();
-	}
-	if (keyID === 56) { // 8
-		is8Key = false;
-		e.preventDefault();
-	}
-	if (keyID === 57) { // 9
-		is9Key = false;
-		e.preventDefault();
-	}*/
 	if (keyID === 32) { // spacebar
 		isSpacebarKey = false;
 		lastKey = null;
