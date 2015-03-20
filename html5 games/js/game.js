@@ -393,6 +393,8 @@ function setPlayerHand() {
 		max--;
 		rand = Math.floor((Math.random() * max));
 	}
+	
+	//playerCards[0].flipHori = true;
 }
 
 function setEnemyHand() {
@@ -519,6 +521,8 @@ function TTCard(name,top,bottom,left,right,numCopy,index){
 	
 	this.srcX = 0;	// column
 	this.srcY = 0;	// row
+	this.origSrcX = 0;
+	this.origSrcY = 0;
 	this.drawX = 0;
 	this.drawY = 0;
 	this.origDrawX = 0;
@@ -708,6 +712,8 @@ TTCard.prototype.srcCoordinates = function(index) {
 	row = j;
 	this.srcX = (64 * col) + (64 * k);
 	this.srcY = 64 * row;
+	this.origSrcX = this.srcX;
+	this.origSrcY = this.srcY;
 }
 
 TTCard.prototype.update = function() {
@@ -716,20 +722,28 @@ TTCard.prototype.update = function() {
 		alert('handSelect');
 	} else if (this.flipHori) {
 		// flip card horizontally
-		alert('flipHori');
-		if (this.heightScale > 0 && this.shrink == true) {
+		
+		if (this.heightScale == heightScale) {
+			// flipping done
+			// switch to cardFront
+			this.shrink = !this.shrink;
+			this.heightScale -= 0.125;
+		}
+		else if (this.heightScale > 0 && this.shrink == true) {
 			this.drawY += 4;
 			this.heightScale -= 0.125;
 		}
 		
-		if (this.heightScale == 0) {
+		else if (this.heightScale == 0) {
 			this.shrink = !this.shrink;
 			this.front = !this.front;
+			this.heightScale += 0.125;
 			//switch to cardBack
 			if (this.front) {
 				// original card coord
-				this.srcX = this.origX;
-				this.srcY = this.origY;
+				this.srcX = this.origSrcX;
+				this.srcY = this.origSrcY;
+				this.player = !this.player;
 			} else {
 				// back card coord
 				this.srcX = this.backX;
@@ -737,17 +751,11 @@ TTCard.prototype.update = function() {
 			}
 		}
 		
-		if (this.shrink == false && this.heightScale < heightScale) {
+		else if (this.shrink == false && this.heightScale < heightScale) {
 			this.drawY -= 4;
 			this.heightScale += 0.125;
-		}
-		
-		if (this.heightScale == heightScale) {
-			// flipping done
-			// switch to cardFront
-			this.shrink = !this.shrink;
-			if (this.front) {
-				this.flip = false;
+			if (this.front && this.heightScale == heightScale) {
+				this.flipHori = false;
 			}
 		}
 	} else if (this.flipVert) {
@@ -789,12 +797,11 @@ TTCard.prototype.checkProximity = function (col, row) {
 				if (card.player) {
 					playerScore++;
 					enemyScore--;
-					check.player = true;
 				} else {
 					playerScore--;
 					enemyScore++;
-					check.player = false;
 				}
+				check.flipHori = true;
 			}
 		}
 	}
@@ -806,12 +813,11 @@ TTCard.prototype.checkProximity = function (col, row) {
 				if (card.player) {
 					playerScore++;
 					enemyScore--;
-					check.player = true;
 				} else {
 					playerScore--;
 					enemyScore++;
-					check.player = false;
 				}
+				check.flipHori = true;
 			}
 		}
 	}
@@ -823,12 +829,11 @@ TTCard.prototype.checkProximity = function (col, row) {
 				if (card.player) {
 					playerScore++;
 					enemyScore--;
-					check.player = true;
 				} else {
 					playerScore--;
 					enemyScore++;
-					check.player = false;
 				}
+				check.flipHori = true;
 			}
 		}
 	}
@@ -840,12 +845,11 @@ TTCard.prototype.checkProximity = function (col, row) {
 				if (card.player) {
 					playerScore++;
 					enemyScore--;
-					check.player = true;
 				} else {
 					playerScore--;
 					enemyScore++;
-					check.player = false;
 				}
+				check.flipHori = true;
 			}
 		}
 	}
@@ -877,6 +881,7 @@ function draw() {
 	for (i = 0; i < enemyCards.length; i++) {
 		if (enemyCards[i] != null) {
 			enemyCards[i].draw();
+			enemyCards[i].update();
 		}
 	}
 	
@@ -884,6 +889,7 @@ function draw() {
 		for (j = 0; j < 3; j++) {
 			if (boardCards[i][j].index > 0) {
 				boardCards[i][j].draw();
+				boardCards[i][j].update();
 			}
 		}
 	}
@@ -1080,7 +1086,6 @@ Selector.prototype.placeOnBoard = function(selectedNumber, locX, locY) {
 		enemyCards[selectedNumber] = null;
 		this.playerHand = true;
 		playerTurn = true;
-		card.player = false;
 	}
 	
 	boardCards[locX][locY].name 	= card.name;
@@ -1092,8 +1097,9 @@ Selector.prototype.placeOnBoard = function(selectedNumber, locX, locY) {
 	boardCards[locX][locY].index	= card.index;
 	boardCards[locX][locY].srcX		= card.srcX;
 	boardCards[locX][locY].srcY		= card.srcY;
+	boardCards[locX][locY].origSrcX	= card.origSrcX;
+	boardCards[locX][locY].origSrcY	= card.origSrcY;
 	boardCards[locX][locY].player	= card.player;
-	boardCards[locX][locY].flipHori = true;
 	
 	boardCards[locX][locY].checkProximity(locX, locY);
 	
