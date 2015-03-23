@@ -15,9 +15,7 @@ var enemyCards = [];
 var gameWidth = canvasBg.width;
 var gameHeight = canvasBg.height;
 var fps = 10;
-var drawInterval;
-var playerTurn = true;
-var turn = 1;
+var updateInterval;
 
 // a Card object has an individual widthScale and heightScale used for animation.
 // These two variables are global scaling variables, used as the
@@ -46,25 +44,18 @@ var boardCards = [
 ];
 
 var lastKey = null;
+var isSpacebarKey = false;
 var isUpKey = false;
 var isRightKey = false;
 var isDownKey = false;
 var isLeftKey = false;
-var is0Key = false;
-var is1Key = false;
-var is2Key = false;
-var is3Key = false;
-var is4Key = false;
-var is5Key = false;
-var is6Key = false;
-var is7Key = false;
-var is8Key = false;
-var is9Key = false;
-var isSpacebarKey = false;
-var isFKey = false;
 
 var playerScore = 5;
 var enemyScore = 5;
+var turn = 1;
+var playerTurn = false;
+var enemyTurn = false;
+var isGameOver = false;
 
 // sounds
 var MainTheme = new Audio('sounds/ShuffleBoogie.mp3');
@@ -366,7 +357,7 @@ function init() {
 	// Draw things on canvas
 	soundBg();
 	drawBg();
-	startDrawing();
+	startUpdating();
 
 	// Initialize board drawing coordinates
 	drawingCoordinates();
@@ -378,7 +369,8 @@ function init() {
 	document.addEventListener('keydown',checkKeyDown,false);
 	document.addEventListener('keyup',checkKeyUp,false);
 	
-	//gameLogic();
+	// Determine if player or enemy goes first
+	whoGoesFirst();
 }
 
 function setPlayerHand() {
@@ -496,6 +488,58 @@ function drawingCoordinates() {
 function gameLogic() {
 	// Transfer the actual game logic to this function.
 	// It will make it easier when we want to create different rules.
+	
+	if (playerTurn) {
+		// take stuff from Selector.select and put in here
+		if (selector1.select) {
+			if (selector1.playerHand && !selector1.board && playerCards[selector1.locY] != null) {
+				// if selecting a card in the player's hand, and not selecting an empty space
+				selector1.selectedNumber = selector1.locY;
+				selector1.locY = 0;	// will point at first slot on board
+				selector1.playerHand = false;
+				selector1.board = true;
+				selector1.select = false;
+			} else if (selector1.board && !selector1.playerHand
+						&& boardCards[selector1.locX][selector1.locY].index == null) {
+				// if selecting an empty space on the board
+				selector1.placeOnBoard(selector1.selectedNumber, selector1.locX, selector1.locY);
+				selector1.select = false;
+				playerTurn = false;
+				enemyTurn = true;
+			}
+		}
+	} else if (enemyTurn) {
+		enemyChoice();
+		playerTurn = true;
+		enemyTurn = false;
+	} else {
+		alert('neither player nor enemy\'s turn');
+	}
+	
+	if (turn >= 10) {
+		playerTurn = false;
+		enemyTurn = false;
+		isGameOver = true;
+		gameOver();
+	} 
+}
+
+function whoGoesFirst() {
+	// Function to choose who goes first
+	// For now, make player go first
+	// True if player, false if enemy
+	playerTurn = true;
+}
+
+function gameOver() {
+	alert('game over');
+	if (playerScore > enemyScore) {
+		alert('Player won!');
+	} else if (playerScore < enemyScore){
+		alert('Enemy won!');
+	} else {
+		alert('Tie game!');
+	}
 }
 
 // end game logic functions
@@ -856,6 +900,21 @@ TTCard.prototype.checkProximity = function (col, row) {
 	
 }
 
+TTCard.prototype.transferCard = function(card) {
+	this.name		= card.name;
+	this.top		= card.top;
+	this.bottom		= card.bottom;
+	this.left		= card.left;
+	this.right		= card.right;
+	this.numCopy	= card.numCopy;
+	this.index		= card.index;
+	this.srcX		= card.srcX;
+	this.srcY		= card.srcY;
+	this.origSrcX	= card.origSrcX;
+	this.origSrcY	= card.origSrcY;
+	this.player		= card.player;
+}
+
 // end TTCard functions
 
 
@@ -863,28 +922,49 @@ TTCard.prototype.checkProximity = function (col, row) {
 
 
 
-// Drawing (on canvas) functions
+// Update functions
 
-function draw() {
+function update() {
+	// This function is called every frame
 
 	// Draw the various images on the canvas
 	// and checks for key input
 	
 	ctxBg.clearRect(0, 0, canvasBg.width, canvasBg.height);
 	drawBg();
+	
+	updatePlayerCards();
+	updateEnemyCards();
+	updateBoardCards();
+	
+	selector1.draw();
+	
+	drawScore();
+	
+	checkKeys();
+	
+	gameLogic();
+}
+
+function updatePlayerCards() {
 	for (i = 0; i < playerCards.length; i++) {
 		if (playerCards[i] != null) {
 			playerCards[i].draw();
 			playerCards[i].update();
 		}
 	}
+}
+
+function updateEnemyCards() {
 	for (i = 0; i < enemyCards.length; i++) {
 		if (enemyCards[i] != null) {
 			enemyCards[i].draw();
 			enemyCards[i].update();
 		}
 	}
-	
+}
+
+function updateBoardCards() {
 	for (i = 0; i < 3; i++) {
 		for (j = 0; j < 3; j++) {
 			if (boardCards[i][j].index > 0) {
@@ -893,34 +973,25 @@ function draw() {
 			}
 		}
 	}
-	
-	selector1.draw();
-	
-	drawScore();
-	
-	checkKeys();
-	
-	if (turn >= 10) {
-		// draw gameOver
-		alert('game over');
-		if (playerScore > enemyScore) {
-			alert('Player won!');
-		} else if (playerScore < enemyScore){
-			alert('Enemy won!');
-		} else {
-			alert('Tie game!');
-		}
-	}
 }
 
-function startDrawing() {
-	stopDrawing();
-	drawInterval = setInterval(draw,fps);
+function startUpdating() {
+	stopUpdating();
+	updateInterval = setInterval(update,fps);
 }
 
-function stopDrawing() {
-	clearInterval(drawInterval);
+function stopUpdating() {
+	clearInterval(updateInterval);
 }
+
+// end Update functions
+
+
+
+
+
+
+// Drawing (on canvas) functions
 
 function drawBg() {
 	var srcX = 0;
@@ -993,24 +1064,24 @@ function Selector() {
 	this.height = gameHeight * 12;
 	this.selectedNumber = 0;
 	
+	this.select = false;
 	this.playerHand = true;
 	this.board = false;
 	this.locX = 0;	// used in relation to board or hand
 	this.locY = 0;	
 }
 
-Selector.prototype.select = function() {
-	// Should actually be in gameLogic
-	if (this.playerHand == true && this.board == false && playerCards[this.locY] != null) {
-		//if selecting a card in the player's hand, and not selecting an empty space
-		this.selectedNumber = this.locY;
-		this.locY = 0; // will point at first slot on board
-		this.playerHand = false;
-		this.board		= true;
-	} else if (this.board == true && this.playerHand == false && boardCards[this.locX][this.locY].index == null) {
-		//if selecting a place on the board to put card
-		this.placeOnBoard(this.selectedNumber, this.locX, this.locY);
-		enemyChoice();
+Selector.prototype.draw = function() {
+	this.hoverboard();
+	ctxBg.drawImage(imgSelector,this.srcX,this.srcY,gameWidth,gameHeight,
+				this.drawX,this.drawY,gameWidth*widthScale,gameHeight*heightScale);
+	
+	if (this.board) {
+		// draw selection square beside selector
+		selX = boardCards[this.locX][this.locY].drawX; selX -= (4 * widthScale);
+		selY = boardCards[this.locX][this.locY].drawY; selY -= (4 * heightScale);
+		ctxBg.drawImage(imgSelection,this.srcX,this.srcY,gameWidth,gameHeight,
+					selX,selY,gameWidth*widthScale,gameHeight*heightScale);
 	}
 }
 
@@ -1088,35 +1159,45 @@ Selector.prototype.placeOnBoard = function(selectedNumber, locX, locY) {
 		playerTurn = true;
 	}
 	
-	boardCards[locX][locY].name 	= card.name;
-	boardCards[locX][locY].top 		= card.top;
-	boardCards[locX][locY].bottom	= card.bottom;
-	boardCards[locX][locY].left 	= card.left;
-	boardCards[locX][locY].right 	= card.right;
-	boardCards[locX][locY].numCopy	= card.numCopy;
-	boardCards[locX][locY].index	= card.index;
-	boardCards[locX][locY].srcX		= card.srcX;
-	boardCards[locX][locY].srcY		= card.srcY;
-	boardCards[locX][locY].origSrcX	= card.origSrcX;
-	boardCards[locX][locY].origSrcY	= card.origSrcY;
-	boardCards[locX][locY].player	= card.player;
+	
+	boardCards[locX][locY].transferCard(card);
 	
 	boardCards[locX][locY].checkProximity(locX, locY);
 	
 	turn++;
 }
 
-Selector.prototype.draw = function() {
-	this.hoverboard();
-	ctxBg.drawImage(imgSelector,this.srcX,this.srcY,gameWidth,gameHeight,
-				this.drawX,this.drawY,gameWidth*widthScale,gameHeight*heightScale);
-	
+Selector.prototype.moveUp = function() {
+	if (this.locY > 0) {
+		this.locY--;
+	}	
+}
+
+Selector.prototype.moveDown = function() {
+	if (this.playerHand) {
+		if (this.locY < 4) {
+			this.locY++;
+		}
+	} else if (this.board) {
+		if (this.locY < 2) {
+			this.locY++;
+		}
+	}
+}
+
+Selector.prototype.moveLeft = function() {
 	if (this.board) {
-		// draw selection square beside selector
-		selX = boardCards[this.locX][this.locY].drawX; selX -= (4 * widthScale);
-		selY = boardCards[this.locX][this.locY].drawY; selY -= (4 * heightScale);
-		ctxBg.drawImage(imgSelection,this.srcX,this.srcY,gameWidth,gameHeight,
-					selX,selY,gameWidth*widthScale,gameHeight*heightScale);
+		if (this.locX > 0) {
+			this.locX--;
+		}
+	}
+}
+
+Selector.prototype.moveRight = function() {
+	if (this.board) {
+		if (this.locX < 2) {
+			this.locX++;
+		}
 	}
 }
 
@@ -1145,7 +1226,7 @@ function enemyChoice() {
 	//choose a card from enemy hand
 	var locX = Math.floor((Math.random() * 3)); // 0-2
 	var locY = Math.floor((Math.random() * 3)); // 0-2
-	if (turn < 10) {
+	if (!isGameOver) {
 		while (boardCards[locX][locY].index >= 0) {
 			// if rng chooses back of card or blank space,
 			// regenerate until actual card is found
@@ -1166,60 +1247,24 @@ function enemyChoice() {
 
 function checkKeys() {
 	if (isSpacebarKey) {
-		selector1.select();
+		selector1.select = true;
 		isSpacebarKey = false;
 	}
 	if (isUpKey) {
-		if (selector1.playerHand) {
-			if (selector1.locY > 0 ) {
-				selector1.locY --;
-				isUpKey = false;
-			}
-		} else if (selector1.board) {
-			if (selector1.locY > 0 ) {
-				selector1.locY --;
-				isUpKey = false;
-			}
-		}
+		selector1.moveUp();
+		isUpKey = false;
 	} 
 	if (isRightKey) {
-		if (selector1.board) {
-			if (selector1.locX < 2 ) {
-				selector1.locX ++;
-				isRightKey = false;
-			}
-		}
+		selector1.moveRight();
+		isRightKey = false;
 	}
 	if (isDownKey) {
-		if (selector1.playerHand) {
-			if (selector1.locY < 4 ) {
-				selector1.locY ++;
-				isDownKey = false;
-			}
-		} else if (selector1.board) {
-			if (selector1.locY < 2 ) {
-				selector1.locY ++;
-				isDownKey = false;
-			}
-		}
+		selector1.moveDown();
+		isDownKey = false;
 	}
 	if (isLeftKey) {
-		if (selector1.board) {
-			if (selector1.locX > 0 ) {
-				selector1.locX --;
-				isLeftKey = false;
-			}
-		}
-	}
-	if (isFKey) {
-		selector1.board = !selector1.board;
-		selector1.playerHand = !selector1.playerHand;
-		if (selector1.player == true) {
-			playerCards[selector1.selected].flip = !playerCards[selector1.selected].flip;
-		} else {
-			enemyCards[selector1.selected].flip = !enemyCards[selector1.selected].flip;
-		}
-		
+		selector1.moveLeft();
+		isLeftKey = false;
 	}
 }
 
@@ -1228,6 +1273,11 @@ function checkKeyDown(e) {
 	if (lastKey && lastKey.keyCode == e.keyCode) {
         return;
     }
+	if (keyID === 32) { // spacebar
+		isSpacebarKey = true;
+		lastKey = e;
+		e.preventDefault();
+	}
 	if (keyID === 38) { // up arrow
 		//alert('up arrow was pressed');
 		isUpKey = true;
@@ -1249,20 +1299,15 @@ function checkKeyDown(e) {
 		lastKey = e;
 		e.preventDefault();
 	}
-	if (keyID === 32) { // spacebar
-		isSpacebarKey = true;
-		lastKey = e;
-		e.preventDefault();
-	}
-	if (keyID === 70) { // F
-		isFKey = true;
-		lastKey = e;
-		e.preventDefault();
-	}
 }
 
 function checkKeyUp(e) {
 	var keyID = e.keyCode || e.which;
+	if (keyID === 32) { // spacebar
+		isSpacebarKey = false;
+		lastKey = null;
+		e.preventDefault();
+	}
 	if (keyID === 38) { // up arrow
 		isUpKey = false;
 		lastKey = null;
@@ -1280,16 +1325,6 @@ function checkKeyUp(e) {
 	}
 	if (keyID === 37) { // left arrow
 		isLeftKey = false;
-		lastKey = null;
-		e.preventDefault();
-	}
-	if (keyID === 32) { // spacebar
-		isSpacebarKey = false;
-		lastKey = null;
-		e.preventDefault();
-	}
-	if (keyID === 70) { // F
-		isFKey = false;
 		lastKey = null;
 		e.preventDefault();
 	}
