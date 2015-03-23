@@ -14,7 +14,7 @@ var enemyCards = [];
 // Game Settings variables
 var gameWidth = canvasBg.width;
 var gameHeight = canvasBg.height;
-var fps = 10;
+var spf = 5;	// seconds per frame
 var updateInterval;
 
 // a Card object has an individual widthScale and heightScale used for animation.
@@ -81,6 +81,9 @@ imgPlayerBack.src = 'images/playerBack.png';
 
 var imgSelection = new Image();
 imgSelection.src = 'images/selection.png';
+
+var imgGameOver = new Image();
+imgGameOver.src = 'images/gameOverStates.png';
 
 // Load background
 imgBg.addEventListener('load',init,false);
@@ -520,7 +523,6 @@ function gameLogic() {
 		playerTurn = false;
 		enemyTurn = false;
 		isGameOver = true;
-		gameOver();
 	} 
 }
 
@@ -529,17 +531,6 @@ function whoGoesFirst() {
 	// For now, make player go first
 	// True if player, false if enemy
 	playerTurn = true;
-}
-
-function gameOver() {
-	alert('game over');
-	if (playerScore > enemyScore) {
-		alert('Player won!');
-	} else if (playerScore < enemyScore){
-		alert('Enemy won!');
-	} else {
-		alert('Tie game!');
-	}
 }
 
 // end game logic functions
@@ -944,6 +935,10 @@ function update() {
 	checkKeys();
 	
 	gameLogic();
+	
+	if (isGameOver) {
+		drawGameOver();
+	}
 }
 
 function updatePlayerCards() {
@@ -977,7 +972,7 @@ function updateBoardCards() {
 
 function startUpdating() {
 	stopUpdating();
-	updateInterval = setInterval(update,fps);
+	updateInterval = setInterval(update,spf);
 }
 
 function stopUpdating() {
@@ -1018,6 +1013,29 @@ function drawScore() {
 	ctxBg.drawImage(imgFont, x, y, 16, 16, locX, locY, scaleX * widthScale, scaleY * heightScale);
 }
 
+function drawGameOver() {
+	var srcX = 0;
+	var srcY = 0;
+	var drawX = 0;
+	var drawY = 0;
+	var width = 160;
+	var height = 40;
+	
+	alert('game over');
+	if (playerScore > enemyScore) {
+		alert('Player won!');
+		srcY = 0;
+	} else if (playerScore < enemyScore){
+		alert('Enemy won!');
+		srcY = 40;
+	} else {
+		alert('Tie game!');
+		srcY = 80;
+	}
+	
+	//imgGameOver
+	ctxBg.drawImage(imgGameOver,srcX,srcY,width,height,drawX,drawY,width*widthScale,height*heightScale);
+}
 // end Drawing functions
 
 
