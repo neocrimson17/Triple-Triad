@@ -56,6 +56,8 @@ var turn = 1;
 var playerTurn = false;
 var enemyTurn = false;
 var isGameOver = false;
+var animating = false;
+var needCheck = false;
 
 // sounds
 var MainTheme = new Audio('sounds/ShuffleBoogie.mp3');
@@ -84,6 +86,9 @@ imgSelection.src = 'images/selection.png';
 
 var imgGameOver = new Image();
 imgGameOver.src = 'images/gameOverStates.png';
+
+var imgBoxInfo = new Image();
+imgBoxInfo.src = 'images/boxInfo.png';
 
 // Load background
 imgBg.addEventListener('load',init,false);
@@ -350,6 +355,15 @@ var CardEnum = {
 // initialization functions
 
 function init() {
+	// Start playing background music
+	soundBg();
+	
+	// Draw background
+	drawBg();
+	
+	// Rules selection (later)
+	
+
 	// Initialize deck object (CardArray global variable)
 	TTDeck();
 	
@@ -357,17 +371,17 @@ function init() {
 	setPlayerHand();
 	setEnemyHand();
 	
-	// Draw things on canvas
-	soundBg();
-	drawBg();
-	startUpdating();
-
+	// Animate cards flowing into hands (later)
+	
 	// Initialize board drawing coordinates
 	drawingCoordinates();
 	
 	// Initialize Selector (finger)
 	selector1 = new Selector();
 	selector1.selected = playerCards[0];
+	
+	// Draw things on canvas
+	startUpdating();
 	
 	document.addEventListener('keydown',checkKeyDown,false);
 	document.addEventListener('keyup',checkKeyUp,false);
@@ -388,8 +402,6 @@ function setPlayerHand() {
 		max--;
 		rand = Math.floor((Math.random() * max));
 	}
-	
-	//playerCards[0].flipHori = true;
 }
 
 function setEnemyHand() {
@@ -492,31 +504,36 @@ function gameLogic() {
 	// Transfer the actual game logic to this function.
 	// It will make it easier when we want to create different rules.
 	
-	if (playerTurn) {
+	if (needCheck) {
+		boardCards[selector1.locX][selector1.locY].checkProximity(selector1.locX, selector1.locY);
+		needCheck = false;
+	} else if (playerTurn) {
 		// take stuff from Selector.select and put in here
-		if (selector1.select) {
-			if (selector1.playerHand && !selector1.board && playerCards[selector1.locY] != null) {
-				// if selecting a card in the player's hand, and not selecting an empty space
-				selector1.selectedNumber = selector1.locY;
-				selector1.locY = 0;	// will point at first slot on board
-				selector1.playerHand = false;
-				selector1.board = true;
-				selector1.select = false;
-			} else if (selector1.board && !selector1.playerHand
-						&& boardCards[selector1.locX][selector1.locY].index == null) {
-				// if selecting an empty space on the board
-				selector1.placeOnBoard(selector1.selectedNumber, selector1.locX, selector1.locY);
-				selector1.select = false;
-				playerTurn = false;
-				enemyTurn = true;
-			}
+		if (selector1.select && selector1.playerHand && !selector1.board
+					&& playerCards[selector1.locY] != null) {
+			// if selecting a card in the player's hand, and not selecting an empty space
+			selector1.selectedNumber = selector1.locY;
+			selector1.locY = 0;	// will point at first slot on board
+			selector1.playerHand = false;
+			selector1.board = true;
+			selector1.select = false;
+		} else if (selector1.select && selector1.board && !selector1.playerHand
+					&& boardCards[selector1.locX][selector1.locY].index == null) {
+			// if selecting an empty space on the board
+			selector1.placeOnBoard(selector1.selectedNumber);
+			boardCards[selector1.locX][selector1.locY].placed = true;
+			selector1.select = false;
+			playerTurn = false;
+			enemyTurn = true;
+		} else {
+			selector1.select = false;
 		}
 	} else if (enemyTurn) {
 		enemyChoice();
 		playerTurn = true;
 		enemyTurn = false;
 	} else {
-		alert('neither player nor enemy\'s turn');
+		//alert('neither player nor enemy\'s turn');
 	}
 	
 	if (turn >= 10) {
@@ -571,10 +588,10 @@ function TTCard(name,top,bottom,left,right,numCopy,index){
 	
 	this.player = true; 		// either player or enemy
 	this.front = true;			// display front or back of card
-	this.handSelect = false;	// when selector points to card in hand
 	this.flipHori = false;		// horizontal flip
 	this.flipVert = false;		// vertical flip
 	this.shrink = false;		// used for flipping
+	this.fall = false;			// fall onto board
 }
 
 // Deck to hold cards
@@ -599,7 +616,7 @@ function TTDeck(){
 		}
 	}
 	//var c = new TTCard(card.properties[1].name,card.properties[1].topValue,card.properties[1].bottomValue,card.properties[1].leftValue,card.properties[1].rightValue);
-	alert("the name of the first card is: " + name.name +", top value: " + name.top + ", bottom value: " + name.bottom + ", left value: "+name.left + ", right value: " + name.right + " the number of copy current: " + name.numCopy );
+	//alert("the name of the first card is: " + name.name +", top value: " + name.top + ", bottom value: " + name.bottom + ", left value: "+name.left + ", right value: " + name.right + " the number of copy current: " + name.numCopy );
 	//alert("name: " +name.name);
 	//alert(CardArray[0].name+" top value: " + CardArray[0].top);// Geezard 1st card
 	//alert(CardArray[1].name+" top value: " + CardArray[1].top);// Funguar 2nd card 
@@ -752,12 +769,30 @@ TTCard.prototype.srcCoordinates = function(index) {
 }
 
 TTCard.prototype.update = function() {
-	if (this.handSelect) {
-		// move card out slightly to the left
-		alert('handSelect');
+	if (this.placed) {
+		// move up off of screen, then down into board
+		fallInt = 2 * heightScale;
+		animating = true;
+		
+		if (this.drawY > -(72 * heightScale) && this.fall == false) {
+			this.drawY -= fallInt;
+			if (this.drawY <= -(72 * heightScale)) {
+				this.drawX = this.origDrawX;
+				this.fall = true;
+			}
+		} else if (this.fall == true) {
+			this.drawY += fallInt;
+			if (this.drawY >= this.origDrawY) {
+				this.drawY = this.origDrawY;
+				this.fall = false;
+				this.placed = false;
+				animating = false;
+				needCheck = true;
+			}
+		}
 	} else if (this.flipHori) {
 		// flip card horizontally
-		
+		animating = true;
 		if (this.heightScale == heightScale) {
 			// flipping done
 			// switch to cardFront
@@ -791,10 +826,48 @@ TTCard.prototype.update = function() {
 			this.heightScale += 0.125;
 			if (this.front && this.heightScale == heightScale) {
 				this.flipHori = false;
+				animating = false;
 			}
 		}
 	} else if (this.flipVert) {
 		// flip card vertically
+		animating = true;
+		if (this.widthScale == widthScale) {
+			// flipping done
+			// switch to cardFront
+			this.shrink = !this.shrink;
+			this.widthScale -= 0.125;
+		}
+		else if (this.widthScale > 0 && this.shrink == true) {
+			this.drawX += 4;
+			this.widthScale -= 0.125;
+		}
+		
+		else if (this.widthScale == 0) {
+			this.shrink = !this.shrink;
+			this.front = !this.front;
+			this.widthScale += 0.125;
+			//switch to cardBack
+			if (this.front) {
+				// original card coord
+				this.srcX = this.origSrcX;
+				this.srcY = this.origSrcY;
+				this.player = !this.player;
+			} else {
+				// back card coord
+				this.srcX = this.backX;
+				this.srcY = this.backY;
+			}
+		}
+		
+		else if (this.shrink == false && this.widthScale < widthScale) {
+			this.drawX -= 4;
+			this.widthScale += 0.125;
+			if (this.front && this.widthScale == widthScale) {
+				this.flipVert = false;
+				animating = false;
+			}
+		}
 		
 	}
 }
@@ -868,7 +941,7 @@ TTCard.prototype.checkProximity = function (col, row) {
 					playerScore--;
 					enemyScore++;
 				}
-				check.flipHori = true;
+				check.flipVert = true;
 			}
 		}
 	}
@@ -884,7 +957,7 @@ TTCard.prototype.checkProximity = function (col, row) {
 					playerScore--;
 					enemyScore++;
 				}
-				check.flipHori = true;
+				check.flipVert = true;
 			}
 		}
 	}
@@ -904,6 +977,9 @@ TTCard.prototype.transferCard = function(card) {
 	this.origSrcX	= card.origSrcX;
 	this.origSrcY	= card.origSrcY;
 	this.player		= card.player;
+	
+	this.drawX 		= card.drawX;
+	this.drawY 		= card.drawY;
 }
 
 // end TTCard functions
@@ -934,10 +1010,12 @@ function update() {
 	
 	checkKeys();
 	
-	gameLogic();
+	if (!animating) {
+		gameLogic();
 	
-	if (isGameOver) {
-		drawGameOver();
+		if (isGameOver) {
+			drawGameOver();
+		}
 	}
 }
 
@@ -1013,6 +1091,26 @@ function drawScore() {
 	ctxBg.drawImage(imgFont, x, y, 16, 16, locX, locY, scaleX * widthScale, scaleY * heightScale);
 }
 
+function drawInfoBox(text) {
+	// Draws info box at bottom of screen,
+	// shows card name
+	var srcX = 0;
+	var srcY = 0;
+	var drawX = 104;
+	var drawY = 184;
+	var width = 176;
+	var height = 32;
+	
+	//imgGameOver
+	ctxBg.drawImage(imgBoxInfo,srcX,srcY,width,height,drawX*widthScale,drawY*heightScale,width*widthScale,height*heightScale);
+	
+	ctxBg.font="32px Georgia";
+	ctxBg.textAlign = "center";
+	ctxBg.fillStyle = "white"; 
+	ctxBg.strokeStyle = "white"; 
+	ctxBg.fillText(text,192*widthScale,204*heightScale);
+}
+
 function drawGameOver() {
 	var srcX = 0;
 	var srcY = 0;
@@ -1021,15 +1119,15 @@ function drawGameOver() {
 	var width = 160;
 	var height = 40;
 	
-	alert('game over');
+	//alert('game over');
 	if (playerScore > enemyScore) {
-		alert('Player won!');
+		//alert('Player won!');
 		srcY = 0;
 	} else if (playerScore < enemyScore){
-		alert('Enemy won!');
+		//alert('Enemy won!');
 		srcY = 40;
 	} else {
-		alert('Tie game!');
+		//alert('Tie game!');
 		srcY = 80;
 	}
 	
@@ -1134,6 +1232,7 @@ Selector.prototype.hoverboard = function() {
 		
 		if (playerCards[this.locY] != null) {
 			playerCards[this.locY].drawX -= 16;
+			drawInfoBox(playerCards[this.locY].name);
 		}
 		
 	} else if (this.board) {
@@ -1162,7 +1261,7 @@ Selector.prototype.hoverboard = function() {
 	
 }
 
-Selector.prototype.placeOnBoard = function(selectedNumber, locX, locY) {
+Selector.prototype.placeOnBoard = function(selectedNumber) {
 	var card;
 	
 	if (playerTurn) {
@@ -1178,9 +1277,7 @@ Selector.prototype.placeOnBoard = function(selectedNumber, locX, locY) {
 	}
 	
 	
-	boardCards[locX][locY].transferCard(card);
-	
-	boardCards[locX][locY].checkProximity(locX, locY);
+	boardCards[this.locX][this.locY].transferCard(card);
 	
 	turn++;
 }
@@ -1227,8 +1324,8 @@ Selector.prototype.moveRight = function() {
 // enemy functions
 
 function enemyChoice() {
-	alert('hey');
-	alert('enemy');
+	//alert('hey');
+	//alert('enemy');
 	
 	//randomize enemy choice
 	
@@ -1242,18 +1339,17 @@ function enemyChoice() {
 	}
 	
 	//choose a card from enemy hand
-	var locX = Math.floor((Math.random() * 3)); // 0-2
-	var locY = Math.floor((Math.random() * 3)); // 0-2
-	if (!isGameOver) {
-		while (boardCards[locX][locY].index >= 0) {
-			// if rng chooses back of card or blank space,
-			// regenerate until actual card is found
-			locX = Math.floor((Math.random() * 3)); // 0-2
-			locY = Math.floor((Math.random() * 3)); // 0-2
-		}
-	
-		selector1.placeOnBoard(selection,locX,locY);
+	selector1.locX = Math.floor((Math.random() * 3)); // 0-2
+	selector1.locY = Math.floor((Math.random() * 3)); // 0-2
+	while (boardCards[selector1.locX][selector1.locY].index >= 0) {
+		// if rng chooses back of card or blank space,
+		// regenerate until actual card is found
+		selector1.locX = Math.floor((Math.random() * 3)); // 0-2
+		selector1.locY = Math.floor((Math.random() * 3)); // 0-2
 	}
+
+	boardCards[selector1.locX][selector1.locY].placed = true;
+	selector1.placeOnBoard(selection);
 }
 
 // end enemy functions
