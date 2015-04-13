@@ -2,9 +2,19 @@
 var canvasBg = document.getElementById('canvasBg');
 var ctxBg = canvasBg.getContext('2d');
 
+// Game States
+gameStates = {
+	Init : 0, 
+	RuleSelect : 1,
+	Game : 2,
+	CardTrade : 3
+}
+
+var gameState = gameStates.Init;
+
 // Decks
-//var playerDeck = [];
-//var enemyDeck = [];
+var playerDeck = [];
+var enemyDeck = [];
 var CardArray = [];
 
 // Hand arrays
@@ -37,6 +47,11 @@ var col2 = widthScale * 160;
 var col3 = widthScale * 224;
 var col4 = widthScale * 296;
 
+var tradeRow0 = row1-(6*heightScale);
+var tradeRow1 = row3+(6*heightScale);
+var tradeCol0 = col0+(8*widthScale);
+var tradeCol4 = col4-(8*widthScale);
+
 var boardCards = [
 [0,0],[0,1],[0,2],
 [1,0],[1,1],[1,2],
@@ -44,6 +59,7 @@ var boardCards = [
 ];
 
 var lastKey = null;
+var isEnterKey = false;
 var isSpacebarKey = false;
 var isUpKey = false;
 var isRightKey = false;
@@ -65,6 +81,9 @@ var CursorMove = new Audio('sounds/CursorMove.mp3');
 
 var imgBg = new Image();
 imgBg.src = 'images/board.png';
+
+var imgTradingBg = new Image();
+imgTradingBg.src = 'images/tradingBoard.png';
 
 var cardSheet = new Image();
 cardSheet.src = 'images/cards.png';
@@ -89,6 +108,9 @@ imgGameOver.src = 'images/gameOverStates.png';
 
 var imgBoxInfo = new Image();
 imgBoxInfo.src = 'images/boxInfo.png';
+
+var imgBoxRules = new Image();
+imgBoxRules.src = 'images/boxRules.png';
 
 // Load background
 imgBg.addEventListener('load',init,false);
@@ -361,9 +383,45 @@ function init() {
 	// Draw background
 	drawBg();
 	
-	// Rules selection (later)
+	// Initialize Selector (finger)
+	selector1 = new Selector();
 	
+	// Event listeners
+	document.addEventListener('keydown',checkKeyDown,false);
+	document.addEventListener('keyup',checkKeyUp,false);
+	
+	// Start Updating
+	startUpdating();
+}
 
+function initRuleSelect() {
+	gameState = gameStates.RuleSelect;
+	// Draws info box at bottom of screen,
+	// shows card name
+	var srcX = 0;
+	var srcY = 0;
+	var drawX = 112;
+	var drawY = 32;
+	var width = 160;
+	var height = 144;
+	ctxBg.drawImage(imgBoxRules,srcX,srcY,width,height,drawX*widthScale,drawY*heightScale,width*widthScale,height*heightScale);
+	
+	var textPosX = 120;
+	var textPosY = 48;
+	ctxBg.font="24px Georgia";
+	ctxBg.textAlign = "left";
+	ctxBg.fillStyle = "white"; 
+	ctxBg.strokeStyle = "white"; 
+	ctxBg.fillText("Rules:",textPosX*widthScale,textPosY*heightScale);
+	ctxBg.fillText("* Random",textPosX*widthScale,textPosY+40*heightScale);
+	ctxBg.fillText("* No Elemental",textPosX*widthScale,textPosY+52*heightScale);
+	ctxBg.fillText("* Trade Rule: One",textPosX*widthScale,textPosY+64*heightScale);
+	ctxBg.fillText("Press Enter to Play!",textPosX*widthScale,textPosY+88*heightScale);
+}
+
+function initGame() {
+	gameState = gameStates.Game;
+	
 	// Initialize deck object (CardArray global variable)
 	TTDeck();
 	
@@ -376,18 +434,33 @@ function init() {
 	// Initialize board drawing coordinates
 	drawingCoordinates();
 	
-	// Initialize Selector (finger)
-	selector1 = new Selector();
-	selector1.selected = playerCards[0];
-	
-	// Draw things on canvas
-	startUpdating();
-	
-	document.addEventListener('keydown',checkKeyDown,false);
-	document.addEventListener('keyup',checkKeyUp,false);
-	
 	// Determine if player or enemy goes first
 	whoGoesFirst();
+}
+
+function clearGameScreen() {
+	ctxBg.clearRect(0, 0, canvasBg.width, canvasBg.height);
+	drawTradingBg();
+	
+	console.log("clearGameScreen");
+	initCardTrade();
+}
+
+function initCardTrade() {
+	gameState = gameStates.CardTrade;
+	
+	cardTradeDrawingCoordinates();
+	
+	selector1.select = false;
+	selector1.board = false;
+	selector1.trading = true;
+	selector1.locX = 0;
+	selector1.locY = 0;	
+	if (playerScore > enemyScore) {
+		selector1.playerHand = true;
+	} else {
+		selector1.playerHand = false;
+	}
 }
 
 function setPlayerHand() {
@@ -401,6 +474,7 @@ function setPlayerHand() {
 		playerCards[i] = TTDraw(rand);
 		max--;
 		rand = Math.floor((Math.random() * max));
+		playerDeck[i] = playerCards[i];
 	}
 }
 
@@ -417,6 +491,7 @@ function setEnemyHand() {
 		enemyCards[i].front = false;
 		max--;
 		rand = Math.floor((Math.random() * max));
+		enemyDeck[i] = enemyCards[i];
 	}
 }
 
@@ -491,6 +566,46 @@ function drawingCoordinates() {
 	}
 }
 
+function cardTradeDrawingCoordinates() {
+	// Initializes the coordinates for drawing each card
+
+	// player cards
+	playerDeck[0].drawX = tradeCol0;
+	playerDeck[1].drawX = col1;
+	playerDeck[2].drawX = col2;
+	playerDeck[3].drawX = col3;
+	playerDeck[4].drawX = tradeCol4;
+	
+	playerDeck[0].drawY = tradeRow1;
+	playerDeck[1].drawY = tradeRow1;
+	playerDeck[2].drawY = tradeRow1;
+	playerDeck[3].drawY = tradeRow1;
+	playerDeck[4].drawY = tradeRow1;
+	
+	for (var i = 0; i < 5; i++) {
+		playerDeck[i].origDrawX = playerDeck[i].drawX;
+		playerDeck[i].origDrawY = playerDeck[i].drawY;
+	}
+	
+	// enemy cards
+	enemyDeck[0].drawX = tradeCol0;
+	enemyDeck[1].drawX = col1;
+	enemyDeck[2].drawX = col2;
+	enemyDeck[3].drawX = col3;
+	enemyDeck[4].drawX = tradeCol4;
+	
+	enemyDeck[0].drawY = tradeRow0;
+	enemyDeck[1].drawY = tradeRow0;
+	enemyDeck[2].drawY = tradeRow0;
+	enemyDeck[3].drawY = tradeRow0;
+	enemyDeck[4].drawY = tradeRow0;
+	
+	for (var i = 0; i < 5; i++) {
+		enemyDeck[i].origDrawX = enemyDeck[i].drawX;
+		enemyDeck[i].origDrawY = enemyDeck[i].drawY;
+		enemyDeck[i].front = true;
+	}
+}
 // end initialization functions
 
 
@@ -544,10 +659,20 @@ function gameLogic() {
 }
 
 function whoGoesFirst() {
-	// Function to choose who goes first
-	// For now, make player go first
-	// True if player, false if enemy
-	playerTurn = true;
+	var n = Math.floor((Math.random() * 2)); // 0-1
+	
+	if (n == 0) {
+		playerTurn = true;
+		enemyTurn = false;
+	} else if (n == 1) {
+		playerTurn = false;
+		enemyTurn = true;
+	}
+}
+
+function acquireCard(card) {
+	// update database with this information
+	drawInfoBoxTop(card.name + "Card acquired");
 }
 
 // end game logic functions
@@ -994,29 +1119,58 @@ TTCard.prototype.transferCard = function(card) {
 function update() {
 	// This function is called every frame
 
-	// Draw the various images on the canvas
-	// and checks for key input
-	
-	ctxBg.clearRect(0, 0, canvasBg.width, canvasBg.height);
-	drawBg();
-	
-	updatePlayerCards();
-	updateEnemyCards();
-	updateBoardCards();
-	
-	selector1.draw();
-	
-	drawScore();
-	
-	checkKeys();
-	
-	if (!animating) {
-		gameLogic();
-	
-		if (isGameOver) {
-			drawGameOver();
+	if (gameState == gameStates.Init) {
+		// game initialized, go to select rules
+		initRuleSelect();
+	} else if (gameState == gameStates.RuleSelect) {
+		if (isEnterKey) {
+			initGame();
+			isEnterKey = false;
 		}
-	}
+	} else if (gameState == gameStates.Game) {
+		// Draw the various images on the canvas
+		// and checks for key input
+		
+		ctxBg.clearRect(0, 0, canvasBg.width, canvasBg.height);
+		drawBg();
+		
+		updatePlayerCards();
+		updateEnemyCards();
+		updateBoardCards();
+		
+		selector1.draw();
+		
+		drawScore();
+		
+		checkKeys();
+		console.log(isEnterKey);
+		
+		if (!animating) {
+			gameLogic();
+		}
+		
+		if (!animating && isGameOver) {
+			drawGameOver();
+			//setTimeout(function(){clearGameScreen();},5000);
+			if (isEnterKey) {
+				clearGameScreen();
+			}
+		}
+	} else if (gameState == gameStates.CardTrade) {
+		ctxBg.clearRect(0, 0, canvasBg.width, canvasBg.height);
+		drawTradingBg();
+		
+		drawTradeCards();
+		
+		selector1.draw();
+		
+		checkKeys();
+		
+		if (selector1.select) {
+			selector1.trading = false;
+			acquireCard(enemyDeck[selector1.locX]);
+		}
+	} else {}
 }
 
 function updatePlayerCards() {
@@ -1048,6 +1202,15 @@ function updateBoardCards() {
 	}
 }
 
+function drawTradeCards() {
+	for (i = 0; i < playerDeck.length; i++) {
+		playerDeck[i].draw();
+	}
+	for (i = 0; i < enemyDeck.length; i++) {
+		enemyDeck[i].draw();
+	}
+}
+
 function startUpdating() {
 	stopUpdating();
 	updateInterval = setInterval(update,spf);
@@ -1074,6 +1237,14 @@ function drawBg() {
 	ctxBg.drawImage(imgBg,srcX,srcY,gameWidth,gameHeight,drawX,drawY,gameWidth*widthScale,gameHeight*heightScale);
 }
 
+function drawTradingBg() {
+	var srcX = 0;
+	var srcY = 0;
+	var drawX = 0;
+	var drawY = 0;
+	ctxBg.drawImage(imgTradingBg,srcX,srcY,gameWidth,gameHeight,drawX,drawY,gameWidth*widthScale,gameHeight*heightScale);
+}
+
 function drawScore() {
 	var scaleX = 40;
 	var scaleY = 40;
@@ -1091,7 +1262,7 @@ function drawScore() {
 	ctxBg.drawImage(imgFont, x, y, 16, 16, locX, locY, scaleX * widthScale, scaleY * heightScale);
 }
 
-function drawInfoBox(text) {
+function drawInfoBoxBottom(text) {
 	// Draws info box at bottom of screen,
 	// shows card name
 	var srcX = 0;
@@ -1101,7 +1272,6 @@ function drawInfoBox(text) {
 	var width = 176;
 	var height = 32;
 	
-	//imgGameOver
 	ctxBg.drawImage(imgBoxInfo,srcX,srcY,width,height,drawX*widthScale,drawY*heightScale,width*widthScale,height*heightScale);
 	
 	ctxBg.font="32px Georgia";
@@ -1109,6 +1279,25 @@ function drawInfoBox(text) {
 	ctxBg.fillStyle = "white"; 
 	ctxBg.strokeStyle = "white"; 
 	ctxBg.fillText(text,192*widthScale,204*heightScale);
+}
+
+function drawInfoBoxTop(text) {
+	// Draws info box at top of screen,
+	// shows card name
+	var srcX = 0;
+	var srcY = 0;
+	var drawX = 104;
+	var drawY = 8;
+	var width = 176;
+	var height = 32;
+	
+	ctxBg.drawImage(imgBoxInfo,srcX,srcY,width,height,drawX*widthScale,drawY*heightScale,width*widthScale,height*heightScale);
+	
+	ctxBg.font="32px Georgia";
+	ctxBg.textAlign = "center";
+	ctxBg.fillStyle = "white"; 
+	ctxBg.strokeStyle = "white"; 
+	ctxBg.fillText(text,192*widthScale,28*heightScale);
 }
 
 function drawGameOver() {
@@ -1148,7 +1337,7 @@ function drawGameOver() {
 // we can simply use this "CursorMove.play();"
 // of course you have to declare var and point it to the correct file to play
 function soundBg(){
-	if (typeof MainTheme.loop == 'boolean')
+	/*if (typeof MainTheme.loop == 'boolean')
 	{
 		MainTheme.loop = true;
 	}
@@ -1161,7 +1350,7 @@ function soundBg(){
 		}, false);
 		
 	}
-	MainTheme.play();
+	MainTheme.play();*/
 }
 
 // end Sound functions
@@ -1183,8 +1372,9 @@ function Selector() {
 	this.select = false;
 	this.playerHand = true;
 	this.board = false;
+	this.trading = false;
 	this.locX = 0;	// used in relation to board or hand
-	this.locY = 0;	
+	this.locY = 0;
 }
 
 Selector.prototype.draw = function() {
@@ -1198,18 +1388,24 @@ Selector.prototype.draw = function() {
 		selY = boardCards[this.locX][this.locY].drawY; selY -= (4 * heightScale);
 		ctxBg.drawImage(imgSelection,this.srcX,this.srcY,gameWidth,gameHeight,
 					selX,selY,gameWidth*widthScale,gameHeight*heightScale);
+	} else if (this.trading) {
+		// draw selection square beside selector
+		selX = enemyDeck[this.locX].drawX; selX -= (4 * widthScale);
+		selY = enemyDeck[this.locY].drawY; selY -= (4 * heightScale);
+		ctxBg.drawImage(imgSelection,this.srcX,this.srcY,gameWidth,gameHeight,
+					selX,selY,gameWidth*widthScale,gameHeight*heightScale);
 	}
 }
 
 Selector.prototype.hoverboard = function() {
 	// hover selector above board, move with arrow keys, select place for card
 	
-	if (this.playerHand) {
+	if (this.playerHand && !this.trading ) {
 		// just up and down keys
 		//locX = 0
 		//locY = 0 to 5
 		
-		this.drawX = col4 - (26 * heightScale);
+		this.drawX = col4 - (32 * widthScale);
 		
 		if (this.locY == 0) {
 			this.drawY = row0 + (16 * heightScale);
@@ -1232,18 +1428,18 @@ Selector.prototype.hoverboard = function() {
 		
 		if (playerCards[this.locY] != null) {
 			playerCards[this.locY].drawX -= 16;
-			drawInfoBox(playerCards[this.locY].name);
+			drawInfoBoxBottom(playerCards[this.locY].name);
 		}
 		
 	} else if (this.board) {
 		
 		// X location
 		if (this.locX == 0) {
-			this.drawX = col1 - (26 * heightScale);
+			this.drawX = col1 - (32 * widthScale);
 		} else if (this.locX == 1) {
-			this.drawX = col2 - (26 * heightScale);
+			this.drawX = col2 - (32 * widthScale);
 		} else if (this.locX == 2) {
-			this.drawX = col3 - (26 * heightScale);
+			this.drawX = col3 - (32 * widthScale);
 		} else {}
 		
 		// Y location
@@ -1254,8 +1450,30 @@ Selector.prototype.hoverboard = function() {
 		} else if (this.locY == 2) {
 			this.drawY = row4 + (16 * heightScale);
 		} else {}
-	} else {
 		
+	} else if (this.trading && this.playerHand) {
+		//during trading at end of game
+		
+		this.drawY = tradeRow0+(16*heightScale);
+		
+		// X location
+		if (this.locX == 0) {
+			this.drawX = tradeCol0-(30*widthScale);
+		} else if (this.locX == 1) {
+			this.drawX = col1-(30*widthScale);
+		} else if (this.locX == 2) {
+			this.drawX = col2-(30*widthScale);
+		} else if (this.locX == 3) {
+			this.drawX = col3-(30*widthScale);
+		} else if (this.locX == 4) {
+			this.drawX = tradeCol4-(30*widthScale);
+		}
+		
+		drawInfoBoxBottom(enemyDeck[this.locX].name);
+		drawInfoBoxTop("Select 1 card you want");
+		
+	} else {
+	
 	}
 	
 	
@@ -1289,7 +1507,7 @@ Selector.prototype.moveUp = function() {
 }
 
 Selector.prototype.moveDown = function() {
-	if (this.playerHand) {
+	if (this.playerHand && !this.trading) {
 		if (this.locY < 4) {
 			this.locY++;
 		}
@@ -1297,11 +1515,13 @@ Selector.prototype.moveDown = function() {
 		if (this.locY < 2) {
 			this.locY++;
 		}
+	} else if (this.trading) {
+		
 	}
 }
 
 Selector.prototype.moveLeft = function() {
-	if (this.board) {
+	if (this.board || this.trading) {
 		if (this.locX > 0) {
 			this.locX--;
 		}
@@ -1311,6 +1531,10 @@ Selector.prototype.moveLeft = function() {
 Selector.prototype.moveRight = function() {
 	if (this.board) {
 		if (this.locX < 2) {
+			this.locX++;
+		}
+	} else if (this.trading) {
+		if (this.locX < 4) {
 			this.locX++;
 		}
 	}
@@ -1360,6 +1584,9 @@ function enemyChoice() {
 // Keyboard functions
 
 function checkKeys() {
+	if (isEnterKey) {
+		//isEnterKey = false;
+	}
 	if (isSpacebarKey) {
 		selector1.select = true;
 		isSpacebarKey = false;
@@ -1387,6 +1614,11 @@ function checkKeyDown(e) {
 	if (lastKey && lastKey.keyCode == e.keyCode) {
         return;
     }
+	if (keyID === 13) { // Enter
+		isEnterKey = true;
+		lastKey = e;
+		e.preventDefault();
+	}
 	if (keyID === 32) { // spacebar
 		isSpacebarKey = true;
 		lastKey = e;
@@ -1417,7 +1649,11 @@ function checkKeyDown(e) {
 
 function checkKeyUp(e) {
 	var keyID = e.keyCode || e.which;
-	if (keyID === 32) { // spacebar
+	if (keyID === 13) { // Enter
+		isEnterKey = false;
+		lastKey = null;
+		e.preventDefault();
+	}if (keyID === 32) { // spacebar
 		isSpacebarKey = false;
 		lastKey = null;
 		e.preventDefault();
