@@ -1337,7 +1337,7 @@ function drawGameOver() {
 // we can simply use this "CursorMove.play();"
 // of course you have to declare var and point it to the correct file to play
 function soundBg(){
-	/*if (typeof MainTheme.loop == 'boolean')
+	if (typeof MainTheme.loop == 'boolean')
 	{
 		MainTheme.loop = true;
 	}
@@ -1350,7 +1350,7 @@ function soundBg(){
 		}, false);
 		
 	}
-	MainTheme.play();*/
+	MainTheme.play();
 }
 
 // end Sound functions
