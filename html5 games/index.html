@@ -6,8 +6,51 @@
 		<link rel="stylesheet" href="game.css">
 	</head>
 	<body>
+		
+		<form name="myForm" onsubmit="return validateForm()" method="post">
+			<h2>Login Form</h2>
+			<input type="text" name="username" />  <br />
+			<input type="password" name="password" />  <br />
+			<input type="submit" value="Login">
+			
+		</form>
+		
+		<script> 
+			function validateForm() {
+				var x = document.forms["myForm"]["username"].value;
+				var y = document.forms["myForm"]["password"].value;
+				// regular expression
+				var ck_username = /^[A-Za-z0-9_]{1,20}$/;
+				var ck_password =  /^[A-Za-z0-9!@#$%^&*()_]{6,20}$/;
+				
+				if (x == null || x == "" || y == null || y == "") {
+					alert("Name and password must be filled out");
+					return false;
+				}
+				if (!ck_username.test(x)) {
+					alert("no special character is allowed");
+					return false;
+				}
+				if (!ck_password.test(y)) {
+					alert("invalid password.  It needs to be at least 6 characters in length");
+					return false;
+				}
+				if ( x != "hdao" && y != "dgmonster"){
+					alert("invalid username or password");
+					return false;
+				}else{
+					alert("login success");
+					
+				}
+				
+			} 		
+		</script>
+		
 		<canvas id="canvasBg" width="768px" height="560px"></canvas>
+		<!--canvas id="canvasBg" width="768px" height="560px"></canvas-->
 		<script src="js/game.js"></script>
+		
+		
 		
 	</body>
 </html>
