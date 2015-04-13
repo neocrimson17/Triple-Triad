@@ -1,3 +1,5 @@
+document.Triad.Game = function() {
+
 // Canvas Variables
 var canvasBg = document.getElementById('canvasBg');
 var ctxBg = canvasBg.getContext('2d');
@@ -1681,3 +1683,5 @@ function checkKeyUp(e) {
 }
 
 // end keyboard functions
+
+};

@@ -4,19 +4,34 @@
 		<meta charset="utf-8">
 		<title>Triple Triad</title>
 		<link rel="stylesheet" href="game.css">
+		<style type="text/css">
+		#canvasBg { display: none; }
+		</style>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+		<script type="text/javascript">
+			document.Triad = {}; // create a namespace
+			$(document).ready(function() {
+				$("#loginButton").click(function() {
+					document.Triad.validateForm();
+				});
+			});
+		</script>
 	</head>
 	<body>
-		
-		<form name="myForm" onsubmit="return validateForm()" method="post">
+		<div id="loginUI">
+		<form name="myForm" onsubmit="return document.Triad.validateForm()" method="post">
 			<h2>Login Form</h2>
 			<input type="text" name="username" />  <br />
 			<input type="password" name="password" />  <br />
-			<input type="submit" value="Login">
+			<!--<input type="submit" value="Login">-->
 			
 		</form>
 		
+		<button id="loginButton">Login</button>
+		</div>
+		
 		<script> 
-			function validateForm() {
+			document.Triad.validateForm = function() {
 				var x = document.forms["myForm"]["username"].value;
 				var y = document.forms["myForm"]["password"].value;
 				// regular expression
@@ -39,8 +54,18 @@
 					alert("invalid username or password");
 					return false;
 				}else{
-					alert("login success");
+					//alert("login success");
 					
+					// Hide the login form
+					$("#loginUI").css('display', 'none');
+					
+					// make the canvas element visisble (by changing its display attribute back to 'block')
+					$("#canvasBg").css("display", "block");
+					
+					// call the game's init() method
+					//window.init();
+					document.Triad.Game();
+					return true;
 				}
 				
 			} 		
