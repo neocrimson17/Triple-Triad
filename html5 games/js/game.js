@@ -77,10 +77,10 @@ var isGameOver = false;
 var animating = false;
 var needCheck = false;
 
-// sounds
+// global sound variables
 var MainTheme = new Audio('sounds/ShuffleBoogie.mp3');
 var CursorMove = new Audio('sounds/CursorMove.mp3');
-
+// global image sources
 var imgBg = new Image();
 imgBg.src = 'images/board.png';
 
@@ -117,6 +117,9 @@ imgBoxRules.src = 'images/boxRules.png';
 // Load background
 imgBg.addEventListener('load',init,false);
 
+
+
+
 // enum for cards to help create a card object
 // note: each card has a name and 4 corresponding values(top,bottom, left and right)
 // The highest value is represented by a letter A graphically (numerically it's equal to 10)
@@ -124,6 +127,8 @@ imgBg.addEventListener('load',init,false);
 // var mySize = CardEnum.GEEZARD;
 // var myCode = CardEnum.properties[mySize].name; // myCode == "Geezard"
 // OR if mycode = Card.properties[mySize].topValue; // myCode == 1
+
+
 var CardEnum = {
 	//level 1 monster cards
 	GEEZARD: 1,
@@ -425,7 +430,7 @@ function initGame() {
 	gameState = gameStates.Game;
 	
 	// Initialize deck object (CardArray global variable)
-	TTDeck();
+	TTDeck(CardArray);
 	
 	// Take cards from deck CardArray and put into hands
 	setPlayerHand();
@@ -725,9 +730,9 @@ function TTCard(name,top,bottom,left,right,numCopy,index){
 // will fix this later. 
 // in the process of testing for iteration through the enum, card object, get name, top,bottom,left, right values
 // array to hold all the cards, so far it seems to work notice the name of the cards and value
-function TTDeck(){
+function TTDeck(Array){
 	var card = CardEnum;
-	var name;
+	
 	// length of enum
 	var keys = Object.keys(card);
 	// CardArray is a global array
@@ -737,10 +742,7 @@ function TTDeck(){
 		
 		var c = new TTCard(card.properties[i].name,card.properties[i].topValue,card.properties[i].bottomValue,card.properties[i].leftValue,card.properties[i].rightValue, card.properties[i].numCopy, i);
 		c.srcCoordinates(i);
-		CardArray.push(c);
-		if (i == 1){
-			name = c;
-		}
+		Array.push(c);
 	}
 	//var c = new TTCard(card.properties[1].name,card.properties[1].topValue,card.properties[1].bottomValue,card.properties[1].leftValue,card.properties[1].rightValue);
 	//alert("the name of the first card is: " + name.name +", top value: " + name.top + ", bottom value: " + name.bottom + ", left value: "+name.left + ", right value: " + name.right + " the number of copy current: " + name.numCopy );
@@ -749,7 +751,7 @@ function TTDeck(){
 	//alert(CardArray[1].name+" top value: " + CardArray[1].top);// Funguar 2nd card 
 	//alert(CardArray[109].name+" top value: " + CardArray[109].top);// Squall last card 
 	
-	return CardArray;
+	return Array;
 	
 }
 
@@ -1327,11 +1329,6 @@ function drawGameOver() {
 }
 // end Drawing functions
 
-
-
-
-
-
 // Sound functions
 
 // play main theme song in a loop
@@ -1682,6 +1679,19 @@ function checkKeyUp(e) {
 	}
 }
 
-// end keyboard functions
+function testcome(){
+	var card = [];
+	TTDeck(card);
+	return card;
 
+}
+exportedFuncs = {
+		"testcome" : testcome
+		
+		/*,
+		"testcome2" : testcome2*/
+};
+	
+return exportedFuncs;
+	
 };

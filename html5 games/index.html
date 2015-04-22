@@ -64,12 +64,29 @@
 					
 					// call the game's init() method
 					//window.init();
-					document.Triad.Game();
+					document.Triad.Functions = document.Triad.Game();
+				
+					if (!document.Triad.Functions) {
+						alert("Functions do not exist yet");
+					} else {
+						var card = document.Triad.Functions.testcome()
+						alert(card[0].name + " and number copy is" + card[0].numCopy);
+					}
+					
 					return true;
 				}
 				
 			} 		
 		</script>
+		<script>
+			/*if (!document.Triad.Functions) {
+				alert("Functions do not exist yet");
+			} else {
+				document.Triad.Functions.testcome();
+			}
+			*/
+		</script>
+		
 		
 		<canvas id="canvasBg" width="768px" height="560px"></canvas>
 		<!--canvas id="canvasBg" width="768px" height="560px"></canvas-->
