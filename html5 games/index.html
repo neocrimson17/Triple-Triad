@@ -12,9 +12,31 @@
 			document.Triad = {}; // create a namespace
 			$(document).ready(function() {
 				$("#loginButton").click(function() {
-					document.Triad.validateForm();
+					if (document.Triad.validateForm()) {
+				
+						var exported = document.Triad.Game();
+						exported.init();
+						console.log(exported.getGlobal1());
+						
+						// Runs startGame first, waits until finished,
+						// then runs printResults
+						exported.startGame().done(printResults);
+						
+						function printResults() {
+							console.log("print results returned to index.html");
+							// This should receive the final player score if player won
+							// and print it to the console.
+							// It will eventually receive more information and
+							// update the database with it.
+							console.log(exported.getGlobal1());
+						}
+						
+					} else {
+						// Form was not valid
+					}
 				});
 			});
+			
 		</script>
 	</head>
 	<body>
@@ -59,20 +81,22 @@
 					// Hide the login form
 					$("#loginUI").css('display', 'none');
 					
-					// make the canvas element visisble (by changing its display attribute back to 'block')
+					// make the canvas element visible (by changing its display attribute back to 'block')
 					$("#canvasBg").css("display", "block");
 					
 					// call the game's init() method
 					//window.init();
-					document.Triad.Game();
-					return true;
+					
+				   
+				   return true;
 				}
 				
-			} 		
+			}
+			
+			
 		</script>
 		
 		<canvas id="canvasBg" width="768px" height="560px"></canvas>
-		<!--canvas id="canvasBg" width="768px" height="560px"></canvas-->
 		<script src="js/game.js"></script>
 		
 		
