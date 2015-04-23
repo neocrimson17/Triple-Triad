@@ -1439,10 +1439,9 @@ document.Triad.Game = function() {
 	}
 	// end Drawing functions
 
-
-
-
-
+	
+	
+	
 
 	// Sound functions
 
