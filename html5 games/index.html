@@ -15,21 +15,28 @@
 					if (document.Triad.validateForm()) {
 				
 						var exported = document.Triad.Game();
-						exported.init();
-						console.log(exported.getGlobal1());
+						exported.init(document.forms["myForm"]["username"].value);
 						
 						// Runs startGame first, waits until finished,
 						// then runs printResults
 						exported.startGame().done(printResults);
 						
 						function printResults() {
-							console.log("print results returned to index.html");
-							// This should receive the final player score if player won
-							// and print it to the console.
-							// It will eventually receive more information and
-							// update the database with it.
-							console.log(exported.getGlobal1());
+							console.log("Printing from index.html:");
+							// This will eventually update the database with the received information
+							var playerScore = exported.getPlayerScore();
+							var enemyScore = exported.getEnemyScore();
+							var chosenCard = exported.getChosenCard();
+							
+							if (playerScore > enemyScore) {
+								console.log("The player won the game and obtained the " + chosenCard.name + " card.");
+							} else if (playerScore < enemyScore){
+								console.log("The player lost the game and lost the " + chosenCard.name +  " card.");
+							} else {
+								console.log("It was a tie game!");
+							}
 						}
+						
 						
 					} else {
 						// Form was not valid
@@ -129,6 +136,31 @@
 
 					}
 					
+					/*var card = document.Triad.Functions.testcom();
+					
+					$.ajaxSetup({
+							   jsonp: null,
+							   jsonpCallback: null
+					   });
+						var monstJ = JSON.stringify(card);
+                                               
+						   $(document).ready(function(){
+								   $.ajax({
+										   type: 'POST',
+										   url: 'test.php',
+										   dataType: 'json',
+										   data: {
+												   monsterId: monstJ
+										   },    
+										   success: function (data) {    
+												   //alert("success");  
+												   alert(data);        
+										   },
+										   error: function () {
+												   alert("could not send data as JSON (failure)");
+										   }
+								   });
+						   });*/
 				   
 				   return true;
 				}

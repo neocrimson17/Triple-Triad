@@ -1,5 +1,6 @@
 document.Triad.Game = function() {
 	var deferrer;
+	var playerName;
 	
 	// Canvas Variables
 	var canvasBg;
@@ -10,7 +11,8 @@ document.Triad.Game = function() {
 		Init : 0, 
 		RuleSelect : 1,
 		Game : 2,
-		CardTrade : 3
+		CardTrade : 3,
+		Finish : 4
 	}
 
 	var gameState;
@@ -65,14 +67,17 @@ document.Triad.Game = function() {
 	var isDownKey;
 	var isLeftKey;
 
-	var playerScore;
-	var enemyScore;
 	var turn;
 	var playerTurn;
 	var enemyTurn;
 	var isGameOver;
 	var animating;
 	var needCheck;
+	
+	// Variables sent to database
+	var playerScore;
+	var enemyScore;
+	var chosenCard;
 
 	// sounds
 	var MainTheme;
@@ -109,10 +114,10 @@ document.Triad.Game = function() {
 	// OR if mycode = Card.properties[mySize].topValue; // myCode == 1
 	var CardEnum;
 	
-	function init() {
+	function init(name) {
 		// initialization function
-		global1 = 1;
 		deferrer = $.Deferred();
+		playerName = name;
 		
 		// Canvas Variables
 		canvasBg = document.getElementById('canvasBg');
@@ -475,7 +480,6 @@ document.Triad.Game = function() {
 	
 };
 		
-		console.log("Initialized");
 	}
 	
 	function startGame() {
@@ -523,18 +527,19 @@ document.Triad.Game = function() {
 		ctxBg.textAlign = "left";
 		ctxBg.fillStyle = "white"; 
 		ctxBg.strokeStyle = "white"; 
-		ctxBg.fillText("Rules:",textPosX*widthScale,textPosY*heightScale);
-		ctxBg.fillText("* Random",textPosX*widthScale,textPosY+40*heightScale);
-		ctxBg.fillText("* No Elemental",textPosX*widthScale,textPosY+52*heightScale);
-		ctxBg.fillText("* Trade Rule: One",textPosX*widthScale,textPosY+64*heightScale);
-		ctxBg.fillText("Press Enter to Play!",textPosX*widthScale,textPosY+88*heightScale);
+		ctxBg.fillText("Hello " + playerName + "!",	textPosX*widthScale,textPosY*heightScale);
+		ctxBg.fillText("Rules:",					textPosX*widthScale,textPosY+52*heightScale);
+		ctxBg.fillText("* Random",					textPosX*widthScale,textPosY+64*heightScale);
+		ctxBg.fillText("* No Elemental",			textPosX*widthScale,textPosY+76*heightScale);
+		ctxBg.fillText("* Trade Rule: One",			textPosX*widthScale,textPosY+88*heightScale);
+		ctxBg.fillText("Press Enter to Play!",		textPosX*widthScale,textPosY+112*heightScale);
 	}
 
 	function initGame() {
 		gameState = gameStates.Game;
 		
 		// Initialize deck object (CardArray global variable)
-		TTDeck();
+		TTDeck(CardArray);
 		
 		// Take cards from deck CardArray and put into hands
 		setPlayerHand();
@@ -553,7 +558,6 @@ document.Triad.Game = function() {
 		ctxBg.clearRect(0, 0, canvasBg.width, canvasBg.height);
 		drawTradingBg();
 		
-		console.log("clearGameScreen");
 		initCardTrade();
 	}
 
@@ -781,14 +785,6 @@ document.Triad.Game = function() {
 		}
 	}
 
-	function acquireCard(card) {
-		// update database with this information
-		drawInfoBoxTop(card.name + " Card acquired");
-		
-		// GAME ENDS HERE
-		deferrer.resolve();
-	}
-
 	// end game logic functions
 
 
@@ -824,6 +820,7 @@ document.Triad.Game = function() {
 		this.height = 64;
 		this.widthScale = widthScale;
 		this.heightScale = heightScale;
+		this.numberScale = 1;
 		
 		this.player = true; 		// either player or enemy
 		this.front = true;			// display front or back of card
@@ -831,15 +828,16 @@ document.Triad.Game = function() {
 		this.flipVert = false;		// vertical flip
 		this.shrink = false;		// used for flipping
 		this.fall = false;			// fall onto board
+		this.tradeAnim = false;		// trading animations at end of game
 	}
 
 	// Deck to hold cards
 	// will fix this later. 
 	// in the process of testing for iteration through the enum, card object, get name, top,bottom,left, right values
 	// array to hold all the cards, so far it seems to work notice the name of the cards and value
-	function TTDeck(){
+	function TTDeck(Array){
 		var card = CardEnum;
-		var name;
+		
 		// length of enum
 		var keys = Object.keys(card);
 		// CardArray is a global array
@@ -849,10 +847,7 @@ document.Triad.Game = function() {
 			
 			var c = new TTCard(card.properties[i].name,card.properties[i].topValue,card.properties[i].bottomValue,card.properties[i].leftValue,card.properties[i].rightValue, card.properties[i].numCopy, i);
 			c.srcCoordinates(i);
-			CardArray.push(c);
-			if (i == 1){
-				name = c;
-			}
+			Array.push(c);
 		}
 		//var c = new TTCard(card.properties[1].name,card.properties[1].topValue,card.properties[1].bottomValue,card.properties[1].leftValue,card.properties[1].rightValue);
 		//alert("the name of the first card is: " + name.name +", top value: " + name.top + ", bottom value: " + name.bottom + ", left value: "+name.left + ", right value: " + name.right + " the number of copy current: " + name.numCopy );
@@ -861,7 +856,7 @@ document.Triad.Game = function() {
 		//alert(CardArray[1].name+" top value: " + CardArray[1].top);// Funguar 2nd card 
 		//alert(CardArray[109].name+" top value: " + CardArray[109].top);// Squall last card 
 		
-		return CardArray;
+		return Array;
 		
 	}
 
@@ -916,7 +911,6 @@ document.Triad.Game = function() {
 			ctxBg.drawImage(cardSheet,this.srcX,this.srcY,this.width,this.height,
 						this.drawX,this.drawY,this.width*this.widthScale,this.height*this.heightScale);
 			
-			// Draw card's point values (and element later)
 			this.drawNumbers();
 		} else {
 			// Draw card's back
@@ -927,9 +921,9 @@ document.Triad.Game = function() {
 	};
 
 	TTCard.prototype.drawNumbers = function () {
-
-		var scaleX = 13 * widthScale;
-		var scaleY = 10.5 * heightScale;
+	
+		var scaleX = 13 * widthScale; scaleX *= this.numberScale;
+		var scaleY = 10.5 * heightScale; scaleY *= this.numberScale;
 		var x = 0;
 		var y = 0;
 		
@@ -1012,6 +1006,8 @@ document.Triad.Game = function() {
 			// move up off of screen, then down into board
 			fallInt = 2 * heightScale;
 			animating = true;
+			
+			//72 * heightScale is slightly longer than card height
 			
 			if (this.drawY > -(72 * heightScale) && this.fall == false) {
 				this.drawY -= fallInt;
@@ -1107,7 +1103,34 @@ document.Triad.Game = function() {
 					animating = false;
 				}
 			}
+		} else if (this.tradeAnim) {
+			// move up off of screen, then down into board
+			fallInt = 2 * heightScale;
+			animating = true;
 			
+			//72 * heightScale is slightly longer than card height
+			
+			if (this.drawY > -(72 * heightScale) && this.fall == false) {
+				this.drawY -= fallInt;
+				if (this.drawY <= -(72 * heightScale)) {
+				
+					// double size and center on screen
+					this.widthScale*=2;
+					this.heightScale*=2;
+					this.numberScale*=2;
+					this.drawX = gameWidth/2 - this.width*widthScale;
+					this.fall = true;
+					this.player = !this.player;
+				}
+			} else if (this.fall == true) {
+				this.drawY += fallInt;
+				if (this.drawY >= (gameHeight/2 - this.height*heightScale)) {
+					this.drawY = gameHeight/2 - this.height*heightScale;
+					this.fall = false;
+					this.tradeAnim = false;
+					animating = false;
+				}
+			}
 		}
 	}
 
@@ -1257,7 +1280,6 @@ document.Triad.Game = function() {
 			drawScore();
 			
 			checkKeys();
-			console.log(isEnterKey);
 			
 			if (!animating) {
 				gameLogic();
@@ -1265,24 +1287,51 @@ document.Triad.Game = function() {
 			
 			if (!animating && isGameOver) {
 				drawGameOver();
-				//setTimeout(function(){clearGameScreen();},5000);
 				if (isEnterKey) {
 					clearGameScreen();
 				}
 			}
 		} else if (gameState == gameStates.CardTrade) {
 			ctxBg.clearRect(0, 0, canvasBg.width, canvasBg.height);
+			
 			drawTradingBg();
 			
 			drawTradeCards();
 			
-			selector1.draw();
+			if (playerScore > enemyScore) {
 			
-			checkKeys();
+				selector1.draw();
+				
+				checkKeys();
+				
+				if (selector1.select) {
+					chosenCard = enemyDeck[selector1.locX];
+					selector1.trading = false;
+					chosenCard.tradeAnim = true;
+					drawAcquireCardBox(chosenCard);
+					updateTradeCards();
+					gameState = gameStates.Finish;
+				}
+			} else if (enemyScore > playerScore) {
+				var selection = Math.floor((Math.random() * 5)); // 0-4
+				chosenCard = playerDeck[selection];
+				chosenCard.tradeAnim = true;
+				drawAcquireCardBox(chosenCard);
+				updateTradeCards();
+				gameState = gameStates.Finish;
+			}
+		} else if (gameState == gameStates.Finish) {
+			// GAME ENDS HERE
+			ctxBg.clearRect(0, 0, canvasBg.width, canvasBg.height);
 			
-			if (selector1.select) {
-				selector1.trading = false;
-				acquireCard(enemyDeck[selector1.locX]);
+			drawTradingBg();
+			
+			drawAcquireCardBox(chosenCard);
+			
+			updateTradeCards();
+		
+			if (!animating) {
+				deferrer.resolve();
 			}
 		} else {}
 	}
@@ -1325,6 +1374,25 @@ document.Triad.Game = function() {
 		}
 	}
 
+	function updateTradeCards() {
+		for (i = 0; i < playerDeck.length; i++) {
+			if (playerDeck[i] != null) {
+				playerDeck[i].draw();
+				playerDeck[i].update();
+			}
+		}
+		
+		for (i = 0; i < enemyDeck.length; i++) {
+			if (enemyDeck[i] != null) {
+				enemyDeck[i].draw();
+				enemyDeck[i].update();
+			}
+		}
+		
+		chosenCard.draw();
+		chosenCard.update();
+	}
+	
 	function startUpdating() {
 		stopUpdating();
 		updateInterval = setInterval(update,spf);
@@ -1414,6 +1482,10 @@ document.Triad.Game = function() {
 		ctxBg.fillText(text,192*widthScale,28*heightScale);
 	}
 
+	function drawAcquireCardBox(card) {
+		drawInfoBoxTop(card.name + " Card acquired");
+	}
+	
 	function drawGameOver() {
 		var srcX = 0;
 		var srcY = 0;
@@ -1796,13 +1868,27 @@ document.Triad.Game = function() {
 	// end keyboard functions
 
 
-	function getGlobal1() { return playerScore; }
+	
 	
 	// Any functions and/or variables
+	
+	function getPlayerScore() { return playerScore; }
+	function getEnemyScore() { return enemyScore; }
+	function getChosenCard() { return chosenCard; }
+	
+	function testcom(){
+		var card = [];
+		TTDeck(card);
+		return card;
+	}
+	
 	var exported = {
 		"init":init,
 		"startGame": startGame,
-		"getGlobal1": getGlobal1
+		"getPlayerScore": getPlayerScore,
+		"getEnemyScore": getEnemyScore,
+		"getChosenCard": getChosenCard,
+		"testcom" : testcom
 	};
 	
 	return exported;
