@@ -69,8 +69,41 @@
 					if (!document.Triad.Functions) {
 						alert("Functions do not exist yet");
 					} else {
-						var card = document.Triad.Functions.testcome()
-						alert(card[0].name + " and number copy is" + card[0].numCopy);
+						var card = document.Triad.Functions.testcom()
+						alert(card[0].name + " and number copy is " + card[0].numCopy);
+						
+						$.ajaxSetup({
+							jsonp: null,
+							jsonpCallback: null
+						});
+						// function to send request
+						// example to send an array as JSON 
+						/*
+						var myArray = [1, 2, 3];
+						var myJson = JSON.stringify(myArray);
+
+						*/
+						// turn it into string
+						var monstJ = JSON.stringify(card);
+						
+						$(document).ready(function(){
+							$.ajax({
+								type: 'POST',
+								url: 'test.php',
+								dataType: 'json',
+								data: {
+									monsterId: monstJ
+								},    
+								success: function (data) {    
+									//alert("success");  
+									alert(data);	
+								},
+								error: function () {
+									alert("could not send data as JSON (failure)");
+								}
+							});
+						});
+
 					}
 					
 					return true;
