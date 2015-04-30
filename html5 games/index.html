@@ -12,30 +12,76 @@
 			document.Triad = {}; // create a namespace
 			$(document).ready(function() {
 				$("#loginButton").click(function() {
+					var x = document.forms["myForm"]["username"].value;
+					var y = document.forms["myForm"]["password"].value;
 					if (document.Triad.validateForm()) {
-				
-						var exported = document.Triad.Game();
-						exported.init(document.forms["myForm"]["username"].value);
-						
-						// Runs startGame first, waits until finished,
-						// then runs printResults
-						exported.startGame().done(printResults);
-						
-						function printResults() {
-							console.log("Printing from index.html:");
-							// This will eventually update the database with the received information
-							var playerScore = exported.getPlayerScore();
-							var enemyScore = exported.getEnemyScore();
-							var chosenCard = exported.getChosenCard();
-							
-							if (playerScore > enemyScore) {
-								console.log("The player won the game and obtained the " + chosenCard.name + " card.");
-							} else if (playerScore < enemyScore){
-								console.log("The player lost the game and lost the " + chosenCard.name +  " card.");
-							} else {
-								console.log("It was a tie game!");
+									
+									var exported = document.Triad.Game();
+									
+									// Starts the game and sends the user's data
+									exported.init(x);
+									
+									var CardArray = exported.getCardArray();
+									var sendArray = JSON.stringify(CardArray);
+									//alert(CardArray[0].name);
+						$.ajaxSetup({
+							jsonp: null,
+							jsonpCallback: null
+						});
+						$.ajax({
+							type: 'POST',
+							url: 'test.php',
+							dataType: 'json',
+							data: {
+								myusername: x,
+								mypassword: y,
+								myCardArray: sendArray
+							},    
+							success: function (data) {
+								if (data == "failure") {
+									alert("Wrong username or password");
+								} else {
+									// Hide the login form
+									$("#loginUI").css('display', 'none');
+									
+									// make the canvas element visible
+									// (by changing its display attribute back to 'block')
+									$("#canvasBg").css("display", "block");
+									
+									// Print returned information to the console
+									console.log("Printing from index.html:");
+									console.log("Username = " + data.username);
+									console.log("Password = " + data.password);
+									console.log("Wins = " + data.wins +
+									", Losses = " + data.losses + 
+									", Total Games = " + data.totalgames);
+									console.log("Cards = " + data.cards);
+									
+									//printMonsterCardsUserHas(data, CardArray);
+									
+									// Runs startGame first, waits until finished,
+									// then runs printResults
+									exported.startGame().done(exportResults);
+									
+									var card = exported.testcom();
+									//alert(card[0].name + " and number copy is " + card[0].numCopy);
+									
+									function exportResults() {
+										var a = exported.getPlayerScore();
+										var b = exported.getEnemyScore();
+										var c = exported.getChosenCard();
+										printResults(a,b,c);
+										updateDatabase(a,b,c);
+									}
+									
+								} 
+							},
+							error: function (xhr, ajaxOptions, thrownError) {
+								alert("Error didn't get a reponse back");
+								alert(xhr.responseText);
+								// Don't Start Game
 							}
-						}
+						});
 						
 						
 					} else {
@@ -65,109 +111,64 @@
 				var y = document.forms["myForm"]["password"].value;
 				// regular expression
 				var ck_username = /^[A-Za-z0-9_]{1,20}$/;
-				var ck_password =  /^[A-Za-z0-9!@#$%^&*()_]{6,20}$/;
+				var ck_password =  /^[A-Za-z0-9!@#$%^&*()_]{3,20}$/;
 				
 				if (x == null || x == "" || y == null || y == "") {
 					alert("Name and password must be filled out");
 					return false;
 				}
 				if (!ck_username.test(x)) {
-					alert("no special character is allowed");
+					alert("No special character is allowed");
 					return false;
 				}
 				if (!ck_password.test(y)) {
-					alert("invalid password.  It needs to be at least 6 characters in length");
-					return false;
-				}
-				if ( x != "hdao" && y != "dgmonster"){
-					alert("invalid username or password");
+					alert("Invalid password.  It needs to be at least 3 characters in length");
 					return false;
 				}else{
 					//alert("login success");
 					
-					// Hide the login form
-					$("#loginUI").css('display', 'none');
-					
-					// make the canvas element visible (by changing its display attribute back to 'block')
-					$("#canvasBg").css("display", "block");
-					
-					// call the game's init() method
-					//window.init();
-
-					document.Triad.Functions = document.Triad.Game();
-				
-					if (!document.Triad.Functions) {
-						alert("Functions do not exist yet");
-					} else {
-						var card = document.Triad.Functions.testcom()
-						alert(card[0].name + " and number copy is " + card[0].numCopy);
-						
-						$.ajaxSetup({
-							jsonp: null,
-							jsonpCallback: null
-						});
-						// function to send request
-						// example to send an array as JSON 
-						/*
-						var myArray = [1, 2, 3];
-						var myJson = JSON.stringify(myArray);
-
-						*/
-						// turn it into string
-						var monstJ = JSON.stringify(card);
-						
-						$(document).ready(function(){
-							$.ajax({
-								type: 'POST',
-								url: 'test.php',
-								dataType: 'json',
-								data: {
-									monsterId: monstJ
-								},    
-								success: function (data) {    
-									//alert("success");  
-									alert(JSON.stringify(data));	
-								},
-								error: function () {
-									alert("could not send data as JSON (failure)");
-								}
-							});
-						});
-
-					}
-					
-					/*var card = document.Triad.Functions.testcom();
-					
-					$.ajaxSetup({
-							   jsonp: null,
-							   jsonpCallback: null
-					   });
-						var monstJ = JSON.stringify(card);
-                                               
-						   $(document).ready(function(){
-								   $.ajax({
-										   type: 'POST',
-										   url: 'test.php',
-										   dataType: 'json',
-										   data: {
-												   monsterId: monstJ
-										   },    
-										   success: function (data) {    
-												   //alert("success");  
-												   alert(data);        
-										   },
-										   error: function () {
-												   alert("could not send data as JSON (failure)");
-										   }
-								   });
-						   });*/
-				   
-				   return true;
+					return true;
 				}
-				
 			}
 			
 			
+		</script>
+		
+		<script>
+		function printResults(playerScore, enemyScore, chosenCard) {
+			console.log("Printing from index.html:");
+			
+			if (playerScore > enemyScore) {
+				console.log("The player won the game and obtained the " + chosenCard.name + " card.");
+			} else if (playerScore < enemyScore){
+				console.log("The player lost the game and lost the " + chosenCard.name +  " card.");
+			} else {
+				console.log("It was a tie game!");
+			}
+		}
+		</script>
+		
+		<script>
+		function updateDatabase(playerScore, enemyScore, chosenCard) {
+			console.log("Printing from index.html:");
+			// This will update the database with the received information
+			
+			// Prepare SQL statement
+			
+			// Increment 'totalgames'
+			
+			if (playerScore > enemyScore) {
+				// Increment 'wins'
+				// Add card to player's deck
+			} else if (playerScore < enemyScore){
+				// Increment 'losses'
+				// Remove card from player's deck
+			} else {
+				// tie game, so do nothing
+			}
+			
+			// execute SQL statement
+		}
 		</script>
 		
 		<canvas id="canvasBg" width="768px" height="560px"></canvas>

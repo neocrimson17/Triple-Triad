@@ -113,7 +113,7 @@ document.Triad.Game = function() {
 	// var myCode = CardEnum.properties[mySize].name; // myCode == "Geezard"
 	// OR if mycode = Card.properties[mySize].topValue; // myCode == 1
 	var CardEnum;
-	
+	// here
 	function init(name) {
 		// initialization function
 		deferrer = $.Deferred();
@@ -480,6 +480,10 @@ document.Triad.Game = function() {
 	
 };
 		
+		
+		
+		// Initialize deck object (CardArray global variable)
+		TTDeck(CardArray);
 	}
 	
 	function startGame() {
@@ -537,9 +541,6 @@ document.Triad.Game = function() {
 
 	function initGame() {
 		gameState = gameStates.Game;
-		
-		// Initialize deck object (CardArray global variable)
-		TTDeck(CardArray);
 		
 		// Take cards from deck CardArray and put into hands
 		setPlayerHand();
@@ -1882,13 +1883,18 @@ document.Triad.Game = function() {
 		return card;
 	}
 	
+	function getCardArray() {
+		return CardArray;
+	}
+	
 	var exported = {
 		"init":init,
 		"startGame": startGame,
 		"getPlayerScore": getPlayerScore,
 		"getEnemyScore": getEnemyScore,
 		"getChosenCard": getChosenCard,
-		"testcom" : testcom
+		"testcom" : testcom,
+		"getCardArray" : getCardArray
 	};
 	
 	return exported;
