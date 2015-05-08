@@ -11,33 +11,160 @@
 		<script type="text/javascript">
 			document.Triad = {}; // create a namespace
 			$(document).ready(function() {
+				// If Log in button was pressed
 				$("#loginButton").click(function() {
+					var x = document.forms["myForm"]["username"].value;
+					var y = document.forms["myForm"]["password"].value;
 					if (document.Triad.validateForm()) {
-				
-						var exported = document.Triad.Game();
-						exported.init(document.forms["myForm"]["username"].value);
-						
-						// Runs startGame first, waits until finished,
-						// then runs printResults
-						exported.startGame().done(printResults);
-						
-						function printResults() {
-							console.log("Printing from index.html:");
-							// This will eventually update the database with the received information
-							var playerScore = exported.getPlayerScore();
-							var enemyScore = exported.getEnemyScore();
-							var chosenCard = exported.getChosenCard();
-							
-							if (playerScore > enemyScore) {
-								console.log("The player won the game and obtained the " + chosenCard.name + " card.");
-							} else if (playerScore < enemyScore){
-								console.log("The player lost the game and lost the " + chosenCard.name +  " card.");
-							} else {
-								console.log("It was a tie game!");
+						$.ajaxSetup({
+							jsonp: null,
+							jsonpCallback: null
+						});
+						$.ajax({
+							type: 'POST',
+							url: 'checklogin.php',
+							dataType: 'json',
+							data: {
+								myusername: x,
+								mypassword: y
+							},    
+							success: function (data) {
+								if (data == "failure") {
+									alert("Wrong username or password");
+								} else {
+									// Hide the login form
+									$("#loginUI").css('display', 'none');
+									
+									// make the canvas element visible
+									// (by changing its display attribute back to 'block')
+									$("#canvasBg").css("display", "block");
+									
+									// Print returned information to the console
+									var userData = data;
+									console.log("Printing from index.html: Logged in");
+									console.log("UserID = " + userData.userID);
+									console.log("Username = " + userData.username);
+									console.log("Password = " + userData.password);
+									console.log("Wins = " + userData.wins +
+									", Losses = " + userData.losses + 
+									", Total Games = " + userData.totalgames);
+									//console.log("userID:  " + data.userID);
+									//console.log("Geezard: " + data.Geezard);
+									
+									//printMonsterCardsUserHas(data, CardArray);
+									
+									// Another call to database to retrieve monster information
+									
+									$.ajax({
+									type: 'POST',
+									url: 'checkmonsters.php',
+									dataType: 'json',
+									data: {
+										myuserID: userData.userID,
+									},    
+									success: function (data) {
+										if (data == "failure") {
+											alert("Wrong username or password");
+										} else {
+											// Hide the login form
+											$("#loginUI").css('display', 'none');
+											
+											// make the canvas element visible
+											// (by changing its display attribute back to 'block')
+											$("#canvasBg").css("display", "block");
+											
+											var exported = document.Triad.Game();
+											
+											// Starts the game and sends the user's data
+											exported.init(x, data);
+											
+											// Runs startGame first, waits until finished,
+											// then runs printResults
+											exported.startGame().done(exportResults);
+											
+											var card = exported.testcom();
+											//alert(card[0].name + " and number copy is " + card[0].numCopy);
+											
+											function exportResults() {
+												var a = exported.getPlayerScore();
+												var b = exported.getEnemyScore();
+												var c = exported.getChosenCard();
+												printResults(a,b,c);
+												updateDatabase(userData, data, a,b,c);
+											}
+										} 
+									},
+									error: function (xhr, ajaxOptions, thrownError) {
+										alert("Error: " + xhr.responseText);
+										// Don't Start Game
+									}
+								});
+									
+								} 
+							},
+							error: function (xhr, ajaxOptions, thrownError) {
+								alert("Error: " + xhr.responseText);
+								// Don't Start Game
 							}
-						}
+						});
 						
 						
+					} else {
+						// Form was not valid
+					}
+				});
+				
+				//If Register button was pressed
+				
+				$("#registerButton").click(function() {
+					//alert("Register!");
+					
+					var x = document.forms["myForm"]["username"].value;
+					var y = document.forms["myForm"]["password"].value;
+					if (document.Triad.validateForm()) {
+						
+						var exported = document.Triad.Game();
+						exported.init(x, null);
+						var CardArray = exported.getRandomSet(10);
+						var sendArray = JSON.stringify(CardArray);
+						
+						/*console.log(CardArray[0]);
+						console.log(CardArray[1]);
+						console.log(CardArray[2]);
+						console.log(CardArray[3]);
+						console.log(CardArray[4]);
+						console.log(CardArray[5]);
+						console.log(CardArray[6]);
+						console.log(CardArray[7]);
+						console.log(CardArray[8]);
+						console.log(CardArray[9]);*/
+						
+						// Check database and attempt to register
+						$.ajaxSetup({
+							jsonp: null,
+							jsonpCallback: null
+						});
+						$.ajax({
+							type: 'POST',
+							url: 'checkregister.php',
+							dataType: 'json',
+							data: {
+								myusername: x,
+								mypassword: y,
+								myCardArray: sendArray
+							},    
+							success: function (data) {
+								if (data == "failure") {
+									alert("User already exists!");
+								} else {
+									alert("Registration Successful! Please log in");
+								}
+							},
+							error: function (xhr, ajaxOptions, thrownError) {
+								alert("Error: " + xhr.responseText);
+								// Don't Register User
+							}
+						});
 					} else {
 						// Form was not valid
 					}
@@ -57,6 +184,7 @@
 		</form>
 		
 		<button id="loginButton">Login</button>
+		<button id="registerButton">Register</button>
 		</div>
 		
 		<script> 
@@ -65,109 +193,133 @@
 				var y = document.forms["myForm"]["password"].value;
 				// regular expression
 				var ck_username = /^[A-Za-z0-9_]{1,20}$/;
-				var ck_password =  /^[A-Za-z0-9!@#$%^&*()_]{6,20}$/;
+				var ck_password =  /^[A-Za-z0-9!@#$%^&*()_]{3,20}$/;
 				
 				if (x == null || x == "" || y == null || y == "") {
 					alert("Name and password must be filled out");
 					return false;
 				}
 				if (!ck_username.test(x)) {
-					alert("no special character is allowed");
+					alert("No special character is allowed");
 					return false;
 				}
 				if (!ck_password.test(y)) {
-					alert("invalid password.  It needs to be at least 6 characters in length");
-					return false;
-				}
-				if ( x != "hdao" && y != "dgmonster"){
-					alert("invalid username or password");
+					alert("Invalid password.  It needs to be at least 3 characters in length");
 					return false;
 				}else{
-					//alert("login success");
-					
-					// Hide the login form
-					$("#loginUI").css('display', 'none');
-					
-					// make the canvas element visible (by changing its display attribute back to 'block')
-					$("#canvasBg").css("display", "block");
-					
-					// call the game's init() method
-					//window.init();
-
-					document.Triad.Functions = document.Triad.Game();
-				
-					if (!document.Triad.Functions) {
-						alert("Functions do not exist yet");
-					} else {
-						var card = document.Triad.Functions.testcom()
-						alert(card[0].name + " and number copy is " + card[0].numCopy);
-						
-						$.ajaxSetup({
-							jsonp: null,
-							jsonpCallback: null
-						});
-						// function to send request
-						// example to send an array as JSON 
-						/*
-						var myArray = [1, 2, 3];
-						var myJson = JSON.stringify(myArray);
-
-						*/
-						// turn it into string
-						var monstJ = JSON.stringify(card);
-						
-						$(document).ready(function(){
-							$.ajax({
-								type: 'POST',
-								url: 'test.php',
-								dataType: 'json',
-								data: {
-									monsterId: monstJ
-								},    
-								success: function (data) {    
-									//alert("success");  
-									alert(data);	
-								},
-								error: function () {
-									alert("could not send data as JSON (failure)");
-								}
-							});
-						});
-
-					}
-					
-					/*var card = document.Triad.Functions.testcom();
-					
-					$.ajaxSetup({
-							   jsonp: null,
-							   jsonpCallback: null
-					   });
-						var monstJ = JSON.stringify(card);
-                                               
-						   $(document).ready(function(){
-								   $.ajax({
-										   type: 'POST',
-										   url: 'test.php',
-										   dataType: 'json',
-										   data: {
-												   monsterId: monstJ
-										   },    
-										   success: function (data) {    
-												   //alert("success");  
-												   alert(data);        
-										   },
-										   error: function () {
-												   alert("could not send data as JSON (failure)");
-										   }
-								   });
-						   });*/
-				   
-				   return true;
+					return true;
 				}
-				
 			}
 			
 			
+		</script>
+		
+		<script>
+		function printResults(playerScore, enemyScore, chosenCard) {
+			console.log("Printing from index.html:");
+			
+			if (playerScore > enemyScore) {
+				console.log("The player won the game and obtained the " + chosenCard.name + " card.");
+			} else if (playerScore < enemyScore){
+				console.log("The player lost the game and lost the " + chosenCard.name +  " card.");
+			} else {
+				console.log("It was a tie game!");
+			}
+		}
+		</script>
+		
+		<script>
+		function updateDatabase(userData, monsterData, playerScore, enemyScore, chosenCard) {
+			console.log("Printing from index.html: updateDatabase");
+			// This will update the database with the received information
+			
+			//var cardIndex = chosenCard.index;
+			
+			// Convert string to integer
+			var wins = parseInt(userData.wins,10);
+			var losses = parseInt(userData.losses,10);
+			var totalgames = parseInt(userData.totalgames,10);
+			// Monster things
+			var monsterName;
+			var newValue = 0;
+			
+			
+			console.log("Wins: " + wins);
+			console.log("Losses: " + losses);
+			console.log("Total Games: "  + totalgames);
+			
+			
+			if (chosenCard != null) {
+				console.log("Chosen Card: " + chosenCard.name);
+				monsterName = chosenCard.name;
+				newValue = monsterData[monsterName];
+				console.log("Monster Data:");
+				console.log(monsterData);
+				console.log("MonsterName variable: " + monsterName);
+				console.log(monsterData[monsterName]);
+			}
+			
+			// Increment 'totalgames'
+			totalgames+=1;
+			if (playerScore > enemyScore) {
+				// Increment 'wins'
+				wins+=1;
+				// Add card to player's deck
+				newValue++;
+			} else if (playerScore < enemyScore){
+				// Increment 'losses'
+				losses+=1;
+				// Remove card from player's deck
+				newValue--;
+			} else {
+				// tie game, so do nothing
+			}
+			
+			// execute SQL statement
+			
+			$.ajaxSetup({
+				jsonp: null,
+				jsonpCallback: null
+			});
+			$.ajax({
+				type: 'POST',
+				url: 'updatedatabase.php',
+				dataType: 'json',
+				data: {
+					user: userData.username,
+					wins: wins,
+					losses: losses,
+					totalgames: totalgames
+				},    
+				success: function (data) {
+					// success, another ajax call to monster table
+					//______________________
+					if (chosenCard != null) {
+						$.ajax({
+							type: 'POST',
+							url: 'updatemonster.php',
+							dataType: 'json',
+							data: {
+								chosenCard: chosenCard.name,
+								newValue: newValue,
+								userID: userData.userID
+							},    
+							success: function (data) {
+								console.log("Monster table return call: ");
+								console.log(data);
+							},
+							error: function (xhr, ajaxOptions, thrownError) {
+								alert("Error: " + xhr.responseText);
+							}
+						});					
+					}
+					//______________________
+				},
+				error: function (xhr, ajaxOptions, thrownError) {
+					//alert("Error: " + xhr.responseText);
+				}
+			});
+		}
 		</script>
 		
 		<canvas id="canvasBg" width="768px" height="560px"></canvas>
