@@ -1,6 +1,7 @@
 document.Triad.Game = function() {
 	var deferrer;
 	var playerName;
+	var monsterData;
 	
 	// Canvas Variables
 	var canvasBg;
@@ -13,6 +14,18 @@ document.Triad.Game = function() {
 		Game : 2,
 		CardTrade : 3,
 		Finish : 4
+	}
+	
+	elements = {
+		none: 0,
+		earth : 1,
+		fire : 2,
+		holy : 3,
+		ice : 4,
+		lightning : 5,
+		poison : 6,
+		water : 7,
+		wind : 8
 	}
 
 	var gameState;
@@ -81,7 +94,11 @@ document.Triad.Game = function() {
 
 	// sounds
 	var MainTheme;
+	var CursorCancel;
 	var CursorMove;
+	var CursorWrong;
+	var DrawPoint;
+	var SavePoint;
 
 	var imgBg;
 
@@ -103,7 +120,11 @@ document.Triad.Game = function() {
 
 	var imgBoxInfo;
 
+	var imgBoxTradeInfo;
+
 	var imgBoxRules;
+	
+	var imgElements;
 
 	// enum for cards to help create a card object
 	// note: each card has a name and 4 corresponding values(top,bottom, left and right)
@@ -113,11 +134,12 @@ document.Triad.Game = function() {
 	// var myCode = CardEnum.properties[mySize].name; // myCode == "Geezard"
 	// OR if mycode = Card.properties[mySize].topValue; // myCode == 1
 	var CardEnum;
-	
-	function init(name) {
+	// here
+	function init(name, data) {
 		// initialization function
 		deferrer = $.Deferred();
 		playerName = name;
+		monsterData = data;
 		
 		// Canvas Variables
 		canvasBg = document.getElementById('canvasBg');
@@ -190,7 +212,11 @@ document.Triad.Game = function() {
 
 		// sounds
 		MainTheme = new Audio('sounds/ShuffleBoogie.mp3');
-		CursorMove = new Audio('sounds/CursorMove.mp3');
+		CursorCancel = new Audio('sounds/CursorCancelNew.mp3');
+		CursorMove = new Audio('sounds/CursorMoveNew.mp3');
+		CursorWrong = new Audio('sounds/CursorWrongNew.mp3');
+		DrawPoint = new Audio('sounds/DrawPointNew.mp3');
+		SavePoint = new Audio('sounds/SavePointNew2.mp3');
 
 		imgBg = new Image();
 		imgBg.src = 'images/board.png';
@@ -217,13 +243,19 @@ document.Triad.Game = function() {
 		imgSelection.src = 'images/selection.png';
 
 		imgGameOver = new Image();
-		imgGameOver.src = 'images/gameOverStates.png';
+		imgGameOver.src = 'images/gameOverStatesNew.png';
 
 		imgBoxInfo = new Image();
 		imgBoxInfo.src = 'images/boxInfo.png';
 
+		imgBoxTradeInfo = new Image();
+		imgBoxTradeInfo.src = 'images/boxTradeInfo.png';
+
 		imgBoxRules = new Image();
 		imgBoxRules.src = 'images/boxRules.png';
+		
+		imgElements = new Image();
+		imgElements.src = 'images/elements.png';
 
 		// enum for cards to help create a card object
 		// note: each card has a name and 4 corresponding values(top,bottom, left and right)
@@ -356,133 +388,140 @@ document.Triad.Game = function() {
 			
 			properties: {
 				// level 1 monsters 
-				1:{name: "Geezard", topValue: 1, bottomValue: 1, leftValue: 5, rightValue: 4, numCopy: 1},
-				2:{name: "Funguar", topValue: 5, bottomValue: 1, leftValue: 3, rightValue: 1, numCopy: 1},
-				3:{name: "Bite Bug", topValue: 1, bottomValue: 3, leftValue: 5, rightValue: 3, numCopy: 1},
-				4:{name: "Red Bat", topValue: 6, bottomValue: 1, leftValue: 2, rightValue: 1, numCopy: 1},
-				5:{name: "Blobra", topValue: 2, bottomValue: 1, leftValue: 5, rightValue: 3, numCopy: 1},
-				6:{name: "Gayla", topValue: 2, bottomValue: 4, leftValue: 4, rightValue: 1, numCopy: 1},
-				7:{name: "Gesper", topValue: 1, bottomValue: 4, leftValue: 1, rightValue: 5, numCopy: 1},
-				8:{name: "Fastitocalon-F", topValue: 3, bottomValue: 2, leftValue: 1, rightValue: 5, numCopy: 1},
-				9:{name: "Blood Soul", topValue: 2, bottomValue: 6, leftValue: 1, rightValue: 1, numCopy: 1},
-				10:{name: "Caterchipillar", topValue: 4, bottomValue: 4, leftValue: 3, rightValue: 2, numCopy: 1},
-				11:{name: "Cockatrice", topValue: 2, bottomValue: 2, leftValue: 6, rightValue: 1, numCopy: 1},
+				1:{name: "Geezard", topValue: 1, bottomValue: 1, leftValue: 5, rightValue: 4, numCopy: 1, element: elements.none},
+				2:{name: "Funguar", topValue: 5, bottomValue: 1, leftValue: 3, rightValue: 1, numCopy: 1, element: elements.none},
+				3:{name: "Bite Bug", topValue: 1, bottomValue: 3, leftValue: 5, rightValue: 3, numCopy: 1, element: elements.none},
+				4:{name: "Red Bat", topValue: 6, bottomValue: 1, leftValue: 2, rightValue: 1, numCopy: 1, element: elements.none},
+				5:{name: "Blobra", topValue: 2, bottomValue: 1, leftValue: 5, rightValue: 3, numCopy: 1, element: elements.none},
+				6:{name: "Gayla", topValue: 2, bottomValue: 4, leftValue: 4, rightValue: 1, numCopy: 1, element: elements.lightning},
+				7:{name: "Gesper", topValue: 1, bottomValue: 4, leftValue: 1, rightValue: 5, numCopy: 1, element: elements.none},
+				8:{name: "Fastitocalon-F", topValue: 3, bottomValue: 2, leftValue: 1, rightValue: 5, numCopy: 1, element: elements.earth},
+				9:{name: "Blood Soul", topValue: 2, bottomValue: 6, leftValue: 1, rightValue: 1, numCopy: 1, element: elements.none},
+				10:{name: "Caterchipillar", topValue: 4, bottomValue: 4, leftValue: 3, rightValue: 2, numCopy: 1, element: elements.none},
+				11:{name: "Cockatrice", topValue: 2, bottomValue: 2, leftValue: 6, rightValue: 1, numCopy: 1, element: elements.lightning},
 				// level 2 monsters 
-				12:{name: "Grat", topValue: 7, bottomValue: 3, leftValue: 1, rightValue: 1, numCopy: 1},
-				13:{name: "Buel", topValue: 6, bottomValue: 2, leftValue: 3, rightValue: 2, numCopy: 1},
-				14:{name: "Mesmerize", topValue: 5, bottomValue: 3, leftValue: 4, rightValue: 3, numCopy: 1},
-				15:{name: "Glacial Eye", topValue: 6, bottomValue: 4, leftValue: 3, rightValue: 1, numCopy: 1},
-				16:{name: "Belhelmel", topValue: 3, bottomValue: 5, leftValue: 3, rightValue: 4, numCopy: 1},
-				17:{name: "Thrustaevis", topValue: 5, bottomValue: 2, leftValue: 5, rightValue: 3, numCopy: 1},
-				18:{name: "Anacondaur", topValue: 5, bottomValue: 3, leftValue: 5, rightValue: 1, numCopy: 1},
-				19:{name: "Creeps", topValue: 5, bottomValue: 5, leftValue: 2, rightValue: 2, numCopy: 1},
-				20:{name: "Grendel", topValue: 4, bottomValue: 5, leftValue: 2, rightValue: 4, numCopy: 1},
-				21:{name: "Jelleye", topValue: 3, bottomValue: 1, leftValue: 7, rightValue: 2, numCopy: 1},
-				22:{name: "Grand Mantis", topValue: 5, bottomValue: 5, leftValue: 3, rightValue: 2, numCopy: 1},
+				12:{name: "Grat", topValue: 7, bottomValue: 3, leftValue: 1, rightValue: 1, numCopy: 1, element: elements.none},
+				13:{name: "Buel", topValue: 6, bottomValue: 2, leftValue: 3, rightValue: 2, numCopy: 1, element: elements.none},
+				14:{name: "Mesmerize", topValue: 5, bottomValue: 3, leftValue: 4, rightValue: 3, numCopy: 1, element: elements.none},
+				15:{name: "Glacial Eye", topValue: 6, bottomValue: 4, leftValue: 3, rightValue: 1, numCopy: 1, element: elements.ice},
+				16:{name: "Belhelmel", topValue: 3, bottomValue: 5, leftValue: 3, rightValue: 4, numCopy: 1, element: elements.none},
+				17:{name: "Thrustaevis", topValue: 5, bottomValue: 2, leftValue: 5, rightValue: 3, numCopy: 1, element: elements.wind},
+				18:{name: "Anacondaur", topValue: 5, bottomValue: 3, leftValue: 5, rightValue: 1, numCopy: 1, element: elements.poison},
+				19:{name: "Creeps", topValue: 5, bottomValue: 5, leftValue: 2, rightValue: 2, numCopy: 1, element: elements.lightning},
+				20:{name: "Grendel", topValue: 4, bottomValue: 5, leftValue: 2, rightValue: 4, numCopy: 1, element: elements.lightning},
+				21:{name: "Jelleye", topValue: 3, bottomValue: 1, leftValue: 7, rightValue: 2, numCopy: 1, element: elements.none},
+				22:{name: "Grand Mantis", topValue: 5, bottomValue: 5, leftValue: 3, rightValue: 2, numCopy: 1, element: elements.none},
 				// level 3 monsters 
-				23:{name: "Forbidden", topValue: 6, bottomValue: 3, leftValue: 2, rightValue: 6, numCopy: 1},
-				24:{name: "Armadodo", topValue: 6, bottomValue: 1, leftValue: 6, rightValue: 3, numCopy: 1},
-				25:{name: "Tri-Face", topValue: 3, bottomValue: 5, leftValue: 5, rightValue: 5, numCopy: 1},
-				26:{name: "Fastitocalon", topValue: 7, bottomValue: 1, leftValue: 3, rightValue: 5, numCopy: 1},
-				27:{name: "Snow Lion", topValue: 7, bottomValue: 5, leftValue: 3, rightValue: 1, numCopy: 1},
-				28:{name: "Ochu", topValue: 5, bottomValue: 3, leftValue: 3, rightValue: 6, numCopy: 1},
-				29:{name: "SAM08G", topValue: 5, bottomValue: 2, leftValue: 4, rightValue: 6, numCopy: 1},
-				30:{name: "Death Claw", topValue: 4, bottomValue: 7, leftValue: 2, rightValue: 4, numCopy: 1},
-				31:{name: "Cactuar", topValue: 6, bottomValue: 6, leftValue: 3, rightValue: 2, numCopy: 1},
-				32:{name: "Tonberry", topValue: 3, bottomValue: 4, leftValue: 4, rightValue: 6, numCopy: 1},
-				33:{name: "Abyss Worm", topValue: 7, bottomValue: 3, leftValue: 5, rightValue: 2, numCopy: 1},
+				23:{name: "Forbidden", topValue: 6, bottomValue: 3, leftValue: 2, rightValue: 6, numCopy: 1, element: elements.none},
+				24:{name: "Armadodo", topValue: 6, bottomValue: 1, leftValue: 6, rightValue: 3, numCopy: 1, element: elements.earth},
+				25:{name: "Tri-Face", topValue: 3, bottomValue: 5, leftValue: 5, rightValue: 5, numCopy: 1, element: elements.poison},
+				26:{name: "Fastitocalon", topValue: 7, bottomValue: 1, leftValue: 3, rightValue: 5, numCopy: 1, element: elements.earth},
+				27:{name: "Snow Lion", topValue: 7, bottomValue: 5, leftValue: 3, rightValue: 1, numCopy: 1, element: elements.ice},
+				28:{name: "Ochu", topValue: 5, bottomValue: 3, leftValue: 3, rightValue: 6, numCopy: 1, element: elements.none},
+				29:{name: "SAM08G", topValue: 5, bottomValue: 2, leftValue: 4, rightValue: 6, numCopy: 1, element: elements.fire},
+				30:{name: "Death Claw", topValue: 4, bottomValue: 7, leftValue: 2, rightValue: 4, numCopy: 1, element: elements.fire},
+				31:{name: "Cactuar", topValue: 6, bottomValue: 6, leftValue: 3, rightValue: 2, numCopy: 1, element: elements.none},
+				32:{name: "Tonberry", topValue: 3, bottomValue: 4, leftValue: 4, rightValue: 6, numCopy: 1, element: elements.none},
+				33:{name: "Abyss Worm", topValue: 7, bottomValue: 3, leftValue: 5, rightValue: 2, numCopy: 1, element: elements.earth},
 				// level 4 monsters 
-				34:{name: "Turtapod", topValue: 2, bottomValue: 6, leftValue: 7, rightValue: 3, numCopy: 1},
-				35:{name: "Vysage", topValue: 6, bottomValue: 4, leftValue: 5, rightValue: 5, numCopy: 1},
-				36:{name: "T-Rexaur", topValue: 4, bottomValue: 2, leftValue: 7, rightValue: 6, numCopy: 1},
-				37:{name: "Bomb", topValue: 2, bottomValue: 6, leftValue: 3, rightValue: 7, numCopy: 1},
-				38:{name: "Blitz", topValue: 1, bottomValue: 4, leftValue: 7, rightValue: 6, numCopy: 1},
-				39:{name: "Wendigo", topValue: 7, bottomValue: 1, leftValue: 6, rightValue: 3, numCopy: 1},
-				40:{name: "Torama", topValue: 7, bottomValue: 4, leftValue: 4, rightValue: 4, numCopy: 1},
-				41:{name: "Imp", topValue: 3, bottomValue: 3, leftValue: 6, rightValue: 7, numCopy: 1},
-				42:{name: "Blue Dragon", topValue: 6, bottomValue: 7, leftValue: 3, rightValue: 2, numCopy: 1},
-				43:{name: "Adamantoise", topValue: 4, bottomValue: 5, leftValue: 6, rightValue: 5, numCopy: 1},
-				44:{name: "Hexadragon", topValue: 7, bottomValue: 4, leftValue: 3, rightValue: 5, numCopy: 1},
+				34:{name: "Turtapod", topValue: 2, bottomValue: 6, leftValue: 7, rightValue: 3, numCopy: 1, element: elements.none},
+				35:{name: "Vysage", topValue: 6, bottomValue: 4, leftValue: 5, rightValue: 5, numCopy: 1, element: elements.none},
+				36:{name: "T-Rexaur", topValue: 4, bottomValue: 2, leftValue: 7, rightValue: 6, numCopy: 1, element: elements.none},
+				37:{name: "Bomb", topValue: 2, bottomValue: 6, leftValue: 3, rightValue: 7, numCopy: 1, element: elements.fire},
+				38:{name: "Blitz", topValue: 1, bottomValue: 4, leftValue: 7, rightValue: 6, numCopy: 1, element: elements.lightning},
+				39:{name: "Wendigo", topValue: 7, bottomValue: 1, leftValue: 6, rightValue: 3, numCopy: 1, element: elements.none},
+				40:{name: "Torama", topValue: 7, bottomValue: 4, leftValue: 4, rightValue: 4, numCopy: 1, element: elements.none},
+				41:{name: "Imp", topValue: 3, bottomValue: 3, leftValue: 6, rightValue: 7, numCopy: 1, element: elements.none},
+				42:{name: "Blue Dragon", topValue: 6, bottomValue: 7, leftValue: 3, rightValue: 2, numCopy: 1, element: elements.poison},
+				43:{name: "Adamantoise", topValue: 4, bottomValue: 5, leftValue: 6, rightValue: 5, numCopy: 1, element: elements.earth},
+				44:{name: "Hexadragon", topValue: 7, bottomValue: 4, leftValue: 3, rightValue: 5, numCopy: 1, element: elements.fire},
 				// level 5 monsters 
-				45:{name: "Iron Giant", topValue: 6, bottomValue: 6, leftValue: 5, rightValue: 5, numCopy: 1},
-				46:{name: "Behemoth", topValue: 3, bottomValue: 5, leftValue: 7, rightValue: 6, numCopy: 1},
-				47:{name: "Chimera", topValue: 7, bottomValue: 5, leftValue: 3, rightValue: 6, numCopy: 1},
-				48:{name: "PuPu", topValue: 3, bottomValue: 2, leftValue: 1, rightValue: 10, numCopy: 1},
-				49:{name: "Elastoid", topValue: 6, bottomValue: 6, leftValue: 7, rightValue: 2, numCopy: 1},
-				50:{name: "GIM47N", topValue: 5, bottomValue: 7, leftValue: 4, rightValue: 5, numCopy: 1},
-				51:{name: "Malboro", topValue: 7, bottomValue: 4, leftValue: 2, rightValue: 7, numCopy: 1},
-				52:{name: "Ruby Dragon", topValue: 7, bottomValue: 7, leftValue: 4, rightValue: 2, numCopy: 1},
-				53:{name: "Elnoyle", topValue: 5, bottomValue: 7, leftValue: 6, rightValue: 3, numCopy: 1},
-				54:{name: "Tonberry King", topValue: 4, bottomValue: 7, leftValue: 4, rightValue: 6, numCopy: 1},
-				55:{name: "Biggs, Wedge", topValue: 6, bottomValue: 2, leftValue: 7, rightValue: 6, numCopy: 1},
+				45:{name: "Iron Giant", topValue: 6, bottomValue: 6, leftValue: 5, rightValue: 5, numCopy: 1, element: elements.none},
+				46:{name: "Behemoth", topValue: 3, bottomValue: 5, leftValue: 7, rightValue: 6, numCopy: 1, element: elements.none},
+				47:{name: "Chimera", topValue: 7, bottomValue: 5, leftValue: 3, rightValue: 6, numCopy: 1, element: elements.water},
+				48:{name: "PuPu", topValue: 3, bottomValue: 2, leftValue: 1, rightValue: 10, numCopy: 1, element: elements.none},
+				49:{name: "Elastoid", topValue: 6, bottomValue: 6, leftValue: 7, rightValue: 2, numCopy: 1, element: elements.none},
+				50:{name: "GIM47N", topValue: 5, bottomValue: 7, leftValue: 4, rightValue: 5, numCopy: 1, element: elements.none},
+				51:{name: "Malboro", topValue: 7, bottomValue: 4, leftValue: 2, rightValue: 7, numCopy: 1, element: elements.poison},
+				52:{name: "Ruby Dragon", topValue: 7, bottomValue: 7, leftValue: 4, rightValue: 2, numCopy: 1, element: elements.fire},
+				53:{name: "Elnoyle", topValue: 5, bottomValue: 7, leftValue: 6, rightValue: 3, numCopy: 1, element: elements.none},
+				54:{name: "Tonberry King", topValue: 4, bottomValue: 7, leftValue: 4, rightValue: 6, numCopy: 1, element: elements.none},
+				55:{name: "Biggs, Wedge", topValue: 6, bottomValue: 2, leftValue: 7, rightValue: 6, numCopy: 1, element: elements.none},
 				// level 6 bosses 
-				56:{name: "Fujin, Raijin", topValue: 2, bottomValue: 8, leftValue: 4, rightValue: 8, numCopy: 1},
-				57:{name: "Elvoret", topValue: 7, bottomValue: 3, leftValue: 4, rightValue: 8, numCopy: 1},
-				58:{name: "X-ATM092", topValue: 4, bottomValue: 7, leftValue: 3, rightValue: 8, numCopy: 1},
-				59:{name: "Granaldo", topValue: 7, bottomValue: 8, leftValue: 5, rightValue: 2, numCopy: 1},
-				60:{name: "Gerogero", topValue: 1, bottomValue: 8, leftValue: 3, rightValue: 8, numCopy: 1},
-				61:{name: "Iguion", topValue: 8, bottomValue: 8, leftValue: 2, rightValue: 2, numCopy: 1},
-				62:{name: "Abadon", topValue: 6, bottomValue: 4, leftValue: 5, rightValue: 8, numCopy: 1},
-				63:{name: "Trauma", topValue: 4, bottomValue: 5, leftValue: 6, rightValue: 8, numCopy: 1},
-				64:{name: "Oilboyle", topValue: 1, bottomValue: 4, leftValue: 8, rightValue: 8, numCopy: 1},
-				65:{name: "Shumi Tribe", topValue: 6, bottomValue: 8, leftValue: 4, rightValue: 5, numCopy: 1},
-				66:{name: "Krysta", topValue: 7, bottomValue: 8, leftValue: 1, rightValue: 5, numCopy: 1},
+				56:{name: "Fujin, Raijin", topValue: 2, bottomValue: 8, leftValue: 4, rightValue: 8, numCopy: 1, element: elements.none},
+				57:{name: "Elvoret", topValue: 7, bottomValue: 3, leftValue: 4, rightValue: 8, numCopy: 1, element: elements.wind},
+				58:{name: "X-ATM092", topValue: 4, bottomValue: 7, leftValue: 3, rightValue: 8, numCopy: 1, element: elements.none},
+				59:{name: "Granaldo", topValue: 7, bottomValue: 8, leftValue: 5, rightValue: 2, numCopy: 1, element: elements.none},
+				60:{name: "Gerogero", topValue: 1, bottomValue: 8, leftValue: 3, rightValue: 8, numCopy: 1, element: elements.poison},
+				61:{name: "Iguion", topValue: 8, bottomValue: 8, leftValue: 2, rightValue: 2, numCopy: 1, element: elements.none},
+				62:{name: "Abadon", topValue: 6, bottomValue: 4, leftValue: 5, rightValue: 8, numCopy: 1, element: elements.none},
+				63:{name: "Trauma", topValue: 4, bottomValue: 5, leftValue: 6, rightValue: 8, numCopy: 1, element: elements.none},
+				64:{name: "Oilboyle", topValue: 1, bottomValue: 4, leftValue: 8, rightValue: 8, numCopy: 1, element: elements.none},
+				65:{name: "Shumi Tribe", topValue: 6, bottomValue: 8, leftValue: 4, rightValue: 5, numCopy: 1, element: elements.none},
+				66:{name: "Krysta", topValue: 7, bottomValue: 8, leftValue: 1, rightValue: 5, numCopy: 1, element: elements.none},
 				// level 7 bosses 
-				67:{name: "Propagator", topValue: 8, bottomValue: 4, leftValue: 8, rightValue: 4, numCopy: 1},
-				68:{name: "Jumbo Cactuar", topValue: 8, bottomValue: 4, leftValue: 4, rightValue: 8, numCopy: 1},
-				69:{name: "Tri-Point", topValue: 8, bottomValue: 2, leftValue: 8, rightValue: 5, numCopy: 1},
-				70:{name: "Gargantua", topValue: 5, bottomValue: 6, leftValue: 8, rightValue: 6, numCopy: 1},
-				71:{name: "Mobile Type 8", topValue: 8, bottomValue: 7, leftValue: 3, rightValue: 6, numCopy: 1},
-				72:{name: "Sphinxara", topValue: 8, bottomValue: 5, leftValue: 8, rightValue: 3, numCopy: 1},
-				73:{name: "Tiamat", topValue: 8, bottomValue: 5, leftValue: 4, rightValue: 8, numCopy: 1},
-				74:{name: "BGH251F2", topValue: 5, bottomValue: 8, leftValue: 5, rightValue: 7, numCopy: 1},
-				75:{name: "Red Giant", topValue: 6, bottomValue: 4, leftValue: 7, rightValue: 8, numCopy: 1},
-				76:{name: "Catoblepas", topValue: 1, bottomValue: 7, leftValue: 7, rightValue: 8, numCopy: 1},
-				77:{name: "Ultima Weapon", topValue: 7, bottomValue: 2, leftValue: 8, rightValue: 7, numCopy: 1},
+				67:{name: "Propagator", topValue: 8, bottomValue: 4, leftValue: 8, rightValue: 4, numCopy: 1, element: elements.none},
+				68:{name: "Jumbo Cactuar", topValue: 8, bottomValue: 4, leftValue: 4, rightValue: 8, numCopy: 1, element: elements.none},
+				69:{name: "Tri-Point", topValue: 8, bottomValue: 2, leftValue: 8, rightValue: 5, numCopy: 1, element: elements.lightning},
+				70:{name: "Gargantua", topValue: 5, bottomValue: 6, leftValue: 8, rightValue: 6, numCopy: 1, element: elements.none},
+				71:{name: "Mobile Type 8", topValue: 8, bottomValue: 7, leftValue: 3, rightValue: 6, numCopy: 1, element: elements.none},
+				72:{name: "Sphinxara", topValue: 8, bottomValue: 5, leftValue: 8, rightValue: 3, numCopy: 1, element: elements.none},
+				73:{name: "Tiamat", topValue: 8, bottomValue: 5, leftValue: 4, rightValue: 8, numCopy: 1, element: elements.none},
+				74:{name: "BGH251F2", topValue: 5, bottomValue: 8, leftValue: 5, rightValue: 7, numCopy: 1, element: elements.none},
+				75:{name: "Red Giant", topValue: 6, bottomValue: 4, leftValue: 7, rightValue: 8, numCopy: 1, element: elements.none},
+				76:{name: "Catoblepas", topValue: 1, bottomValue: 7, leftValue: 7, rightValue: 8, numCopy: 1, element: elements.none},
+				77:{name: "Ultima Weapon", topValue: 7, bottomValue: 2, leftValue: 8, rightValue: 7, numCopy: 1, element: elements.none},
 				// level 8 guardian forces
-				78:{name: "Chubby Chocobo", topValue: 4, bottomValue: 8, leftValue: 9, rightValue: 4, numCopy: 1},
-				79:{name: "Angelo", topValue: 9, bottomValue: 7, leftValue: 3, rightValue: 6, numCopy: 1},
-				80:{name: "Gilgamesh", topValue: 3, bottomValue: 9, leftValue: 6, rightValue: 7, numCopy: 1},
-				81:{name: "MiniMog", topValue: 9, bottomValue: 9, leftValue: 2, rightValue: 3, numCopy: 1},
-				82:{name: "Chocobo", topValue: 9, bottomValue: 8, leftValue: 4, rightValue: 4, numCopy: 1},
-				83:{name: "Quezacotl", topValue: 2, bottomValue: 9, leftValue: 4, rightValue: 9, numCopy: 1},
-				84:{name: "Shiva", topValue: 6, bottomValue: 4, leftValue: 9, rightValue: 7, numCopy: 1},
-				85:{name: "Ifrit", topValue: 9, bottomValue: 2, leftValue: 8, rightValue: 6, numCopy: 1},
-				86:{name: "Siren", topValue: 8, bottomValue: 6, leftValue: 2, rightValue: 9, numCopy: 1},
-				87:{name: "Sacred", topValue: 5, bottomValue: 9, leftValue: 9, rightValue: 1, numCopy: 1},
-				88:{name: "Minotaur", topValue: 9, bottomValue: 2, leftValue: 9, rightValue: 5, numCopy: 1},
+				78:{name: "Chubby Chocobo", topValue: 4, bottomValue: 8, leftValue: 9, rightValue: 4, numCopy: 1, element: elements.none},
+				79:{name: "Angelo", topValue: 9, bottomValue: 7, leftValue: 3, rightValue: 6, numCopy: 1, element: elements.none},
+				80:{name: "Gilgamesh", topValue: 3, bottomValue: 9, leftValue: 6, rightValue: 7, numCopy: 1, element: elements.none},
+				81:{name: "MiniMog", topValue: 9, bottomValue: 9, leftValue: 2, rightValue: 3, numCopy: 1, element: elements.none},
+				82:{name: "Chocobo", topValue: 9, bottomValue: 8, leftValue: 4, rightValue: 4, numCopy: 1, element: elements.none},
+				83:{name: "Quezacotl", topValue: 2, bottomValue: 9, leftValue: 4, rightValue: 9, numCopy: 1, element: elements.lightning},
+				84:{name: "Shiva", topValue: 6, bottomValue: 4, leftValue: 9, rightValue: 7, numCopy: 1, element: elements.ice},
+				85:{name: "Ifrit", topValue: 9, bottomValue: 2, leftValue: 8, rightValue: 6, numCopy: 1, element: elements.fire},
+				86:{name: "Siren", topValue: 8, bottomValue: 6, leftValue: 2, rightValue: 9, numCopy: 1, element: elements.none},
+				87:{name: "Sacred", topValue: 5, bottomValue: 9, leftValue: 9, rightValue: 1, numCopy: 1, element: elements.earth},
+				88:{name: "Minotaur", topValue: 9, bottomValue: 2, leftValue: 9, rightValue: 5, numCopy: 1, element: elements.earth},
 				// level 9 guardian forces 
-				89:{name: "Carbuncle", topValue: 8, bottomValue: 10, leftValue: 4, rightValue: 4, numCopy: 1},
-				90:{name: "Diablos", topValue: 5, bottomValue: 8, leftValue: 3, rightValue: 10, numCopy: 1},
-				91:{name: "Leviathan", topValue: 7, bottomValue: 1, leftValue: 7, rightValue: 10, numCopy: 1},
-				92:{name: "Odin", topValue: 8, bottomValue: 3, leftValue: 5, rightValue: 10, numCopy: 1},
-				93:{name: "Pandemona", topValue: 10, bottomValue: 7, leftValue: 7, rightValue: 1, numCopy: 1},
-				94:{name: "Cerberus", topValue: 7, bottomValue: 6, leftValue: 10, rightValue: 4, numCopy: 1},
-				95:{name: "Alexander", topValue: 9, bottomValue: 4, leftValue: 2, rightValue: 10, numCopy: 1},
-				96:{name: "Phoenix", topValue: 7, bottomValue: 7, leftValue: 10, rightValue: 2, numCopy: 1},
-				97:{name: "Bahamut", topValue: 10, bottomValue: 2, leftValue: 6, rightValue: 8, numCopy: 1},
-				98:{name: "Doomtrain", topValue: 3, bottomValue: 10, leftValue: 10, rightValue: 1, numCopy: 1},
-				99:{name: "Eden", topValue: 4, bottomValue: 9, leftValue: 10, rightValue: 4, numCopy: 1},
+				89:{name: "Carbuncle", topValue: 8, bottomValue: 10, leftValue: 4, rightValue: 4, numCopy: 1, element: elements.none},
+				90:{name: "Diablos", topValue: 5, bottomValue: 8, leftValue: 3, rightValue: 10, numCopy: 1, element: elements.none},
+				91:{name: "Leviathan", topValue: 7, bottomValue: 1, leftValue: 7, rightValue: 10, numCopy: 1, element: elements.water},
+				92:{name: "Odin", topValue: 8, bottomValue: 3, leftValue: 5, rightValue: 10, numCopy: 1, element: elements.none},
+				93:{name: "Pandemona", topValue: 10, bottomValue: 7, leftValue: 7, rightValue: 1, numCopy: 1, element: elements.wind},
+				94:{name: "Cerberus", topValue: 7, bottomValue: 6, leftValue: 10, rightValue: 4, numCopy: 1, element: elements.none},
+				95:{name: "Alexander", topValue: 9, bottomValue: 4, leftValue: 2, rightValue: 10, numCopy: 1, element: elements.holy},
+				96:{name: "Phoenix", topValue: 7, bottomValue: 7, leftValue: 10, rightValue: 2, numCopy: 1, element: elements.fire},
+				97:{name: "Bahamut", topValue: 10, bottomValue: 2, leftValue: 6, rightValue: 8, numCopy: 1, element: elements.none},
+				98:{name: "Doomtrain", topValue: 3, bottomValue: 10, leftValue: 10, rightValue: 1, numCopy: 1, element: elements.poison},
+				99:{name: "Eden", topValue: 4, bottomValue: 9, leftValue: 10, rightValue: 4, numCopy: 1, element: elements.none},
 				// level 10 characters
-				100:{name: "Ward", topValue: 10, bottomValue: 2, leftValue: 8, rightValue: 7, numCopy: 1},
-				101:{name: "Kiros", topValue: 6, bottomValue: 6, leftValue: 10, rightValue: 7, numCopy: 1},
-				102:{name: "Laguna", topValue: 5, bottomValue: 3, leftValue: 9, rightValue: 10, numCopy: 1},
-				103:{name: "Selphie", topValue: 10, bottomValue: 6, leftValue: 4, rightValue: 8, numCopy: 1},
-				104:{name: "Quistis", topValue: 9, bottomValue: 10, leftValue: 2, rightValue: 6, numCopy: 1},
-				105:{name: "Irvine", topValue: 2, bottomValue: 9, leftValue: 10, rightValue: 6, numCopy: 1},
-				106:{name: "Zell", topValue: 8, bottomValue: 10, leftValue: 6, rightValue: 5, numCopy: 1},
-				107:{name: "Rinoa", topValue: 4, bottomValue: 2, leftValue: 10, rightValue: 10, numCopy: 1},
-				108:{name: "Edea", topValue: 10, bottomValue: 3, leftValue: 3, rightValue: 10, numCopy: 1},
-				109:{name: "Seifer", topValue: 6, bottomValue: 10, leftValue: 4, rightValue: 9, numCopy: 1},
-				110:{name: "Squall", topValue: 10, bottomValue: 6, leftValue: 9, rightValue: 4, numCopy: 1}
+				100:{name: "Ward", topValue: 10, bottomValue: 2, leftValue: 8, rightValue: 7, numCopy: 1, element: elements.none},
+				101:{name: "Kiros", topValue: 6, bottomValue: 6, leftValue: 10, rightValue: 7, numCopy: 1, element: elements.none},
+				102:{name: "Laguna", topValue: 5, bottomValue: 3, leftValue: 9, rightValue: 10, numCopy: 1, element: elements.none},
+				103:{name: "Selphie", topValue: 10, bottomValue: 6, leftValue: 4, rightValue: 8, numCopy: 1, element: elements.none},
+				104:{name: "Quistis", topValue: 9, bottomValue: 10, leftValue: 2, rightValue: 6, numCopy: 1, element: elements.none},
+				105:{name: "Irvine", topValue: 2, bottomValue: 9, leftValue: 10, rightValue: 6, numCopy: 1, element: elements.none},
+				106:{name: "Zell", topValue: 8, bottomValue: 10, leftValue: 6, rightValue: 5, numCopy: 1, element: elements.none},
+				107:{name: "Rinoa", topValue: 4, bottomValue: 2, leftValue: 10, rightValue: 10, numCopy: 1, element: elements.none},
+				108:{name: "Edea", topValue: 10, bottomValue: 3, leftValue: 3, rightValue: 10, numCopy: 1, element: elements.none},
+				109:{name: "Seifer", topValue: 6, bottomValue: 10, leftValue: 4, rightValue: 9, numCopy: 1, element: elements.none},
+				110:{name: "Squall", topValue: 10, bottomValue: 6, leftValue: 9, rightValue: 4, numCopy: 1, element: elements.none}
 				
 			}
 	
 };
 		
+		
+		
+		// Initialize deck object (CardArray global variable)
+		TTDeck(CardArray);
 	}
 	
 	function startGame() {
+		// Prints out which cards the user has, and how many
+		testingFunction();
+		
 		// Start playing background music
 		soundBg();
 		
@@ -538,9 +577,6 @@ document.Triad.Game = function() {
 	function initGame() {
 		gameState = gameStates.Game;
 		
-		// Initialize deck object (CardArray global variable)
-		TTDeck(CardArray);
-		
 		// Take cards from deck CardArray and put into hands
 		setPlayerHand();
 		setEnemyHand();
@@ -582,7 +618,7 @@ document.Triad.Game = function() {
 		// Randomly takes five cards from the main deck
 		// and assigns cards to player's hand
 		
-		var max = CardArray.length; max--;
+		/*var max = CardArray.length; max--;
 		var rand = Math.floor((Math.random() * max));
 		
 		for (var i = 0; i < 5; i++) {
@@ -590,7 +626,106 @@ document.Triad.Game = function() {
 			max--;
 			rand = Math.floor((Math.random() * max));
 			playerDeck[i] = playerCards[i];
+		}*/
+		
+		//testingFunction();
+		
+		var count = 0;
+		var stop = false;
+		var i = 0;
+		
+		var card = CardEnum;
+		console.log("Player Hand:");
+		console.log("");
+		
+		/*var test = [];
+		
+		for (var key in monsterData) {
+			//test[i] = key;
+			test.push(key);
+			//Array.push(c);
 		}
+		
+		var i = 0;
+		
+		console.log(test[1]);
+		console.log(test[2]);*/
+		
+		for (var key in monsterData) {
+			if (i > 110 || count > 4) {
+				//stop = true;
+			} else if (i > 0) {
+				console.log("Key: " + key);
+				console.log("Key information: " + monsterData[key]);
+				console.log("Card " + i + ": " + card.properties[i].name);
+				//if (key == card.properties[i].name) {
+				if (monsterData[key] > 0) {
+					console.log("Add card to hand: " + key);
+					count++;
+					//playerCards[i] = TTDraw(i-count);
+					var temp = TTDraw(i-count);
+					playerCards.push(temp);
+					//playerDeck[i] = playerCards[i];
+					playerDeck.push(temp);
+					console.log("End card");
+				}
+				i++;
+			} else { i++; }
+		}
+		
+		console.log("Print final hand:");
+		
+		for (var i = 0; i < 5; i++) {
+			console.log("Card " + i + ": " + playerCards[i].name);
+		}
+		
+		
+		/*var card = CardEnum;
+		
+		// length of enum
+		var keys = Object.keys(card);
+		// CardArray is a global array
+		//var CardArray = [];
+		//alert(keys.length);
+		for (var i = 1;i<keys.length;i++){
+			
+			var c = new TTCard(card.properties[i].name,card.properties[i].topValue,card.properties[i].bottomValue,card.properties[i].leftValue,card.properties[i].rightValue, card.properties[i].numCopy, card.properties[i].element,i);
+			c.srcCoordinates(i);
+			Array.push(c);
+		}*/
+		
+		//monsterData is list of cards
+		/*for (var key in monsterData) {
+				if (monsterData[key] > 0) {
+					console.log(key + ": " + monsterData[key]);
+				}
+			}*/
+		
+		/*var stop = false;
+		var i = 1;
+		while (!stop) {
+			if (
+		}
+		
+		playerCards[i] = CardArray[index];
+		
+		playerCards[i] = 
+		
+		var card = CardEnum;
+		
+		// length of enum
+		var keys = Object.keys(card);
+		// CardArray is a global array
+		//var CardArray = [];
+		//alert(keys.length);
+		for (var i = 1;i<keys.length;i++){
+			
+			var c = new TTCard(card.properties[i].name,card.properties[i].topValue,card.properties[i].bottomValue,card.properties[i].leftValue,card.properties[i].rightValue, card.properties[i].numCopy, card.properties[i].element,i);
+			c.srcCoordinates(i);
+			Array.push(c);
+		}*/
+		
+		
 	}
 
 	function setEnemyHand() {
@@ -607,6 +742,7 @@ document.Triad.Game = function() {
 			max--;
 			rand = Math.floor((Math.random() * max));
 			enemyDeck[i] = enemyCards[i];
+			console.log("Enemy Card " + i + ": " + enemyCards[i].name);
 		}
 	}
 
@@ -755,8 +891,11 @@ document.Triad.Game = function() {
 				selector1.select = false;
 				playerTurn = false;
 				enemyTurn = true;
-			} else {
+			} else if (selector1.select && selector1.board && !selector1.playerHand
+						&& boardCards[selector1.locX][selector1.locY].index != null) {
+				// if selecting a place on the board where there is already a card
 				selector1.select = false;
+				CursorWrong.play();
 			}
 		} else if (enemyTurn) {
 			enemyChoice();
@@ -797,13 +936,14 @@ document.Triad.Game = function() {
 	// card object to represent a monster/character/GF card
 	// name = name of card, top,bottom,left,right are the card's strength corresponding to 
 	// the 4 values on the card, and numCopy = the number of copies of the same card you have in the deck
-	function TTCard(name,top,bottom,left,right,numCopy,index){
+	function TTCard(name,top,bottom,left,right,numCopy,element,index){
 		this.name = name;
 		this.top = top;
 		this.bottom = bottom;
 		this.left = left;
 		this.right = right;
 		this.numCopy = numCopy;
+		this.element = element;
 		this.index = index; // used for finding correct image on spritesheet
 		
 		this.srcX = 0;	// column
@@ -845,7 +985,7 @@ document.Triad.Game = function() {
 		//alert(keys.length);
 		for (var i = 1;i<keys.length;i++){
 			
-			var c = new TTCard(card.properties[i].name,card.properties[i].topValue,card.properties[i].bottomValue,card.properties[i].leftValue,card.properties[i].rightValue, card.properties[i].numCopy, i);
+			var c = new TTCard(card.properties[i].name,card.properties[i].topValue,card.properties[i].bottomValue,card.properties[i].leftValue,card.properties[i].rightValue, card.properties[i].numCopy, card.properties[i].element,i);
 			c.srcCoordinates(i);
 			Array.push(c);
 		}
@@ -949,6 +1089,36 @@ document.Triad.Game = function() {
 		// Bottom
 		if (-1 < this.bottom && this.bottom < 10) { x = 148 + (this.bottom * 16); y = 66; } else { x = 175; y = 83; }
 		ctxBg.drawImage(imgFont, x, y, 16, 16, col2, row3, scaleX, scaleY);
+		
+		// Draw Element
+		if (this.element != elements.none) {
+			x = 0;
+			y = 0;
+			col1 = this.drawX + (this.widthScale*40);
+			row1 = this.drawY + (this.heightScale*2);
+			scaleX *= 1.5;
+			scaleY *= 2;
+			
+			if (this.element == elements.earth) {
+				x = 0; y = 0;
+			} else if (this.element == elements.fire) {
+				x = 21; y = 0;
+			} else if (this.element == elements.holy) {
+				x = 21*2; y = 0;
+			} else if (this.element == elements.ice) {
+				x = 21*3; y = 0;
+			} else if (this.element == elements.lightning) {
+				x = 0; y = 21;
+			} else if (this.element == elements.poison) {
+				x = 21; y = 21;
+			} else if (this.element == elements.water) {
+				x = 21*2; y = 21;
+			} else if (this.element == elements.wind) {
+				x = 21*3; y = 21;
+			} else {  }
+			
+			ctxBg.drawImage(imgElements, x, y, 21, 21, col1, row1, scaleX, scaleY);
+		}
 		
 	}
 
@@ -1172,6 +1342,7 @@ document.Triad.Game = function() {
 						enemyScore++;
 					}
 					check.flipHori = true;
+					SavePoint.play();
 				}
 			}
 		}
@@ -1188,6 +1359,7 @@ document.Triad.Game = function() {
 						enemyScore++;
 					}
 					check.flipHori = true;
+					SavePoint.play();
 				}
 			}
 		}
@@ -1204,6 +1376,7 @@ document.Triad.Game = function() {
 						enemyScore++;
 					}
 					check.flipVert = true;
+					SavePoint.play();
 				}
 			}
 		}
@@ -1220,6 +1393,7 @@ document.Triad.Game = function() {
 						enemyScore++;
 					}
 					check.flipVert = true;
+					SavePoint.play();
 				}
 			}
 		}
@@ -1233,6 +1407,7 @@ document.Triad.Game = function() {
 		this.left		= card.left;
 		this.right		= card.right;
 		this.numCopy	= card.numCopy;
+		this.element	= card.element;
 		this.index		= card.index;
 		this.srcX		= card.srcX;
 		this.srcY		= card.srcY;
@@ -1319,17 +1494,27 @@ document.Triad.Game = function() {
 				drawAcquireCardBox(chosenCard);
 				updateTradeCards();
 				gameState = gameStates.Finish;
+			} else {
+				gameState = gameStates.Finish;
 			}
 		} else if (gameState == gameStates.Finish) {
 			// GAME ENDS HERE
-			ctxBg.clearRect(0, 0, canvasBg.width, canvasBg.height);
 			
-			drawTradingBg();
+			// if tie, do NOTHIN 
 			
-			drawAcquireCardBox(chosenCard);
 			
-			updateTradeCards();
-		
+				ctxBg.clearRect(0, 0, canvasBg.width, canvasBg.height);
+				
+				drawTradingBg();
+			
+			if (playerScore == enemyScore) {
+				
+			} else {
+				
+				drawAcquireCardBox(chosenCard);
+				
+				updateTradeCards();
+			}
 			if (!animating) {
 				deferrer.resolve();
 			}
@@ -1468,12 +1653,12 @@ document.Triad.Game = function() {
 		// shows card name
 		var srcX = 0;
 		var srcY = 0;
-		var drawX = 104;
+		var drawX = 76;
 		var drawY = 8;
-		var width = 176;
+		var width = 232;
 		var height = 32;
 		
-		ctxBg.drawImage(imgBoxInfo,srcX,srcY,width,height,drawX*widthScale,drawY*heightScale,width*widthScale,height*heightScale);
+		ctxBg.drawImage(imgBoxTradeInfo,srcX,srcY,width,height,drawX*widthScale,drawY*heightScale,width*widthScale,height*heightScale);
 		
 		ctxBg.font="32px Georgia";
 		ctxBg.textAlign = "center";
@@ -1489,10 +1674,10 @@ document.Triad.Game = function() {
 	function drawGameOver() {
 		var srcX = 0;
 		var srcY = 0;
-		var drawX = 0;
-		var drawY = 0;
-		var width = 160;
-		var height = 40;
+		var width = 256;
+		var height = 50;
+		var drawX = width/4;
+		var drawY = height*2;
 		
 		//alert('game over');
 		if (playerScore > enemyScore) {
@@ -1500,14 +1685,16 @@ document.Triad.Game = function() {
 			srcY = 0;
 		} else if (playerScore < enemyScore){
 			//alert('Enemy won!');
-			srcY = 40;
+			srcY = 50;
 		} else {
 			//alert('Tie game!');
-			srcY = 80;
+			srcY = 100;
 		}
 		
 		//imgGameOver
-		ctxBg.drawImage(imgGameOver,srcX,srcY,width,height,drawX,drawY,width*widthScale,height*heightScale);
+		if (!animating) {
+			ctxBg.drawImage(imgGameOver,srcX,srcY,width,height,drawX*widthScale,drawY*widthScale,width*widthScale,height*heightScale);
+		}
 	}
 	// end Drawing functions
 
@@ -1778,18 +1965,22 @@ document.Triad.Game = function() {
 		}
 		if (isUpKey) {
 			selector1.moveUp();
+			CursorMove.play();
 			isUpKey = false;
 		} 
 		if (isRightKey) {
 			selector1.moveRight();
+			CursorMove.play();
 			isRightKey = false;
 		}
 		if (isDownKey) {
 			selector1.moveDown();
+			CursorMove.play();
 			isDownKey = false;
 		}
 		if (isLeftKey) {
 			selector1.moveLeft();
+			CursorMove.play();
 			isLeftKey = false;
 		}
 	}
@@ -1799,33 +1990,33 @@ document.Triad.Game = function() {
 		if (lastKey && lastKey.keyCode == e.keyCode) {
 			return;
 		}
-		if (keyID === 13) { // Enter
+		if (keyID === 13 && animating == false) { // Enter
 			isEnterKey = true;
 			lastKey = e;
 			e.preventDefault();
 		}
-		if (keyID === 32) { // spacebar
+		if (keyID === 32 && animating == false) { // spacebar
 			isSpacebarKey = true;
 			lastKey = e;
 			e.preventDefault();
 		}
-		if (keyID === 38) { // up arrow
+		if (keyID === 38 && animating == false) { // up arrow
 			//alert('up arrow was pressed');
 			isUpKey = true;
 			lastKey = e;
 			e.preventDefault();
 		}
-		if (keyID === 39) { // right arrow
+		if (keyID === 39 && animating == false) { // right arrow
 			isRightKey = true;
 			lastKey = e;
 			e.preventDefault();
 		}
-		if (keyID === 40) { // down arrow 
+		if (keyID === 40 && animating == false) { // down arrow 
 			isDownKey = true;
 			lastKey = e;
 			e.preventDefault();
 		}
-		if (keyID === 37) { // left arrow
+		if (keyID === 37 && animating == false) { // left arrow
 			isLeftKey = true;
 			lastKey = e;
 			e.preventDefault();
@@ -1882,13 +2073,60 @@ document.Triad.Game = function() {
 		return card;
 	}
 	
+	function getCardArray() {
+		return CardArray;
+	}
+	
+	function getRandomSet(n) {
+		//returns a list of names of random cards to give to a new user
+		//n is number of random cards
+		randomSet = [];
+		randomCards = [];
+		
+		for (var i = 1; i < 111; i++) {
+			randomSet.push(i);
+		}
+		
+		shuffle(randomSet);
+		for (var i = 0;i<n;i++){
+			randomCards[i] = CardEnum.properties[randomSet.pop()].name;
+		}
+		
+		return randomCards;
+		
+	}
+	
+	function shuffle(v) {
+		for(var j, x, i = v.length; i; j = parseInt(Math.random() * i),
+		x = v[--i], v[i] = v[j], v[j] = x);
+		return v;
+	};
+	
+	function testingFunction() {
+			console.log("Printing from game.js");
+			console.log("Cards that " + playerName + ", userID of " + monsterData.userID + " currently has:");
+			//console.log("userID:   " + data.userID);
+			//console.log("Geezard:  " + data.Geezard);
+			//console.log(data);
+			/*for (var key in data) {
+			  console.log(key);
+			}*/
+			for (var key in monsterData) {
+				if (monsterData[key] > 0) {
+					console.log(key + ": " + monsterData[key]);
+				}
+			}
+		}
+	
 	var exported = {
 		"init":init,
 		"startGame": startGame,
 		"getPlayerScore": getPlayerScore,
 		"getEnemyScore": getEnemyScore,
 		"getChosenCard": getChosenCard,
-		"testcom" : testcom
+		"testcom" : testcom,
+		"getCardArray" : getCardArray,
+		"getRandomSet" : getRandomSet
 	};
 	
 	return exported;
