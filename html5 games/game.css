@@ -7,3 +7,8 @@ body {
 	background:#ffffff;
 	margin:auto;
 }
+
+th {
+    background-color: green;
+    color: white;
+}
