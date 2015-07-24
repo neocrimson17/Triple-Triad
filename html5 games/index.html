@@ -170,6 +170,28 @@
 						// Form was not valid
 					}
 				});
+				$("#testButton").click(function() {
+					alert("Test Game!");
+					
+					// Hide the login form
+					$("#loginUI").css('display', 'none');
+					
+					// make the canvas element visible
+					// (by changing its display attribute back to 'block')
+					$("#canvasBg").css("display", "block");
+					
+					var exported = document.Triad.Game();
+					
+					// Starts the game and sends the user's data
+					exported.init(-1, -1);
+					
+					exported.startGame().done(exportResults);
+					
+					function exportResults() {
+						
+					}
+					
+				});
 			});
 			
 		</script>
@@ -186,6 +208,8 @@
 		
 		<button id="loginButton">Login</button>
 		<button id="registerButton">Register</button>
+		<p>
+		<button id="testButton">Test Game</button>
 		</div>
 		
 		<script> 

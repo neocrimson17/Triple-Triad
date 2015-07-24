@@ -1,6 +1,7 @@
 
 document.Triad.Game = function() {
 	var deferrer;
+	var offline;
 	var playerName;
 	var monsterData;
 	
@@ -139,8 +140,18 @@ document.Triad.Game = function() {
 	function init(name, data) {
 		// initialization function
 		deferrer = $.Deferred();
-		playerName = name;
-		monsterData = data;
+		
+		// if name and data and -1, then game is offline
+		// so generate data with 'offline' function (just random cards for now)
+		if (name == -1 && data == -1) {
+			offline = true;
+			playerName = "Offline User";
+			monsterData = data;
+		} else {
+			offline = false;
+			playerName = name;
+			monsterData = data;
+		}
 		
 		// Canvas Variables
 		canvasBg = document.getElementById('canvasBg');
@@ -630,103 +641,120 @@ document.Triad.Game = function() {
 		}*/
 		
 		//testingFunction();
-		
-		var count = 0;
-		var stop = false;
-		var i = 0;
-		
-		var card = CardEnum;
-		console.log("Player Hand:");
-		console.log("");
-		
-		/*var test = [];
-		
-		for (var key in monsterData) {
-			//test[i] = key;
-			test.push(key);
-			//Array.push(c);
-		}
-		
-		var i = 0;
-		
-		console.log(test[1]);
-		console.log(test[2]);*/
-		
-		for (var key in monsterData) {
-			if (i > 110 || count > 4) {
-				//stop = true;
-			} else if (i > 0) {
-				console.log("Key: " + key);
-				console.log("Key information: " + monsterData[key]);
-				console.log("Card " + i + ": " + card.properties[i].name);
-				//if (key == card.properties[i].name) {
-				if (monsterData[key] > 0) {
-					console.log("Add card to hand: " + key);
-					count++;
-					//playerCards[i] = TTDraw(i-count);
-					var temp = TTDraw(i-count);
-					playerCards.push(temp);
-					//playerDeck[i] = playerCards[i];
-					playerDeck.push(temp);
-					console.log("End card");
-				}
-				i++;
-			} else { i++; }
-		}
-		
-		console.log("Print final hand:");
-		
-		for (var i = 0; i < 5; i++) {
-			console.log("Card " + i + ": " + playerCards[i].name);
-		}
-		
-		
-		/*var card = CardEnum;
-		
-		// length of enum
-		var keys = Object.keys(card);
-		// CardArray is a global array
-		//var CardArray = [];
-		//alert(keys.length);
-		for (var i = 1;i<keys.length;i++){
+		if (!offline) {
+			var count = 0;
+			var stop = false;
+			var i = 0;
 			
-			var c = new TTCard(card.properties[i].name,card.properties[i].topValue,card.properties[i].bottomValue,card.properties[i].leftValue,card.properties[i].rightValue, card.properties[i].numCopy, card.properties[i].element,i);
-			c.srcCoordinates(i);
-			Array.push(c);
-		}*/
-		
-		//monsterData is list of cards
-		/*for (var key in monsterData) {
-				if (monsterData[key] > 0) {
-					console.log(key + ": " + monsterData[key]);
-				}
+			var card = CardEnum;
+			console.log("Player Hand:");
+			console.log("");
+			
+			/*var test = [];
+			
+			for (var key in monsterData) {
+				//test[i] = key;
+				test.push(key);
+				//Array.push(c);
+			}
+			
+			var i = 0;
+			
+			console.log(test[1]);
+			console.log(test[2]);*/
+			
+			for (var key in monsterData) {
+				if (i > 110 || count > 4) {
+					//stop = true;
+				} else if (i > 0) {
+					console.log("Key: " + key);
+					console.log("Key information: " + monsterData[key]);
+					console.log("Card " + i + ": " + card.properties[i].name);
+					//if (key == card.properties[i].name) {
+					if (monsterData[key] > 0) {
+						console.log("Add card to hand: " + key);
+						count++;
+						//playerCards[i] = TTDraw(i-count);
+						var temp = TTDraw(i-count);
+						playerCards.push(temp);
+						//playerDeck[i] = playerCards[i];
+						playerDeck.push(temp);
+						console.log("End card");
+					}
+					i++;
+				} else { i++; }
+			}
+			
+			console.log("Print final hand:");
+			
+			for (var i = 0; i < 5; i++) {
+				console.log("Card " + i + ": " + playerCards[i].name);
+			}
+			
+			
+			/*var card = CardEnum;
+			
+			// length of enum
+			var keys = Object.keys(card);
+			// CardArray is a global array
+			//var CardArray = [];
+			//alert(keys.length);
+			for (var i = 1;i<keys.length;i++){
+				
+				var c = new TTCard(card.properties[i].name,card.properties[i].topValue,card.properties[i].bottomValue,card.properties[i].leftValue,card.properties[i].rightValue, card.properties[i].numCopy, card.properties[i].element,i);
+				c.srcCoordinates(i);
+				Array.push(c);
 			}*/
-		
-		/*var stop = false;
-		var i = 1;
-		while (!stop) {
-			if (
-		}
-		
-		playerCards[i] = CardArray[index];
-		
-		playerCards[i] = 
-		
-		var card = CardEnum;
-		
-		// length of enum
-		var keys = Object.keys(card);
-		// CardArray is a global array
-		//var CardArray = [];
-		//alert(keys.length);
-		for (var i = 1;i<keys.length;i++){
 			
-			var c = new TTCard(card.properties[i].name,card.properties[i].topValue,card.properties[i].bottomValue,card.properties[i].leftValue,card.properties[i].rightValue, card.properties[i].numCopy, card.properties[i].element,i);
-			c.srcCoordinates(i);
-			Array.push(c);
-		}*/
-		
-		
+			//monsterData is list of cards
+			/*for (var key in monsterData) {
+					if (monsterData[key] > 0) {
+						console.log(key + ": " + monsterData[key]);
+					}
+				}*/
+			
+			/*var stop = false;
+			var i = 1;
+			while (!stop) {
+				if (
+			}
+			
+			playerCards[i] = CardArray[index];
+			
+			playerCards[i] = 
+			
+			var card = CardEnum;
+			
+			// length of enum
+			var keys = Object.keys(card);
+			// CardArray is a global array
+			//var CardArray = [];
+			//alert(keys.length);
+			for (var i = 1;i<keys.length;i++){
+				
+				var c = new TTCard(card.properties[i].name,card.properties[i].topValue,card.properties[i].bottomValue,card.properties[i].leftValue,card.properties[i].rightValue, card.properties[i].numCopy, card.properties[i].element,i);
+				c.srcCoordinates(i);
+				Array.push(c);
+			}*/
+			
+		} else {
+			//offline, so make random cards in hands
+			
+			// took the following lines of code from setEnemyHand, changing booleans to 'true',
+			// to just give player a random set of 5
+			var max = CardArray.length; max--;
+			var rand = Math.floor((Math.random() * max));
+			
+			for (var i = 0; i < 5; i++) {
+				playerCards[i] = TTDraw(rand);
+				playerCards[i].player = true;
+				playerCards[i].front = true;
+				max--;
+				rand = Math.floor((Math.random() * max));
+				playerDeck[i] = playerCards[i];
+				console.log("Player Card " + i + ": " + playerCards[i].name);
+			}
+		}
 	}
 
 	function setEnemyHand() {
@@ -925,6 +953,11 @@ document.Triad.Game = function() {
 		}
 	}
 
+	function offlineFunction() {
+		playerName = "OfflineUser";
+		monsterData = data;
+	}
+	
 	// end game logic functions
 
 
